@@ -1,0 +1,62 @@
+<script>
+
+    "use strict";
+    app.controller("cpOperateReportCtrl", [
+        "$scope",
+        function ( $scope) {
+            $scope.risksList = [
+                {
+                    id: "",
+                    name: "注册用户数量",
+                    sref: "comOperate.page({view_type:'login'})"
+                },
+                {
+                    id: "",
+                    name: "终端数量",
+                    sref: "comOperate.page({view_type:'terminal'})"
+                },
+                {
+                    id: "",
+                    name: "员工数量",
+                    sref: "comOperate.page({view_type:'employee'})"
+                },
+                {
+                    id: "",
+                    name: "总放款数量",
+                    sref: "comOperate.page({view_type:'loan'})"
+                },
+                {
+                    id: "",
+                    name: "总申请额度",
+                    sref: "comOperate.page({view_type:'apply'})"
+                },
+                {
+                    id: "",
+                    name: "总开卡数量",
+                    sref: "comOperate.page({view_type:'credit'})"
+                }
+            ]
+        }
+    ]);
+</script>
+
+<div class="hbox hbox-auto-xs hbox-auto-sm" ng-controller="cpOperateReportCtrl">
+    <div class="col w-md bg-light dk b-r bg-auto hidden-sm hidden-xs">
+        <div class="wrapper-md b-b bg-light">
+            <div class="font-thin h4">
+                公司运营概览
+            </div>
+        </div>
+        <div class="wrapper-md">
+            <ul class="nav nav-pills nav-stacked nav-sm">
+                <li ui-sref-active="active"
+                    ng-repeat="list in risksList">
+                    <a ui-sref="{{ list.sref }}">{{list.name}}</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="col">
+        <div class="hbox hbox-auto-xs bg-light" ui-view></div>
+    </div>
+</div>

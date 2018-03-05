@@ -1,0 +1,122 @@
+<div class="wrapper-md b-b b-light clearfix">
+    <button class="btn-success btn" ui-sref="workflowEntity.home.profile.info({entity_key:'ordersbdy'})">
+        返回
+    </button>
+</div>
+<div class="wrapper-md">
+    <div class="row">
+        <div class="col-xs-12 col-sm-10">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    申请信息
+                </div>
+                <table class="table table-striped m-b-none">
+                    <tbody>
+                    <tr>
+                        <td class="v-middle text-right w-sm">姓名：</td>
+                        <td class="v-middle w-xl">
+                            <input type="text" ng-model="profile.realName" class="form-control">
+                        </td>
+                        <td class="v-middle text-right w-sm">手机号码：</td>
+                        <td class="v-middle w-xl">
+                            <input type="text" ng-model="profile.applyMobile" class="form-control">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right w-sm">身份证号：</td>
+                        <td class="v-middle w-xl">
+                            <input type="text" ng-model="profile.applyIdentityNo" disabled class="form-control">
+                        </td>
+                        <td class="v-middle text-right w-sm">办公地址：</td>
+                        <td class="v-middle w-xl">
+                            <input type="text" ng-model="profile.applyEnterpriseAddress" placeholder="办公区域地址"
+                                   class="form-control">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right w-sm">申请额度：</td>
+                        <td class="v-middle w-xl">
+                            <input type="text" ng-model="profile.applyAmount" disabled class="form-control">
+                        </td>
+                        <td class="v-middle text-right w-sm">借款期限：</td>
+                        <td class="v-middle w-xl">
+                            <input type="text" ng-model="profile.applyPeriodNumber" disabled class="form-control">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">日平均收件量：</td>
+                        <td class="v-middle">
+                            <input type="text" ng-model="profile.applyDayPatchExpress" class="form-control">
+                        </td>
+                        <td class="v-middle text-right">日平均派件量：</td>
+                        <td class="v-middle">
+                            <input type="text" ng-model="profile.applyDayPickExpress" class="form-control">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">快递网点名称：</td>
+                        <td class="v-middle">
+                            <input type="text" ng-model="profile.applyEnterpriseName" class="form-control">
+                        </td>
+                        <td class="v-middle text-right">经营区域：</td>
+                        <td class="v-middle">
+                            <input type="text" ng-model="profile.applyEnterpriseProvince" placeholder="省"
+                                   class="m-l-xs inline w-xs form-control">
+                            <input type="text" ng-model="profile.applyEnterpriseCity" placeholder="市"
+                                   class="m-l-xs inline w-xs form-control">
+                            <input type="text" ng-model="profile.applyEnterpriseDistrict" placeholder="区"
+                                   style="width: 45%" class="m-l-xs inline w-xs form-control">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right"></td>
+                        <td class="v-middle">
+                        </td>
+                        <td class="v-middle text-right"></td>
+                        <td class="v-middle">
+                            <button type="submit" ng-click="ordersbdyExcute.updateSave()" class="btn  btn-primary">保存
+                            </button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="clearfix m-b-md" ng-if="accountShow">
+                <div class="pull-left m-r" style="width: 410px;">
+                    <div class="wrapper-md bg-white" style="border: 1px solid #E7EBED;">
+                        <div class="bg-info text-center"
+                             style="width: 80px;height: 50px; line-height: 50px;border-radius: 5px;">
+                            <span class="text-white font-bold">小金银行</span>
+                        </div>
+                        <div class="m-t-md m-b-md text-muted font-thin h4">
+                            1234 4321 3214 3241
+                        </div>
+                        <div class="clearfix">
+                            <div class="pull-left clearfix">
+                                <span class="pull-left font-bold">过期时间：</span>
+                                <span class="pull-left">20/09</span>
+                            </div>
+                            <div class="pull-right clearfix">
+                                <span class="pull-left font-bold">持卡人：</span>
+                                <span class="pull-left">力饼</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="pull-left w-xl">
+                    <button class="btn btn-sm btn-success btn-addon"
+                            ui-sref="workflowEntity.home.profile.info({entity_key:'account',state_code:accountList.state_code,id:accountList.id})">
+                        <i class="fa fa-credit-card"></i> 账户详情
+                    </button>
+                    <div class="line line-dashed b-b"></div>
+                    <div>创建时间：{{ accountList.createdAt | datetime }}</div>
+                    <div class="line line-dashed b-b"></div>
+                    <div>提示：{{ accountList.notice }}</div>
+                    <div class="line line-dashed b-b"></div>
+                    <div>账号：{{ accountList.account }}</div>
+                    <div class="line line-dashed b-b m-b-n"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

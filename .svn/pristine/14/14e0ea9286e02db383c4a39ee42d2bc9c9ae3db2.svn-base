@@ -1,0 +1,95 @@
+<script>
+
+    "use strict";
+    app.controller("risksentertpriseCtrl", [
+        "$scope",
+        function ( $scope) {
+            $scope.risksList = [
+                {
+                    id: "",
+                    name: "注册信息核查",
+                    sref: "risksentertprise.page({view_type:'registration_info'})"
+                },
+                {
+                    id: "",
+                    name: "企业法院失信详情",
+                    sref: "risksentertprise.page({view_type:'business_details'})"
+
+                },
+                {
+                    id: "",
+                    name: "企业法院判决简项",
+                    sref: "risksentertprise.page({view_type:'business_sentence'})"
+
+                },
+                {
+                    id: "",
+                    name: "企业裁判文书详情",
+                    sref: "risksentertprise.page({view_type:'business_document'})"
+
+                },
+                {
+                    id: "",
+                    name: "企业法院失信简项",
+                    sref: "risksentertprise.page({view_type:'business_simple'})"
+
+                },
+                {
+                    id: "",
+                    name: "企业借贷信息",
+                    sref: "risksentertprise.page({view_type:'business_loan'})"
+
+                },
+                {
+                    id: "",
+                    name: "企业不良信息",
+                    sref: "risksentertprise.page({view_type:'business_bad'})"
+
+                },
+                {
+                    id: "",
+                    name: "商户账单真伪验证",
+                    sref: "risksentertprise.page({view_type:'business_authenticity'})"
+
+                },
+                {
+                    id: "",
+                    name: "商户银联流水画像",
+                    sref: "risksentertprise.page({view_type:'business_flowing'})"
+                },
+                {
+                    id: "",
+                    name: "POS交易账动",
+                    sref: "risksentertprise.page({view_type:'business_POS'})"
+
+                },
+                {
+                    id: "",
+                    name: "银联注册信息检索",
+                    sref: "risksentertprise.page({view_type:'business_retrieval'})"
+
+                }
+            ]
+        }
+    ]);
+</script>
+
+<div class="hbox hbox-auto-xs hbox-auto-sm" ng-controller="risksentertpriseCtrl">
+    <div class="col w-md bg-light dk b-r bg-auto hidden-sm hidden-xs">
+        <div class="wrapper-md b-b bg-light">
+            <div class="font-thin h4">
+                企业信息查询
+            </div>
+        </div>
+        <div class="wrapper-md">
+            <ul class="nav nav-pills nav-stacked nav-sm">
+                <li ui-sref-active="active" ng-repeat="list in risksList">
+                    <a ui-sref="{{ list.sref }}">{{list.name}}</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="col">
+        <div class="hbox hbox-auto-xs bg-light" ui-view></div>
+    </div>
+</div>

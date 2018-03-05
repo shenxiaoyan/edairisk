@@ -1,0 +1,120 @@
+<script>
+    "use strict";
+    app.controller("managerHomeController",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$state",
+            "$stateParams",
+            "entity",
+            function ($rootScope, $scope, $http, $state, $stateParams, entity) {
+
+                //获取实体id
+                $scope.id = $stateParams.id;
+
+                $scope.profile     = {};
+                $scope.canActs     = [];
+                $scope.canFileActs = [];
+
+                //获取实体详情
+                entity.getDetail("/rest/users/" + $scope.id, ["createdBy", "state", "createdByDepartment", "lastModifiedBy", "department", "role", "workflow"]).then(function (resResult) {
+
+                    $scope.profile = resResult;
+
+                    //对状态按钮进行分组
+                    angular.forEach($scope.profile.currentUserCanActList, function (val, key) {
+                        if (val.actGroup === "UPDATE") {
+                            $scope.canActs.push(val);
+                        }
+                    });
+
+                    $scope.state_code = $scope.profile.state.stateCode;
+
+                    entity.getDetail($scope.profile.department._links.departmenttype.href, ["roles"]).then(function (typeResResult) {
+                        //获取部门类型的角色
+                        $scope.allRoles  = typeResResult.roles._embeddedItems;
+                        $scope.adoptRole = entity.getSelectedMyOwn($scope.allRoles, $scope.profile.role);
+                    });
+
+
+                });
+
+                /*
+                 * 用户所有操作的方法集合，其中每一个方法对应实体的一个行为，也有自定义方法
+                 * @author  李斌
+                 * */
+                $scope.managerExcute = {
+                    "patch": function (options) {
+                        swal({
+                            title: options.title,
+                            type: options.type,
+                            text: options.text,
+                            showCancelButton: true,
+                            cancelButtonText: "退出",
+                            confirmButtonText: "同意",
+                            closeOnConfirm: true
+                        }, function () {
+                            $http({
+                                method: "PATCH",
+                                url: options.url,
+                                data: options.data
+                            }).success(function (resResult) {
+
+                                if (options.modal) {
+                                    $("#" + options.modal + "_manager_modal").modal("hide");
+                                }
+
+                                $rootScope.toasterSuccess("成功！", "操作成功！");
+
+                                $state.go("workflowEntity.list", {
+                                    entity_key: "manager",
+                                    workflow_id: $scope.profile.workflow.id
+                                }, {reload: true});
+
+                            });
+                        });
+                    },
+                    "adopt": function () {
+                        $("#adopt_user_modal").modal("show");
+                    },
+                    "roleSelectedSave": function () {
+                        if ($scope.adoptRole !== null) {
+                            $scope.userExcute.patch({
+                                title: "请确认！",
+                                text: "确定给该用户分配" + $scope.adoptRole.label + "角色嘛？",
+                                type: "warning",
+                                modal: "adopt",
+                                url: $scope.profile._links.self.href,
+                                data: {
+                                    act: "adopt",
+                                    role: $scope.adoptRole._links.self.href
+                                }
+                            })
+                        }
+                    },
+                    "selectRole": function (role) {
+                        //自定义的方法在实体行为不存在这个
+                        $scope.adoptRole = role;
+                    },
+                    "update": function () {
+                        $state.go("workflowEntity.home.profile.form", {
+                            id: $scope.id,
+                            entity_key: "manager"
+                        }, {reload: false});
+                    }
+                };
+
+            }
+        ]
+    );
+</script>
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light" ng-controller="managerHomeController">
+    <!-- column -->
+    <div class="col w-md lter b-l">
+        <div class="h-full" ui-view></div>
+    </div>
+    <!-- /column -->
+</div>
+<!-- /hbox layout -->

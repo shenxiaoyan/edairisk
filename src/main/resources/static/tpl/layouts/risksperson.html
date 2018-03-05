@@ -1,0 +1,191 @@
+<script>
+
+    "use strict";
+    app.controller("riskspersonCtrl", [
+        "$scope",
+        function ( $scope) {
+            $scope.risksList = [
+                {
+                    id: "",
+                    name: "身份核查",
+                    sref: "risksperson.page({view_type:'intellegence'})"
+                },
+                {
+                    id: "",
+                    name: "入网时长核查",
+                    sref: "risksperson.page({view_type:'phone_online'})"
+
+                },
+                {
+                    id: "",
+                    name: "手机号归属地查询",
+                    sref: "risksperson.page({view_type:'phone_attribution'})"
+
+                },
+                {
+                    id: "",
+                    name: "手机号状态核查",
+                    sref: "risksperson.page({view_type:'phone_status'})"
+
+                },
+                {
+                    id: "",
+                    name: "肖像核查",
+                    sref: "risksperson.page({view_type:'man_verification'})"
+
+                },
+                {
+                    id: "",
+                    name: "ocr身份信息识别",
+                    sref: "risksperson.page({view_type:'man_information'})"
+
+                },
+                {
+                    id: "",
+                    name: "智能人脸识别验证",
+                    sref: "risksperson.page({view_type:'man_recognition'})"
+
+                },
+                {
+                    id: "",
+                    name: "人像对比认证",
+                    sref: "risksperson.page({view_type:'man_comparison'})"
+
+                },
+                {
+                    id: "",
+                    name: "刑事案底核查",
+                    sref: "risksperson.page({view_type:'personal_criminal'})"
+                },
+                {
+                    id: "",
+                    name: "个人银联账单验证",
+                    sref: "risksperson.page({view_type:'personal_unionPay'})"
+
+                },
+                {
+                    id: "",
+                    name: "老赖核查",
+                    sref: "risksperson.page({view_type:'personal_lai'})"
+
+                },
+                {
+                    id: "",
+                    name: "多头借贷全量核查",
+                    sref: "risksperson.page({view_type:'personal_whole'})"
+
+                },
+                {
+                    id: "",
+                    name: "多头借贷信息核查",
+                    sref: "risksperson.page({view_type:'personal_info'})"
+
+                },
+                {
+                    id: "",
+                    name: "个人法院失信简项",
+                    sref: "risksperson.page({view_type:'promise_simple'})"
+
+                },
+                {
+                    id: "",
+                    name: "个人法院失信详情",
+                    sref: "risksperson.page({view_type:'promise_detail'})"
+
+                },
+                {
+                    id: "",
+                    name: "个人法院判决简项",
+                    sref: "risksperson.page({view_type:'sentence_simple'})"
+
+                },
+                {
+                    id: "",
+                    name: "个人判决文书详情",
+                    sref: "risksperson.page({view_type:'sentence_detail'})"
+
+                },
+                {
+                    id: "",
+                    name: "失联人员地址修复",
+                    sref: "risksperson.page({view_type:'lost_repair'})"
+
+                },
+                {
+                    id: "",
+                    name: "综合风险验证",
+                    sref: "risksperson.page({view_type:'comprehensive_risk'})"
+
+                },
+                {
+                    id: "",
+                    name: "逾期风险验证",
+                    sref: "risksperson.page({view_type:'overdue_risk'})"
+
+                },
+                {
+                    id: "",
+                    name: "助贷中介机构查询",
+                    sref: "risksperson.page({view_type:'lending_intermediary'})"
+
+                },
+                {
+                    id: "",
+                    name: "银行卡核查",
+                    sref: "risksperson.page({view_type:'card_query'})"
+                },
+                {
+                    id: "",
+                    name: "银联消费报告",
+                    sref: "risksperson.page({view_type:'card_presentation'})"
+                },
+                {
+                    id: "",
+                    name: "银联消费画像",
+                    sref: "risksperson.page({view_type:'card_portrait'})"
+
+                },
+                {
+                    id: "",
+                    name: "手机绑定银行卡信息",
+                    sref: "risksperson.page({view_type:'card_binding'})"
+                },
+                {
+                    id: "",
+                    name: "个人投资核查",
+                    sref: "risksperson.page({view_type:'individual_investment'})"
+                },
+                {
+                    id: "",
+                    name: "学历信息核查",
+                    sref: "risksperson.page({view_type:'academic_info'})"
+                },
+                {
+                    id: "",
+                    name: "航旅信息核查",
+                    sref: "risksperson.page({view_type:'air_info'})"
+                }
+            ]
+        }
+    ]);
+</script>
+
+<div class="hbox hbox-auto-xs hbox-auto-sm" ng-controller="riskspersonCtrl">
+    <div class="col w-md bg-light dk b-r bg-auto hidden-sm hidden-xs">
+        <div class="wrapper-md b-b bg-light">
+            <div class="font-thin h4">
+                个人信息查询
+            </div>
+        </div>
+        <div class="wrapper-md">
+            <ul class="nav nav-pills nav-stacked nav-sm">
+                <li ui-sref-active="active" ng-repeat="list in risksList">
+                    <a ui-sref="{{ list.sref }}">{{list.name}}</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="col">
+        <div class="hbox hbox-auto-xs bg-light" ui-view></div>
+    </div>
+</div>

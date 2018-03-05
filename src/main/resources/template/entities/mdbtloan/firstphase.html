@@ -1,0 +1,96 @@
+<div class="wrapper">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    第一期还款计划
+                </div>
+                <table class="table table-striped m-b-none">
+                    <tbody>
+                    <tr>
+                        <td class="v-middle text-right w-sm">计划单号：</td>
+                        <td class="v-middle w-xl">{{ firstPhase.planSn }}</td>
+                        <td class="v-middle text-right w-sm">操作人姓名：</td>
+                        <td class="v-middle w-xl">{{ firstPhase.debtorName }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right w-sm">借款本金：</td>
+                        <td class="v-middle w-xl">{{ firstPhase.principal}}</td>
+                        <td class="v-middle text-right w-sm">借款利息：</td>
+                        <td class="v-middle w-xl">{{ firstPhase.interest }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right w-sm">借款总额：</td>
+                        <td class="v-middle w-xl">{{ firstPhase.fees }}</td>
+                        <td class="v-middle text-right w-sm">剩余应还：</td>
+                        <td class="v-middle w-xl">{{ firstPhase.leftAmount }}</td>
+                    </tr>
+
+                    <tr>
+                        <td class="v-middle text-right w-sm">还款截止日期：</td>
+                        <td class="v-middle w-xl">{{ firstPhase.debtorRepaymentDate | datetime}}</td>
+                        <td class="v-middle text-right w-sm"></td>
+                        <td class="v-middle w-xl"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="wrapper bg-white clearfix">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            还款记录
+        </div>
+        <div class="panel-heading" ng-if="firstPhaseRepayments.length == 0" >
+            暂无还款记录！
+        </div>
+        <div class="table-responsive" ng-if="firstPhaseRepayments.length > 0">
+            <table class="table table-hover b-light">
+                <thead>
+                <tr>
+                    <th>还款单号</th>
+                    <th>操作人</th>
+                    <th>应还总额(元)</th>
+                    <th>罚息(元)</th>
+                    <th>实际还款金额(元)</th>
+                    <th>还款状态</th>
+                    <th>实际还款日期</th>
+                    <th>预计还款时间(元)</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="item in firstPhaseRepayments">
+                    <td class="v-middle">
+                        {{item.orderNo}}
+                    </td>
+                    <td class="v-middle">
+                        {{ item.debtorName }}
+                    </td>
+                    <td class="v-middle">
+                        {{ item.fees }}
+                    </td>
+                    <td class="v-middle">
+                        {{ item.punishinterest }}
+                    </td>
+                    <td class="v-middle">
+                        {{ item.payAmount }}
+                    </td>
+                    <td class="v-middle">
+                        {{ item.state.label }}
+                    </td>
+                    <td class="v-middle">
+                        {{ item.debtorActualRepaymentDate | datetime }}
+                    </td>
+                    <td class="v-middle">
+                        {{ item.debtorRepaymentDate | datetime }}
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+

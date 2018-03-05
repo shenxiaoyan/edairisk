@@ -1,0 +1,116 @@
+<script>
+    "use strict";
+    app.controller("departmentUserController",
+        [
+            "$rootScope",
+            "$scope",
+            "$stateParams",
+            "entity",
+            function ($rootScope, $scope, $stateParams, entity) {
+
+                //初始化分页参数
+                $scope.pageList = {
+                    size: 0,
+                    total_elements: 0,
+                    current_page: 0,
+                    num_page: 1,
+                    total_page: 1
+                };
+
+                $scope.getDepartmentUsers = function (page) {
+
+                    entity.getList($scope.userListUrl + "&page=" + page, ["workflow"]).then(function (resResult) {
+
+                        $scope.list = resResult._embeddedItems;
+
+                        //设置分页参数
+                        $scope.pageList = {
+                            size: resResult.page.size,
+                            total_elements: resResult.page.totalElements,
+                            current_page: resResult.page.number,
+                            num_page: resResult.page.totalPages,
+                            total_page: resResult.page.totalPages
+                        };
+
+                        //生成翻页插件
+                        if ($scope.list.length > 0) {
+                            $rootScope.setPaginator("#department_user_paginator", $scope.pageList, $scope.getDepartmentUsers);
+                        }
+                    });
+
+                };
+
+                $scope.getDepartmentUsers($scope.pageList.current_page);
+
+                $scope.pageChange = function (num) {
+                    $scope.pageList.current_page += num;
+                    $scope.getDepartmentUsers($scope.pageList.current_page);
+                };
+
+            }
+        ]
+    )
+</script>
+<div class="padder-md" ng-controller="departmentUserController">
+    <div class="m-t-md" ng-if="list.length < 1">
+        没有更多记录！
+    </div>
+    <div class="panel panel-default m-t-md" ng-if="list.length > 0">
+        <div class="panel-heading">
+            人员列表
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped b-t b-light">
+                <thead>
+                <tr>
+                    <th style="width: 50px;">头像</th>
+                    <th>姓名</th>
+                    <th>性别</th>
+                    <th>创建时间</th>
+                    <th>最后修改时间</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="item in list">
+                    <td class="v-middle">
+                        <span class="pull-left thumb avatar m-r">
+                            <img ng-src="{{ item.headimgurl }}">
+                        </span>
+                    </td>
+                    <td class="v-middle">
+                        {{ item.nickname }}
+                    </td>
+                    <td class="v-middle">
+                        {{ item.sex === 1?"男":"女" }}
+                    </td>
+                    <td class="v-middle">
+                        {{ item.createdAt | datetime }}
+                    </td>
+                    <td class="v-middle">
+                        {{ item.lastModifiedAt | datetime }}
+                    </td>
+                    <td class="v-middle clearfix">
+                        <button ui-sref="workflowEntity.home.profile.info({id:item.id,entity_key:'user',workflow_id:item.workflow.id})"
+                                class="pull-left btn btn-sm btn-info m-r">详情
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="m-t-md m-b-md clearfix">
+        <div class="pull-right">
+            <button class="btn btn-sm btn-default" ng-click="pageChange(-1)">
+                <i class="fa fa-chevron-left"></i>
+            </button>
+            <button class="btn btn-sm btn-default" ng-click="pageChange(1)">
+                <i class="fa fa-chevron-right"></i>
+            </button>
+        </div>
+        <small class="pull-right text-muted inline m-r" style="margin-top: 6px;">第{{ pageList.current_page + 1 }}页，共 {{
+            list.length }} 条
+        </small>
+    </div>
+</div>

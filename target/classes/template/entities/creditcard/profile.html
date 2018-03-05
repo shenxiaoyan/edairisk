@@ -1,0 +1,41 @@
+<div class="vbox bg-white">
+    <div class="bg-white b-b clearfix" style="padding:19px 20px">
+        <button class="pull-left btn btn-sm btn-primary btn-addon"
+                ui-sref="workflowEntity.list({entity_key:'creditcard',workflow_id:profile.workflow.id})"
+                ng-if="profile.workflow.id">
+            <i class="fa fa-arrow-left"></i>
+            返回
+        </button>
+        <ul class="nav nav-pills nav-sm pull-right">
+            <li ui-sref-active="active">
+                <a ui-sref="workflowEntity.home.profile.info">主页</a>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="workflowEntity.home.profile.page({entity_key:'creditcard',view_type:'loan'})">贷款信息</a>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="workflowEntity.home.profile.page({entity_key:'creditcard',view_type:'creditrepayment'})">还款信息</a>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="workflowEntity.home.profile.page({entity_key:'creditcard',view_type:'file'})">文件列表</a>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="workflowEntity.home.profile.page({entity_key:'creditcard',view_type:'log'})">操作记录</a>
+            </li>
+        </ul>
+    </div>
+    <div class="wrapper b-b b-light clearfix" ng-if="canActs.length > 0">
+        <button class="pull-left btn btn-sm btn-primary btn-addon m-r-sm"
+                ng-click="creditcardExcute[act.actCode]()"
+                tooltip="{{act.help}}"
+                tooltip-placement="bottom"
+                ng-repeat="act in canActs">
+            <i class="fa fa-plus"></i> {{act.label}}
+        </button>
+    </div>
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner" ui-view=""></div>
+        </div>
+    </div>
+</div>

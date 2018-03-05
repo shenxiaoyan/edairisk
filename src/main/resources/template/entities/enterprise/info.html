@@ -1,0 +1,117 @@
+<div class="wrapper">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    企业详细信息
+                </div>
+                <table class="table table-striped m-b-none">
+                    <tbody>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="enterprise.state.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.state.label }}</td>
+                        <td class="v-middle text-right">
+                            <span translate="enterprise.creditGrant.label"></span>：
+                        </td>
+                        <td class="v-middle">{{ profile.creditGrant }}元</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="enterprise.label.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.label }}</td>
+                        <td class="v-middle text-right">
+                            <span translate="enterprise.alias.label"></span>：
+                        </td>
+                        <td class="v-middle">{{ profile.alias }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="enterprise.registerAddress.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.registerAddress }}</td>
+                        <td class="v-middle text-right">
+                            <span translate="enterprise.registerDate.label"></span>：
+                        </td>
+                        <td class="v-middle">{{ profile.registerDate | toLocalDate }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="enterprise.identity.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.identity }}</td>
+                        <td class="v-middle text-right">
+                            <span translate="enterprise.taxIdentity.label"></span>：
+                        </td>
+                        <td class="v-middle">{{ profile.taxIdentity }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="enterprise.representativeName.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.representativeName }}</td>
+                        <td class="v-middle text-right">
+                            <span translate="enterprise.vakudutyPeriod.label"></span>：
+                        </td>
+                        <td class="v-middle">{{ profile.vakudutyPeriod }}年</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="enterprise.telephone1.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.telephone1 }}</td>
+                        <td class="v-middle text-right">
+                            <span translate="enterprise.telephone2.label"></span>：
+                        </td>
+                        <td class="v-middle">{{ profile.telephone2 }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="enterprise.email.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.email }}</td>
+                        <td class="v-middle text-right">
+                            <span translate="enterprise.website.label"></span>：
+                        </td>
+                        <td class="v-middle">{{ profile.website }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="enterprise.bussinessContent.label"></span>：
+                        </td>
+                        <td class="v-middle b-r" colspan="3">{{ profile.bussinessContent }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="enterprise.description.label"></span>：
+                        </td>
+                        <td class="v-middle b-r" colspan="3">{{ profile.description }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="enterprise.createdBy.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.createdBy.nickname }}</td>
+                        <td class="v-middle text-right">
+                            <span translate="enterprise.createdAt.label"></span>：
+                        </td>
+                        <td class="v-middle">{{ profile.createdAt | datetime }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="enterprise.lastModifiedBy.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.lastModifiedBy.nickname }}</td>
+                        <td class="v-middle text-right">
+                            <span translate="enterprise.lastModifiedAt.label"></span>：
+                        </td>
+                        <td class="v-middle">{{ profile.lastModifiedAt | datetime }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

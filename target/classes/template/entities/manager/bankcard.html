@@ -1,0 +1,105 @@
+<script>
+    "use strict";
+    app.controller("bankcardController",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "entity",
+            function ($rootScope, $scope, $http, $stateParams, entity) {
+
+                $scope.states = [];
+
+
+                entity.getList("/rest/bankcardStates?sort=sort").then(function (resResult) {
+
+                    angular.forEach(resResult._embeddedItems, function (val, key) {
+                        if (val.stateCode !== "DELETED") {
+                            $scope.states.push(val)
+                        }
+                    });
+
+                });
+
+                $scope.pageList = {
+                    size: 0,
+                    total_elements: 0,
+                    current_page: 0,
+                    num_page: 1,
+                    total_page: 1
+                };
+
+                $scope.list = [];
+
+
+                $scope.getList = function (page) {
+
+                    $scope.loading = true;
+                    //此处的查询需要根据角色判断listOwn之类的
+                    var link                   = "/rest/bankcards";
+
+                    entity.getList(link).then(function (resResult) {
+
+                        $scope.loading = false;
+
+                        $scope.list = resResult._embeddedItems;
+
+                        $scope.pageList = {
+                            size: resResult.page.size,
+                            total_elements: resResult.page.totalElements,
+                            current_page: resResult.page.number,
+                            num_page: resResult.page.totalPages,
+                            total_page: resResult.page.totalPages
+                        };
+
+                        if ($scope.list.length > 0) {
+                            $rootScope.setPaginator("#bankcard_paginator", $scope.pageList, $scope.getList);
+                        }
+
+                    });
+                };
+
+                $scope.getList(0);
+
+            }
+        ]
+    );
+</script>
+
+
+<div ng-controller="bankcardController">
+    <div class="wrapper-md">
+        <table class="table table-striped m-b-none table-hover" ng-if="list.length > 0">
+            <thead>
+            <tr>
+                <th>序号</th>
+                <th>卡号</th>
+                <th>所属银行</th>
+                <th>创建时间</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="item in loanList">
+                <td class="v-middle">
+                    {{ item.id }}
+                </td>
+                <td class="v-middle">
+                    <!--{{ item.amount }}-->
+                </td>
+                <td class="v-middle">
+                    <!--{{ item.createdAt }}-->
+                </td>
+                <td class="v-middle">
+                    {{ item.createdAt | datetime}}
+                </td>
+            </tr>
+            </tbody>
+
+        </table>
+        <div class="m-l-md">
+            <ul id="bankcard_paginator"></ul>
+        </div>
+    </div>
+</div>
+

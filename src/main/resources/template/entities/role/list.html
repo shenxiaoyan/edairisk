@@ -1,0 +1,174 @@
+<script>
+    app.controller("roleListController",
+        [
+            "$scope",
+            "$http",
+            "entity",
+            "$rootScope",
+            function ($scope, $http, entity,$rootScope) {
+
+                $scope.list = [];
+
+                $scope.loading = true;
+                $scope.pageList = {
+                    size: 0,
+                    total_elements: 0,
+                    current_page: 0,
+                    num_page: 1,
+                    total_page: 1
+                };
+                $scope.getList=function (page) {
+                    entity.getList("rest/roles?sort=id,desc&size=10&page="+page, ["state", "departmenttype"]).then(function (resResult) {
+
+                        $scope.loading = false;
+                        //console.log(resResult)
+
+                        $scope.list = resResult._embeddedItems;
+                        $scope.pageList = {
+                            size: resResult.page.size,
+                            total_elements: resResult.page.totalElements,
+                            current_page: resResult.page.number,
+                            num_page: resResult.page.totalPages,
+                            total_page: resResult.page.totalPages
+                        };
+
+                        if ($scope.list.length > 0) {
+                            $("#role_list_paginator").show();
+                            $rootScope.setPaginator("#role_list_paginator", $scope.pageList, $scope.getList);
+                        }else{
+                            $("#role_list_paginator").hide();
+                        }
+                    });
+                }
+                $scope.getList(0)
+
+
+            }
+        ]
+    );
+</script>
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light" ng-controller="roleListController">
+    <!-- column -->
+    <div class="col w-md lter b-l">
+        <div class="vbox">
+            <div class="wrapper b-b b-light clearfix">
+                <!--<div class="pull-left m-r w inline">-->
+                <!--<label class="sr-only" for=""></label>-->
+                <!--<input type="text" class="form-control" id="">-->
+                <!--</div>-->
+                <!--<div class="pull-left m-r w inline">-->
+                <!--<label class="sr-only" for=""></label>-->
+                <!--<input type="text" class="form-control" id="">-->
+                <!--</div>-->
+                <!--<div class="pull-left m-r w inline">-->
+                <!--<label class="sr-only" for=""></label>-->
+                <!--<input type="text" class="form-control" id="">-->
+                <!--</div>-->
+                <!--<div class="pull-left m-r inline">-->
+                <!--<button class="btn btn-primary btn-addon">-->
+                <!--<i class="fa fa-search"></i>-->
+                <!--查询-->
+                <!--</button>-->
+                <!--</div>-->
+                <div class="pull-left inline">
+                    <button class="btn btn-danger btn-addon" ui-sref="auditEntity.form">
+                        <i class="fa fa-star"></i>
+                        新建
+                    </button>
+                </div>
+            </div>
+            <div class="wrapper b-b b-light clearfix">
+                <div class="inline pull-left">
+                    所有<span translate="role.self.label"></span>
+                </div>
+            </div>
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner">
+                        <div class="wrapper">
+                            <div class="panel panel-default">
+                                <div class="panel-heading" ng-if="!loading && list.length > 0">
+                                    查询结果
+                                </div>
+                                <div ng-if="loading"
+                                     style="position: fixed;top: 50%;right: 50%;margin-left: -15px;margin-top: -15px;">
+                                    <div class="sk-spinner sk-spinner-cube-grid">
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                    </div>
+                                    <div class="text-center m-t">加载中请稍后</div>
+                                </div>
+                                <div class="panel-heading" ng-if="!loading && list.length < 1">
+                                    暂无数据！
+                                </div>
+                                <div class="table-responsive" ng-if="!loading && list.length > 0">
+                                    <table class="table table-hover b-light">
+                                        <thead>
+                                        <tr>
+                                            <th>操作</th>
+                                            <th>角色名称</th>
+                                            <th>创建时间</th>
+                                            <th>所属部门类型</th>
+                                            <th>状态</th>
+                                            <th>最后修改时间</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr ng-repeat="item in list">
+                                            <td class="v-middle clearfix">
+                                                <div class="btn-group dropdown">
+                                                    <button class="btn btn-success btn-xs" data-toggle="dropdown">操作 <span class="caret"></span></button>
+                                                    <ul class="dropdown-menu">
+                                                        <li ><a ui-sref="auditEntity.home.profile.info({id:item.id})">详情</a>
+                                                        </li>
+                                                        <li ><a ui-sref="auditEntity.form({id:item.id})">编辑</a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                            <td class="v-middle">
+                                                {{item.label}}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{item.createdAt | datetime}}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{
+                                                item.departmenttype.id?item.departmenttype.label?item.departmenttype.label:"类型名称未知":"未分配"
+                                                }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.state.id?item.state.label?item.state.label:"状态名称未知":"无" }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{item.lastModifiedAt | datetime}}
+                                            </td>
+
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="wrapper b-t b-light clearfix">
+                <ul id="role_list_paginator" style="margin:2px 0;float: right;"></ul>
+                <small class="m-l-md pull-right text-muted inline m-t-sm m-b-sm m-r">共 {{pageList.total_elements}} 条，本页共 {{ list.length }}
+                    条
+                </small>
+            </div>
+        </div>
+    </div>
+    <!-- /column -->
+</div>
+<!-- /hbox layout -->

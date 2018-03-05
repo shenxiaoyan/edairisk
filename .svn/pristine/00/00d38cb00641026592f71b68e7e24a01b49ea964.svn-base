@@ -1,0 +1,267 @@
+<script>
+    "use strict";
+    app.controller("departmentListController",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "entity",
+            function ($rootScope, $scope, $http, $stateParams, entity) {
+
+                $scope.states = [];
+
+                entity.getList("/rest/departmentStates?sort=sort").then(function (resResult) {
+                    $scope.states = resResult._embeddedItems;
+                    if ($scope.states.length > 0) {
+
+                        $scope.states = $scope.states.sort(function (a, b) {
+                            return a.sort - b.sort;
+                        });
+
+                        $scope.state_code = $scope.states[1].stateCode;
+                        $scope.getList(0);
+                    }
+                });
+                $scope.searchForm= {
+                    companyName:'',
+                    companyNumber:''
+                }
+
+                //搜索按钮
+                $scope.searchFormBtn=function () {
+                    $scope.getList(0)
+
+                }
+
+                //重置按钮
+                $scope.resetSearchFormBtn=function () {
+                    $scope.searchForm= {
+                        companyName:'',
+                        companyNumber:''
+                    }
+                    $scope.getList(0)
+                }
+
+                //初始化分页参数
+                $scope.pageList = {
+                    size: 0,
+                    total_elements: 0,
+                    current_page: 0,
+                    num_page: 1,
+                    total_page: 1
+                };
+
+                $scope.list = [];
+
+                /*
+                 * 获取实体列表
+                 * @author  金杭
+                 * @param   {number}  页码
+                 * @return  无
+                 * */
+
+                $scope.getList = function (page) {
+
+                    $scope.loading = true;
+
+                    $scope.list = [];
+
+                    //var link = "/rest/departments/search/listStateOwnDepartmentAndChildren?sort=id,desc&stateCode=" + $scope.state_code + "&size=20&page=" + page;
+                    var link ="/company/list?stateCode="+$scope.state_code+"&companyNumber="+$scope.searchForm.companyNumber+"&companyName="+$scope.searchForm.companyName+"&page="+page+"&size=10&sort=id,desc";
+
+
+                    entity.getList(link).then(function (resResult) {
+
+                        $scope.loading = false;
+
+                        $scope.list = resResult.data.content;
+
+                        //设置分页参数
+                        $scope.pageList = {
+                            size: resResult.data.size,
+                            total_elements: resResult.data.totalElements,
+                            current_page: resResult.data.number,
+                            num_page: resResult.data.totalPages,
+                            total_page: resResult.data.totalPages
+                        };
+
+                        //生成翻页插件
+                        if ($scope.list.length > 0) {
+                            $("#company_list_paginator").show();
+                            $rootScope.setPaginator("#company_list_paginator", $scope.pageList, $scope.getList);
+                        }else{
+                            $("#company_list_paginator").hide();
+                        }
+
+                    });
+                };
+
+                //状态筛选
+                $scope.stateSelect = function ($event, stateCode) {
+                    if ($event.target.nodeName === "INPUT") {
+                        $scope.state_code = stateCode;
+                        $scope.getList(0);
+                    }
+                };
+                $scope.getList(0);
+
+            }
+        ]
+    );
+</script>
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light" ng-controller="departmentListController">
+    <!-- column -->
+    <div class="col w-md lter b-l">
+        <div class="vbox">
+            <!--<div class="wrapper b-b b-light clearfix">-->
+                <!--<div class="pull-left m-r w inline">-->
+                <!--<label class="sr-only" for=""></label>-->
+                <!--<input type="text" class="form-control" id="">-->
+                <!--</div>-->
+                <!--<div class="pull-left m-r w inline">-->
+                <!--<label class="sr-only" for=""></label>-->
+                <!--<input type="text" class="form-control" id="">-->
+                <!--</div>-->
+                <!--<div class="pull-left m-r w inline">-->
+                <!--<label class="sr-only" for=""></label>-->
+                <!--<input type="text" class="form-control" id="">-->
+                <!--</div>-->
+                <!--<div class="pull-left m-r inline">-->
+                <!--<button class="btn btn-primary btn-addon">-->
+                <!--<i class="fa fa-search"></i>-->
+                <!--查询-->
+                <!--</button>-->
+                <!--</div>-->
+                <!--<div class="pull-left inline">-->
+                    <!--<button class="btn btn-danger btn-addon" ui-sref="auditEntity.form">-->
+                        <!--<i class="fa fa-star"></i>-->
+                        <!--新建-->
+                    <!--</button>-->
+                <!--</div>-->
+            <!--</div>-->
+            <div class="wrapper b-b b-light clearfix">
+                <div class="inline pull-left">
+                    公司状态：
+                </div>
+                <!--<div class="inline pull-left m-r">-->
+                <!--<label class="i-checks pull-left m-n" ng-click="stateSelect($event,'')">-->
+                <!--<input type="radio" name="state" checked><i></i>  全部-->
+                <!--</label>-->
+                <!--</div>-->
+                <div class="inline pull-left m-r" ng-repeat="state in states">
+                    <label class="i-checks pull-left m-n" ng-click="stateSelect($event,state.stateCode)">
+                        <input type="radio" value="{{state.stateCode}}" ng-model="state_code" name="state"><i></i> {{
+                        state.label }}
+                    </label>
+                </div>
+            </div>
+            <div class="wrapper b-b clearfix ">
+                <form class="form-inline" name="search_form">
+                    <div class="form-group m-r">
+                        <label for="">公司名称: </label>
+                        <input ng-model="searchForm.companyName" class="form-control" type="text" pattern="^\s*[\u4E00-\u9FA5\(\)]+\s*$" name="companyName">
+                        <span class="help-block text-danger"
+                              ng-show="search_form.companyName.$dirty && search_form.companyName.$invalid">
+                            <i class="fa fa-exclamation-circle text-danger"></i>输入格式有误
+                        </span>
+                    </div>
+                    <div class="form-group m-r">
+                        <label for="">统一社会信用代码: </label>
+                        <input ng-model="searchForm.companyNumber" class="form-control" type="text" pattern="^\s*[\dA-Z]+\s*$" name="companyNumber">
+                        <span class="help-block text-danger"
+                              ng-show="search_form.companyNumber.$dirty && search_form.companyNumber.$invalid">
+                            <i class="fa fa-exclamation-circle text-danger"></i>输入格式有误
+                        </span>
+                    </div>
+                    <button class="btn btn-primary m-r" ng-click="searchFormBtn()" ng-disabled="search_form.$invalid">
+                        <i class="fa fa-search"></i>查询
+                    </button>
+                    <button class="btn btn-default m-r" ng-click="resetSearchFormBtn()">
+                        <i class="fa fa-refresh"></i>重置
+                    </button>
+                </form>
+            </div>
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner">
+                        <div class="wrapper">
+                            <div class="panel panel-default">
+                                <div class="panel-heading" ng-if="!loading && list.length > 0">
+                                    查询结果
+                                </div>
+                                <div ng-if="loading"
+                                     style="position: fixed;top: 50%;right: 50%;margin-left: -15px;margin-top: -15px;">
+                                    <div class="sk-spinner sk-spinner-cube-grid">
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                    </div>
+                                    <div class="text-center m-t">加载中请稍后</div>
+                                </div>
+                                <div class="panel-heading" ng-if="!loading && list.length < 1">
+                                    暂无数据！
+                                </div>
+                                <div class="table-responsive" ng-if="!loading && list.length > 0">
+                                    <table class="table table-hover b-light">
+                                        <thead>
+                                        <tr>
+                                            <th>操作</th>
+                                            <th>公司名称</th>
+                                            <th>公司法人</th>
+                                            <th>公司地址</th>
+                                            <th>统一社会信用代码</th>
+                                            <th>公司人数</th>
+                                            <th>创建时间</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr ng-repeat="item in list">
+                                            <td class="v-middle clearfix">
+                                                <button ui-sref="auditEntity.home.profile.info({id:item.id})"
+                                                        class="pull-left btn btn-xs btn-success m-r">详情
+                                                </button>
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.companyName }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{item.companyPersonName}}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.addressFullName}}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.companyNumber }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.peopleAmount}}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.createdAt | datetime }}
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="wrapper b-t b-light clearfix">
+                <ul id="company_list_paginator" style="margin:2px 0;float: right;"></ul>
+                <small class="m-l-md pull-right text-muted inline m-t-sm m-b-sm m-r">共{{pageList.total_elements}}条,本页共 {{ list.length }} 条</small>
+            </div>
+        </div>
+    </div>
+    <!-- /column -->
+</div>
+<!-- /hbox layout -->

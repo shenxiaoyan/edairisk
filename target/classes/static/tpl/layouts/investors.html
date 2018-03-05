@@ -1,0 +1,37 @@
+
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light">
+	<div class="col w-md b-r ">
+		<div class="vbox">
+			<div class="wrapper b-b">
+				<div class="font-thin h4">投资机构</div>
+			</div>
+			<div class="wrapper b-b">
+				<div class="btn-group pos-stc">
+					<div class="btn-group dropdown">
+						<a ui-sref="stores.new"
+							class="pull-right btn btn-sm btn-danger w-auto-xs dropdown-toggle"
+							tooltip="新建门店" tooltip-placement="bottom"><i
+							class="fa fa-fw fa-tag"></i> 新建 </a>
+					</div>
+				</div>
+			</div>
+			<div class="row-row">
+				<div class="cell scrollable">
+					<div class="cell-inner">
+						<div class="wrapper-md">
+
+							<ul class="nav nav-pills nav-stacked nav-sm">
+								<li ui-sref-active="active"><a href="#/stores/view/1">红创金服</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+	<div class="col lter" ui-view></div>
+</div>
+<!-- /hbox layout -->

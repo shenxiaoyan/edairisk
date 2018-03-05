@@ -1,0 +1,416 @@
+<script>
+    "use strict";
+    app.controller("abnormaluserListController",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "entity",
+            "$state",
+            function ($rootScope, $scope, $http, $stateParams, entity, $state) {
+
+                $scope.states = [
+                    {label:'待审核',stateCode:'CREATED'},
+                    {label:'未通过',stateCode:'DENIED'},
+                    {label:'通过',stateCode:'ADOPT'},
+                    {label:'已放贷',stateCode:'DISABLED'}
+                ];
+
+                $scope.state_code = $scope.states[0].stateCode;
+
+                $scope.failedVla=null;
+
+                $scope.searchForm= {
+                    personName:'',
+                    mobile:'',
+                    orderNo:''
+                }
+
+                $scope.searchList = function(page) {
+                    //# % & 号键会注释掉后面的内容
+                    $scope.searchForm.personName= $scope.searchForm.personName.replace(/#/g,'').replace(/%/g,'').replace(/&/g,'').replace(/\^/g,'')
+                    $scope.searchForm.mobile=$scope.searchForm.mobile.replace(/#/g,'').replace(/%/g,'').replace(/&/g,'').replace(/\^/g,'')
+                    console.log($scope.searchForm.personName);
+                    console.log($scope.searchForm.mobile);
+
+                    $http({
+                        method: "GET",
+                        url: "/approveLoan/list?personName="+$scope.searchForm.personName+"&mobile="+$scope.searchForm.mobile+"&orderNo="+$scope.searchForm.orderNo+"&stateCode=" + $scope.state_code+"&page="+page+"&size=10&sort=id,desc"
+                    }).success(function (resResult) {
+
+                        console.log(resResult)
+                        $scope.list = resResult.data.content;
+
+                        //搜索的返回格式和 rest/search不一样
+                        $scope.pageList = {
+                            size: resResult.data.size,
+                            total_elements: resResult.data.totalElements,
+                            current_page: resResult.data.number,
+                            num_page: resResult.data.totalPages,
+                            total_page: resResult.data.totalPages
+                        };
+
+                        if ($scope.list.length > 0) {
+                            $("#abnormaluser_list_paginator").show();
+                            $rootScope.setPaginator("#abnormaluser_list_paginator", $scope.pageList, $scope.searchList);
+                        }else{
+                            $("#abnormaluser_list_paginator").hide();
+                        }
+
+                    });
+                }
+
+                //搜索按钮
+                $scope.searchFormBtn=function () {
+                    console.log( $scope.state_code)
+                    $scope.searchList(0)
+
+                }
+
+                //重置按钮
+                $scope.resetSearchFormBtn=function () {
+                    $scope.searchForm= {
+                        personName:'',
+                        mobile:'',
+                        orderNo:''
+                    }
+                    $scope.searchList(0)
+                }
+
+//                entity.getList("/rest/orderwdsjshWorkflows/ " + $stateParams.workflow_id + "/states").then(function (resResult) {
+//                    $scope.states = resResult._embeddedItems;
+//                    if ($scope.states.length > 0) {
+//
+//                        $scope.states = $scope.states.sort(function (a, b) {
+//                            return a.sort - b.sort;
+//                        });
+//
+//
+//                        $scope.state_code = $scope.states[0].stateCode;
+//                        $scope.getList(0);
+//                    }
+//                });
+
+                $scope.pageList = {
+                    size: 0,
+                    total_elements: 0,
+                    current_page: 0,
+                    num_page: 1,
+                    total_page: 1
+                };
+
+                $scope.list = [];
+
+                /*默认读取列表*/
+
+                $scope.getList = function (page) {
+
+                    $scope.loading = true;
+
+                    $scope.list = [];
+
+//                    var link = "/rest/orderwdsjshes/search/listOwnDepartmentAndChildren?sort=lastModifiedAt,desc&size=20&page=" + page;
+
+//                    if($scope.state_code){
+                    var link = "/approveLoan/list?personName="+$scope.searchForm.personName+"&mobile="+$scope.searchForm.mobile+"&orderNo="+$scope.searchForm.orderNo+"&stateCode=" + $scope.state_code+"&page="+page+"&size=10&sort=id,desc";
+
+//                    }
+
+                    entity.getList(link).then(function (resResult) {
+
+                        $scope.loading = false;
+
+                        $scope.list = resResult.data.content;
+
+                        $scope.pageList = {
+                            size: resResult.data.size,
+                            total_elements: resResult.data.totalElements,
+                            current_page: resResult.data.number,
+                            num_page: resResult.data.totalPages,
+                            total_page: resResult.data.totalPages
+                        };
+
+                        if ($scope.list.length > 0) {
+                            $("#abnormaluser_list_paginator").show();
+                            $rootScope.setPaginator("#abnormaluser_list_paginator", $scope.pageList, $scope.getList);
+                        }else{
+                            $("#abnormaluser_list_paginator").hide();
+                        }
+
+                    });
+                };
+
+                $scope.stateSelect = function ($event, stateCode) {
+                    if ($event.target.nodeName === "INPUT") {
+                        $scope.state_code = stateCode;
+                        $scope.searchForm= {
+                            personName:'',
+                            mobile:'',
+                            orderNo:''
+                        }
+                        $scope.getList(0);
+                    }
+                };
+
+                $scope.getList(0);
+
+                $scope.adopt=function (id) {
+                    console.log('adas')
+                    swal({
+                        title: "是否审核通过",
+                        type: "warning",
+                        showCancelButton: true,
+                        cancelButtonText: "退出",
+                        confirmButtonText: "同意",
+                        closeOnConfirm: true
+                    }, function () {
+                        $http({
+                            method: "post",
+                            url: "/approveLoan/adopt?approveLoanId="+id,
+                            data: {}
+                        }).success(function (resResult) {
+                            console.log(resResult);
+                            if(resResult.status !== 500){
+                                $rootScope.toasterSuccess("注意", "该异常用户借款申请通过！");
+                                $state.go("auditEntity.list", {entity_key: "abnormaluser"}, {reload: true});
+                            }
+
+                        });
+                    });
+                }
+
+                $scope.fail=function (id) {
+                    $scope.failId=id;
+                    $('#abnormaluser_failed').modal('show')
+                }
+
+
+                //未通过模态框
+                $('#model_fail').click(function () {
+                    $http({
+                        method: "post",
+                        url: "/approveLoan/notadopt?approveLoanId="+$scope.failId,
+                        data: {}
+                    }).success(function (resResult) {
+                        console.log(resResult);
+                        if(resResult.status !== 500){
+                            $('#abnormaluser_failed').modal('hide')
+                            $rootScope.toasterSuccess("注意", "该异常用户借款未通过！");
+                            $state.go("auditEntity.list", {entity_key: "abnormaluser"}, {reload: true});
+                        }
+
+                    });
+                })
+
+            }
+        ]
+    );
+</script>
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light" ng-controller="abnormaluserListController">
+    <!-- column -->
+    <div class="col w-md lter b-l">
+        <div class="vbox">
+            <div class="wrapper b-b clearfix">
+                <div class="inline pull-left">
+                    异常用户申请单状态：
+                </div>
+                <!--<div class="inline pull-left m-r">-->
+                <!--<label class="i-checks pull-left m-n" ng-click="stateSelect($event,'')">-->
+                <!--<input type="radio" name="state" checked><i></i>  全部-->
+                <!--</label>-->
+                <!--</div>-->
+                <div class="inline pull-left m-r" ng-repeat="state in states">
+                    <label class="i-checks pull-left m-n" ng-click="stateSelect($event,state.stateCode)">
+                        <input type="radio" value="{{state.stateCode}}" ng-model="state_code" name="state"><i></i> {{
+                        state.label }}
+                    </label>
+                </div>
+            </div>
+            <div class="wrapper b-b clearfix ">
+                <form class="form-inline" name="search_form">
+                    <div class="form-group m-r">
+                        <label for="">申请单号: </label>
+                        <input ng-model="searchForm.orderNo" class="form-control" type="text" pattern="^\s*[a-zA-Z\d]+\s*$" name="orderNo">
+                        <span class="help-block text-danger"
+                              ng-show="search_form.orderNo.$dirty && search_form.orderNo.$invalid">
+                            <i class="fa fa-exclamation-circle text-danger"></i>申请单号必须为英文或数字
+                        </span>
+                    </div>
+                    <div class="form-group m-r">
+                        <label for="">客户姓名: </label>
+                        <input ng-model="searchForm.personName" class="form-control" type="text" pattern="^\s*[\u4e00-\u9fa5]+(·[\u4e00-\u9fa5]+)*\s*$" name="personName">
+                        <span class="help-block text-danger"
+                              ng-show="search_form.personName.$dirty && search_form.personName.$invalid">
+                            <i class="fa fa-exclamation-circle text-danger"></i>不符合姓名格式
+                        </span>
+                    </div>
+                    <div class="form-group m-r">
+                        <label for="">手机号: </label>
+                        <input ng-model="searchForm.mobile" class="form-control" type="tel" pattern="^\s*\d+\s*$" name="mobile">
+                        <span class="help-block text-danger"
+                              ng-show="search_form.mobile.$dirty && search_form.mobile.$invalid">
+                            <i class="fa fa-exclamation-circle text-danger"></i>手机号必须为数字
+                        </span>
+                    </div>
+                    <button class="btn btn-primary m-r" ng-click="searchFormBtn()" ng-disabled="search_form.$invalid">
+                        <i class="fa fa-search"></i>查询
+                    </button>
+                    <button class="btn btn-default m-r" ng-click="resetSearchFormBtn()">
+                        <i class="fa fa-refresh"></i>重置
+                    </button>
+                </form>
+            </div>
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner">
+                        <div class="wrapper">
+                            <div class="panel panel-default">
+                                <div class="panel-heading" ng-if="!loading && list.length > 0">
+                                    查询结果
+                                </div>
+                                <div ng-if="loading"
+                                     style="position: fixed;top: 50%;right: 50%;margin-left: -15px;margin-top: -15px;">
+                                    <div class="sk-spinner sk-spinner-cube-grid">
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                    </div>
+                                    <div class="text-center m-t">加载中请稍后</div>
+                                </div>
+                                <div class="panel-heading" ng-if="!loading && list.length < 1">
+                                    暂无数据！
+                                </div>
+                                <div ng-if="!loading && list.length > 0">
+                                    <table class="table table-hover b-t b-light">
+                                        <thead>
+                                        <tr>
+                                            <th>操作</th>
+                                            <th>申请单号</th>
+                                            <th>姓名</th>
+                                            <th>手机号</th>
+                                            <!--<th>网点名称</th>-->
+                                            <!--<th>产品线</th>-->
+                                            <th>借款金额(元)</th>
+                                            <th>状态</th>
+                                            <!--<th>日均收件量</th>-->
+                                            <!--<th>日均派件量</th>-->
+                                            <!--<th>授信额度(元)</th>-->
+                                            <!--<th>调整额度(元)</th>-->
+                                            <th>创建时间</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr ng-repeat="item in list">
+                                            <td class="v-middle">
+                                                <div class="btn-group dropdown">
+                                                    <button ng-disabled="!(item.stateCode == 'CREATED')" class="btn btn-success btn-xs" data-toggle="dropdown">操作 <span class="caret"></span></button>
+                                                    <ul class="dropdown-menu">
+                                                        <li  ng-click="adopt(item.id)">
+                                                            <a>通过</a>
+                                                        </li>
+                                                        <li ng-click="fail(item.id)">
+                                                            <a>未通过</a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+
+                                            <td class="v-middle">
+                                                {{ item.orderNo }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.personName }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.mobile }}
+                                            </td>
+                                            <!--<td class="v-middle">-->
+                                                <!--{{ item.applyEnterpriseName }}-->
+                                            <!--</td>-->
+                                            <!--<td class="v-middle">-->
+                                                <!--{{ item.productLabel }}-->
+                                            <!--</td>-->
+                                            <td class="v-middle">
+                                                {{ item.loanAmount }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.stateLabel }}
+                                            </td>
+                                            <!--<td class="v-middle">-->
+                                                <!--{{ item.applyDayPickExpress }}-->
+                                            <!--</td>-->
+                                            <!--<td class="v-middle">-->
+                                                <!--{{ item.applyDayPatchExpress }}-->
+                                            <!--</td>-->
+                                            <!--<td class="v-middle">-->
+                                                <!--{{ item.currentAmount }}-->
+                                            <!--</td>-->
+                                            <!--<td class="v-middle">-->
+                                                <!--{{ item.quotaAmount }}-->
+                                            <!--</td>-->
+                                            <td class="v-middle">
+                                                {{ item.createDate? (item.createDate| datetime):''}}
+                                            </td>
+                                            <!--<td class="v-middle clearfix" ng-if="item.stateCode == 'CREATED' ">-->
+                                            <!--<button ng-click="adopt(item.id)" class="pull-left btn btn-sm btn-info m-r">通过</button>-->
+                                            <!--<button ng-click="fail(item.id)" class="pull-left btn btn-sm btn-addon m-r-sm m-b-sm btn-danger">未通过</button>-->
+                                            <!--&lt;!&ndash;<button ui-sref="workflowEntity.form({id:item.id})"&ndash;&gt;-->
+                                            <!--&lt;!&ndash;class="pull-left btn btn-sm btn-danger m-r">编辑&ndash;&gt;-->
+                                            <!--&lt;!&ndash;</button>&ndash;&gt;-->
+                                            <!--</td>-->
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="wrapper b-t b-light clearfix">
+                <ul id="abnormaluser_list_paginator" style="margin:2px 0;float: right;"></ul>
+                <small class="m-l-md pull-right text-muted inline m-t-sm m-b-sm m-r">共 {{pageList.total_elements}} 条，本页共 {{ list.length }}
+                    条
+                </small>
+            </div>
+        </div>
+    </div>
+    <!-- /column -->
+</div>
+<!-- /hbox layout -->
+
+<div class="modal fade" id="abnormaluser_failed" tabindex="-1" role="dialog">
+    <div class="modal-xs modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"
+                        aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title">请填写未通过理由</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group clearfix">
+                    <label class="col-lg-2 text-right">理由</label>
+                    <div class="col-lg-10">
+                                <textarea class="form-control" ng-model="failedVla" cols="9" style="height: 250px">
+                                </textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer text-center">
+                <button id="model_fail" type="button" class="btn btn-success w-lg">
+                    提交
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

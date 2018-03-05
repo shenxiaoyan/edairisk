@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>提现申请</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <link rel="stylesheet" href="../../../css/weui.css">
+    <link rel="stylesheet" href="../../../css/weui2.css">
+    <style>
+        .btn{
+            width: 100%;
+            height: 40px;
+            background: #169BD5;
+            border-radius: 20px;
+            display: inline-block;
+            text-align: center;
+            line-height: 40px;
+            color: white;
+            font-size: 16px;
+        }
+        .btn:active{
+            background: #CCCCCC;
+            color: white;
+        }
+        .weui_navbar_item.tab-green{
+            border-bottom: 3px solid #169BD5;
+            color: #169BD5;
+        }
+        .now_card{
+            display: block;
+            background: #fff;
+            margin-top: 15px;
+            border: 1px solid #e6e5e5;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+        a:link{
+            color: #0D0D0D;
+        }
+        a:active{
+            color: #0D0D0D;
+        }
+        a{
+            color: #0D0D0D;
+        }
+        .now_card span{
+            margin-left: 5px;
+        }
+        .now_card > div{
+            padding: 10px 15px;
+        }
+        .now_card_title_whk{
+            padding: 0 12px;
+            background: #169BD5;
+            color: white;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-top: 1px;
+        }
+        .now_card_title_wjq{
+            padding: 0 12px;
+            background: #14c7a7;
+            color: white;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-top: 1px;
+        }
+        .now_card_title_yq{
+            padding: 0 12px;
+            background: #f96c70;
+            color: white;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-top: 1px;
+        }
+        .now_card_title_yjq{
+            padding: 0 12px;
+            background: #ccc;
+            color: white;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-top: 1px;
+        }
+        .now_card_content{
+            border-top: 1px solid #e6e5e5;
+            padding: 15px;
+        }
+        .margin-top-5{
+            margin-top: 5px;
+        }
+        .text-linear{
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+<div class="weui_tab " style="height:44px;" id="tab1"><!--tab-fixed添加顶部-->
+    <div class="weui_navbar" style="height:44px;">
+        <div id="btn1" class="weui_navbar_item">
+            借款申请
+        </div>
+        <div id="btn2" class="weui_navbar_item">
+            借款审核
+        </div>
+    </div>
+</div>
+<div id="loanTab1">
+    <div style="margin: 0; padding: 8px 15px"  class="weui_cells_title">提现申请</div>
+    <div class="weui_cells" style="margin-top: 0">
+        <div class="weui_cell weui_vcode">
+            <div class="weui_cell_hd"><label class="weui_label">提现金额</label></div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <input id="money" oninput="change()" class="weui_input" type="number" placeholder="请输入提现金额"/>
+            </div>
+            <div class="weui_cell_ft">
+                <a href="javascript:;" style="padding: 0 1.6em 0 1.7em;color:#000;" class="weui-vcode-btn">元</a>
+            </div>
+        </div>
+        <div class="weui_cell">
+            <div class="weui_cell_bd weui_cell_primary">
+                <p>借款时间</p>
+            </div>
+            <div class="weui_cell_ft" id="nowDate"></div>
+        </div>
+        <div class="weui_cell">
+            <div class="weui_cell_bd weui_cell_primary">
+                <p>还款时间</p>
+            </div>
+            <div class="weui_cell_ft" id="preDate"></div>
+        </div>
+        <div class="weui_cell">
+            <div class="weui_cell_bd weui_cell_primary">
+                <p>日息</p>
+            </div>
+            <div id="Dailyinterest" class="weui_cell_ft"></div>
+        </div>
+    </div>
+    <div style="margin-top: 20px;" class="page-bd-15">
+        <a id="applyBtn" class="btn">立即申请</a>
+    </div>
+</div>
+<div id="loanTab2" style="display: none">
+    <div class="page-bd-15" id="warp">
+        <!--<a class="now_card">-->
+            <!--<div class="clearfix">-->
+                <!--<p class="left" style="font-size:14px">借款单号:'+val.orderNo+'</p>-->
+                <!--<p class="right now_card_title_whk">待审核</p>-->
+            <!--</div>-->
+            <!--<div class="now_card_content">-->
+                <!--<div class="clearfix">-->
+                    <!--<p style="float: left;color: #a3a3a3;">借款金额</p>-->
+                    <!--<p style="float: right">'+val.principal+'</p>-->
+                <!--</div>-->
+                <!--<div class="clearfix margin-top-5">-->
+                    <!--<p style="float: left;color: #a3a3a3;">借款日期</p>-->
+                    <!--<p style="float: right">'+(val.useDate).split(' ')[0]+'</p>-->
+                <!--</div>-->
+                <!--<div class="clearfix margin-top-5">-->
+                        <!--<div style="float:right;width: 66px;height: 20px; border-radius: 10px;background:#169BD5;text-align: center;line-height: 20px;color: #ffffff ;font-size: 12px;">立即借款</div>-->
+                <!--</div>-->
+            <!--</div>-->
+        <!--</a>-->
+        <p id="loanNull" style="text-align: center;margin-top: 30px; display: none">暂无借款申请!</p>
+    </div>
+</div>
+</body>
+<script src="../../../js/jquery-3.2.1.js"></script>
+<script src="../../../js/zepto.min.js"></script>
+<script src="../../../js/config.js"></script>
+<script>
+    if(window.location.search){
+        var href = window.location.href;
+        window.mobile = href.split('&')[0];
+        window.mobile = window.mobile.split('=')[1];
+        window.personid = href.split('&')[1];
+        window.personid = window.personid.split('=')[1];
+    }
+
+    //查看有无申请记录
+    function init() {
+        $.ajax({
+            type: 'get',
+            url:'/rest/approveLoans/search/findByTwoStateCode',
+            data: {
+                'personId':window.personid,
+            } ,
+            headers: {
+                app_code:"WULIUQIANZHUANG",
+                client:"wechat"
+            },
+            success: function (res) {
+               console.log(res._embedded.approveLoans)
+                var list =res._embedded.approveLoans;
+               $.each(list,function (key,val) {
+                   $.ajax({
+                       type: 'get',
+                       url:'/rest/approveLoans/'+val.id+'/approveLoanState',
+                       data: {} ,
+                       headers: {
+                           app_code:"WULIUQIANZHUANG",
+                           client:"wechat",
+                       },
+                       success: function (res) {
+                           $('#applyBtn').css('background','#CCCCCC').unbind()
+                          val.state = res.stateLabel;
+                           val.stateCode =res.stateCode;
+                           if(val.stateCode == 'ADOPT'){
+                               var href =window.config.link+"/bdjf/html5/borrowByFollow.html?mobile="+window.mobile+"&zcCode=1004&loanAmount="+val.loanAmount+"&ptproductId="+window.config.ptproductId+"&zcName="+window.config.zcName+"&bankType=2";
+                               var str ='<a class="now_card" href="'+href+'">\n' +
+                                   '            <div class="clearfix">\n' +
+                                   '                <p class="left" style="font-size:14px">借款申请</p>\n' +
+                                   '                <p class="right now_card_title_whk">'+val.state+'</p>\n' +
+                                   '            </div>\n' +
+                                   '            <div class="now_card_content">\n' +
+                                   '                <div class="clearfix">\n' +
+                                   '                    <p style="float: left;color: #a3a3a3;">借款金额</p>\n' +
+                                   '                    <p style="float: right">'+val.loanAmount+'</p>\n' +
+                                   '                </div>\n' +
+                                   '                <div class="clearfix margin-top-5">\n' +
+                                   '                    <p style="float: left;color: #a3a3a3;">借款日期</p>\n' +
+                                   '                    <p style="float: right">'+(val.createDate).split(' ')[0]+'</p>\n' +
+                                   '                </div>\n' +
+                                   '                <div class="clearfix margin-top-5">\n' +
+                                   '                        <div style="float:right;width: 66px;height: 20px; border-radius: 10px;background:#169BD5;text-align: center;line-height: 20px;color: #ffffff ;font-size: 12px;">立即借款</div>\n' +
+                                   '                </div>\n' +
+                                   '            </div>\n' +
+                                   '        </a>'
+                           }else {
+                               var str ='<a class="now_card">\n' +
+                                   '            <div class="clearfix">\n' +
+                                   '                <p class="left" style="font-size:14px">借款申请</p>\n' +
+                                   '                <p class="right now_card_title_whk">'+val.state+'</p>\n' +
+                                   '            </div>\n' +
+                                   '            <div class="now_card_content">\n' +
+                                   '                <div class="clearfix">\n' +
+                                   '                    <p style="float: left;color: #a3a3a3;">借款金额</p>\n' +
+                                   '                    <p style="float: right">'+val.loanAmount+'</p>\n' +
+                                   '                </div>\n' +
+                                   '                <div class="clearfix margin-top-5">\n' +
+                                   '                    <p style="float: left;color: #a3a3a3;">借款日期</p>\n' +
+                                   '                    <p style="float: right">'+(val.createDate).split(' ')[0]+'</p>\n' +
+                                   '                </div>\n' +
+                                   '            </div>\n' +
+                                   '        </a>'
+                           }
+
+                           $('#warp').append(str);
+                       } ,
+                       error:function (res) {
+
+                       },
+                       dataType: 'json'
+                   });
+               })
+
+            } ,
+            error:function (res) {
+                $('#loanNull').show()
+            },
+            dataType: 'json'
+        });
+    }
+
+    //获取当前时间 yyyy-MM-dd HH:MM:SS
+    function getNowFormatDate() {
+        var date = new Date();
+        var seperator1 = "-";
+        var seperator2 = ":";
+        var month = date.getMonth() + 1;
+        var strDate = date.getDate();
+        if (month >= 1 && month <= 9) {
+            month = "0" + month;
+        }
+        if (strDate >= 0 && strDate <= 9) {
+            strDate = "0" + strDate;
+        }
+        var currentdate = date.getFullYear() + seperator1 + month + seperator1 + strDate
+            + " " + date.getHours() + seperator2 + date.getMinutes()
+            + seperator2 + date.getSeconds();
+        return currentdate;
+    }
+
+    var d = new Date();
+    var vYear = d.getFullYear();
+    var vMon = d.getMonth() + 1;
+    var vDay = d.getDate();
+    var preMon=d.getMonth() + 4;
+    if(preMon > 12){
+        preMon = preMon -12
+    }
+    var s=vYear+"/"+(vMon<10 ? "0" + vMon : vMon)+"/"+(vDay<10 ? "0"+ vDay : vDay);
+    var p=vYear+"/"+(preMon<10 ? "0" + preMon : preMon)+"/"+(vDay<10 ? "0"+ vDay : vDay);
+    $('#nowDate').text(s);
+    $('#preDate').text(p);
+
+    function change() {
+        var con = $('#money').val() * 0.000417;
+        $('#Dailyinterest').text(con);
+    }
+
+    init();
+    $('#tab1').tab({defaultIndex:0,activeClass:"tab-green"});
+
+    $('#btn1').click(function () {
+        $('#loanTab1').show();
+        $('#loanTab2').hide();
+    })
+    $('#btn2').click(function () {
+        $('#loanTab1').hide();
+        $('#loanTab2').show();
+    })
+    $('#applyBtn').click(function () {
+        var mobile = window.location.search;
+        mobile = mobile.split('?')[1];
+        if(!$('#money').val()){
+            $.alert('申请金额不能为空!')
+
+        }else if($('#money').val() > 1000000){
+            $.alert('单次提现不超过100万!')
+        }else{
+            var money =$('#money').val();
+            var creartAt =getNowFormatDate();
+            $.showLoading();
+            var data ={
+                'mobile':window.mobile,
+                'person.id':window.personid,
+                'loanAmount':money,
+                'approveLoanState.id':"1",
+                'createDate':creartAt
+            }
+            $.ajax({
+                type: 'post',
+                url:'/approveLoan/addApproveLoan',
+                data: data ,
+                headers: {
+                    app_code:"WULIUQIANZHUANG",
+                    client:"wechat"
+                },
+                success: function (res) {
+                    $.hideLoading();
+                    $.toast("申请成功");
+                    window.location.reload();
+                } ,
+                error:function (res) {
+                    $.hideLoading();
+                },
+                dataType: 'json'
+            });
+        }
+    })
+
+</script>
+</html>

@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>账户</title>
+    <link rel="stylesheet" href="../../css/weui.css">
+    <link rel="stylesheet" href="../../css/weui2.css">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <link rel="stylesheet" href="../../css/jquery.circliful.css">
+    <link rel="stylesheet" href="../../css/icon.css">
+    <style>
+        .card{
+            background: #fff;
+            padding: 15px;
+            margin-top: 10px;
+            display: block;
+        }
+        .card > p{
+            text-align: center;
+            font-size: 14px;
+        }
+        a{
+            color: #0a1015;
+        }
+        a:active{
+            color: #0a1015;
+        }
+        .weui-slider-track{
+            background: #02B4FE;
+        }
+    </style>
+</head>
+<body style="background: #f7f7f7">
+<div id="accountNull" style="height: 100%;width: 100%;background: #fff;display:none;">
+    <div style="background: #fff;width: calc(100% - 30px); height: 44px;padding: 0 15px;border-bottom: 1px solid #e6e6e6;" class="clearfix">
+        <div style="float: left">
+            <i class="icon icon-109 f-black" style="font-size: 25px; line-height: 44px;"></i>
+        </div>
+        <div style="float: left;width: calc(100% - 130px); padding: 0 50px; height: 44px;text-align: center;line-height: 44px;font-weight: bolder">
+            账户
+        </div>
+    </div>
+    <div class="page-bd-15">
+        <div style="margin: 50px auto 30px;width: 111px;">
+            <img src="../../images/null_con.png">
+        </div>
+        <p style="text-align: center;color: #666">您尚未申请产品授信额度，当前账户为空</p>
+        <p style="text-align: center;color: #666">请先申请产品授信额度~</p>
+        <a href="../loan/appli.html" class="btn" style="margin-top: 30px;color:#fff">立即申请</a>
+    </div>
+</div>
+    <div id="cardBg">
+        <!--<a href="ordermdbt/myLoan.html?userId='+userid+'&cardId='+resData.mdbt.cardId+'" class="card">-->
+            <!--<div class="clearfix">-->
+                <!--<div class="left">-->
+                <!--<img style="width: 31px;" src="../../images/icon_lous@3x.png">-->
+                    <!--<span style="vertical-align: middle;font-weight: bold;display: inline-block;margin-top: -30px; margin-left: 10px;">面单白条</span>-->
+                <!--</div>-->
+                <!--<div class="right" style="color: #ADADAD;font-size: 11px;margin-top: 5px;">-->
+                    <!--<div class="clearfix">-->
+                        <!--<div class="right" style="width: 71px;height: 21px;color:#00B0EC;border: 1px solid #00B0EC;line-height: 21px;text-align: center;border-radius: 15px;">立即借款</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+            <!--</div>-->
+            <!--<div class="weui-slider" style="padding: 0;margin-top: 15px;">-->
+                <!--<div class="weui-slider-inner" style="height: 4px;position: relative">-->
+                    <!--<div style="position: absolute;top: -20px;left: calc( '+progress+'% - 5px);">-->
+                        <!--<img style="width: 10px;" src="../../images/pic_slide_blue@3x.png">-->
+                    <!--</div>-->
+                    <!--<div style="width: '+progress+'%;height: 4px;" class="weui-slider-track"></div>-->
+                <!--</div>-->
+            <!--</div>-->
+            <!--<div class="clearfix" style="font-size: 14px;margin-top: 5px;font-size: 12px;">-->
+                <!--<div class="left">-->
+                    <!--<span style="color: #8C8C8C">我的额度:</span>-->
+                    <!--<span>'+creditGrant+'</span>-->
+                <!--</div>-->
+                <!--<div class="right" style="color: #8C8C8C;">-->
+                    <!--<span>剩余</span>'+creditBalance+'-->
+                <!--</div>-->
+            <!--</div>-->
+        <!--</a>-->
+    </div>
+</body>
+</html>
+<script src="../../js/jquery-3.2.1.js"></script>
+<script src="../../js/zepto.min.js"></script>
+<script src="../../js/config.js"></script>
+<script>
+    if(window.location.search){
+        var href = window.location.href;
+        var state = href.split('&')[1];
+        state = state.split('=')[1];
+        var code = href.split('?')[1];
+        code = code.split('&')[0];
+        code = code.split('=')[1];
+    }
+    $.ajax({
+        type: 'GET',
+        url: '/wechat/wlqz/callback' ,
+        //data: {'code':code} ,
+        headers: {
+            app_code:"WULIUQIANZHUANG",
+            client:"wechat"
+        },
+        success: function (res) {
+
+            if(res.message == 'error'){
+                $.ajax({
+                    type: 'GET',
+                    url: '/wechatLogin' ,
+                    data: {'code':code,'state':state} ,
+                    headers: {
+                        app_code:"WULIUQIANZHUANG",
+                        client:"wechat"
+                    },
+                    success: function (res) {
+
+                        if(res.ActionStatus == 'FAIL'){
+                            //用户没注册
+                            var uri='http://'+window.config.location+'/wechat/wlqz/html/login.html';
+                            uri=encodeURIComponent(uri);
+                            window.location.href='https://open.weixin.qq.com/connect/oauth2/authorize?appid='+window.config.appid+'&redirect_uri='+uri+'&response_type=code&scope=snsapi_base&state='+state+'#wechat_redirect';
+                        }else{
+                            window.userid=res.message;
+                            productAll(window.userid)
+                        }
+
+                    } ,
+                    dataType: 'json'
+                })
+
+            }else{
+                window.userid=res.message;
+                productAll(window.userid)
+            }
+        } ,
+        dataType: 'json'
+    });
+
+    function productAll(userid) {
+        $.ajax({
+            type: 'GET',
+            url: '/getuserproductinfo',
+            data: {'userid': userid},
+            headers: {
+                app_code: "WULIUQIANZHUANG",
+                client: "wechat"
+            },
+            success: function (res) {
+                console.log(res)
+                var resData =res.data;
+
+                //没有生成信用卡
+                if(resData.rzzl.cardId == null && resData.sjsh.cardId == null && resData.wdxyd.cardId == null  && resData.mdbt.cardId == null && resData.companyMDBT == null){
+                    $('#accountNull').show();
+                }
+                if(resData.sjsh.cardId){
+                    $.ajax({
+                        type: 'GET',
+                        url: '/rest/creditcards/'+resData.sjsh.cardId,
+                        data: {},
+                        headers: {
+                            app_code: "WULIUQIANZHUANG",
+                            client: "wechat"
+                        },
+                        success: function (res) {
+                            var creditBalance =Number(res.creditBalance).toLocaleString();
+                            var creditGrant =Number(res.creditGrant).toLocaleString();
+                            var progress = (Number(res.creditBalance)/Number(res.creditGrant))*100
+                            //var str ='<a class="card" href="ordersjsh/myLoan.html?cardId='+resData.sjsh.cardId+'&userid='+window.userid+'" ><div class="clearfix"><div class="left"><img style="width: 40px;" src="../../images/icon_sjsh@3x.png"><span style="vertical-align: middle;font-weight: bold;display: inline-block;margin-top: -30px; margin-left: 10px;">随借随还</span></div><p class="right" style="color: #ADADAD;margin-top: 20px;"><span>剩余</span>'+creditBalance+'</p></div><div class="weui-slider" style="padding: 0;margin-top: 15px;"><div class="weui-slider-inner" style="height: 4px;position: relative"><div style="position: absolute;top: -20px;left: calc( '+progress+'% - 7px);"><img style="width: 12px;" src="../../images/pic_slide_blue@3x.png"></div><div style="width: '+progress+'%;height: 4px;" class="weui-slider-track"></div></div></div><div style="font-size: 14px;margin-top: 5px"><span style="color: #ADADAD">我的额度:</span><span>'+creditGrant+'</span></div></a>\n'
+
+                            var str='<a href="ordersjsh/myLoan.html?cardId='+resData.sjsh.cardId+'&userid='+window.userid+'" class="card">\n' +
+                                '            <div class="clearfix">\n' +
+                                '                <div class="left">\n' +
+                                '                <img style="width: 31px;" src="../../images/icon_sjsh@3x.png">\n' +
+                                '                    <span style="vertical-align: middle;font-weight: bold;display: inline-block;margin-top: -30px; margin-left: 10px;">随借随还</span>\n' +
+                                '                </div>\n' +
+                                '                <div class="right" style="color: #ADADAD;font-size: 11px;margin-top: 5px;">\n' +
+                                '                    <div class="clearfix">\n' +
+                                '                        <div class="right" style="width: 71px;height: 21px;color:#00B0EC;border: 1px solid #00B0EC;line-height: 21px;text-align: center;border-radius: 15px;">立即借款</div>\n' +
+                                '                    </div>\n' +
+                                '                </div>\n' +
+                                '            </div>\n' +
+                                '            <div class="weui-slider" style="padding: 0;margin-top: 15px;">\n' +
+                                '                <div class="weui-slider-inner" style="height: 4px;position: relative">\n' +
+                                '                    <div style="position: absolute;top: -20px;left: calc( '+progress+'% - 5px);">\n' +
+                                '                        <img style="width: 10px;" src="../../images/pic_slide_blue@3x.png">\n' +
+                                '                    </div>\n' +
+                                '                    <div style="width: '+progress+'%;height: 4px;" class="weui-slider-track"></div>\n' +
+                                '                </div>\n' +
+                                '            </div>\n' +
+                                '            <div class="clearfix" style="font-size: 14px;margin-top: 5px;font-size: 12px;">\n' +
+                                '                <div class="left">\n' +
+                                '                    <span style="color: #8C8C8C">我的额度:</span>\n' +
+                                '                    <span>'+creditGrant+'</span>\n' +
+                                '                </div>\n' +
+                                '                <div class="right" style="color: #8C8C8C;">\n' +
+                                '                    <span>剩余</span>'+creditBalance+'\n' +
+                                '                </div>\n' +
+                                '            </div>\n' +
+                                '        </a>'
+
+
+                            $('#cardBg').append(str)
+                        },
+                        dataType: 'json'
+                    })
+
+                }
+                //老板
+                if(resData.mdbt.cardId){
+                    $.ajax({
+                        type: 'GET',
+                        url: '/rest/creditcards/'+resData.mdbt.cardId,
+                        data: {},
+                        headers: {
+                            app_code: "WULIUQIANZHUANG",
+                            client: "wechat"
+                        },
+                        success: function (res) {
+                            var creditBalance =Number(res.creditBalance).toLocaleString();
+                            var creditGrant =Number(res.creditGrant).toLocaleString();
+                            var progress = (Number(res.creditBalance)/Number(res.creditGrant))*100
+                            //var str ='<a href="ordermdbt/myLoan.html?userId='+userid+'&cardId='+resData.mdbt.cardId+'" class="card"><div class="clearfix"><h4 class="left">网点面单白条</h4><p class="right" style="font-size: 14px;">最高提现3000万</p></div><div class="clearfix"><h4 class="left" id="leftAmount">'+creditBalance+'</h4><h4 class="right">'+creditGrant+'</h4></div><div class="weui-slider" style="padding: 0;margin-top: 10px;"><div class="weui-slider-inner" style="height: 5px"><div style="width: '+ progress+'%;height: 5px;" class="weui-slider-track"></div></div></div><div style="text-align: center;font-size: 14px;margin-top: 5px">申请额度(元)</div></a>\n'
+
+                            //var str ='<a href="ordermdbt/myLoan.html?userId='+userid+'&cardId='+resData.mdbt.cardId+'" class="card"><div class="clearfix"><div class="left"><img style="width: 40px;" src="../../images/icon_lous@3x.png"><span style="vertical-align: middle;font-weight: bold;display: inline-block;margin-top: -30px; margin-left: 10px;">面单白条</span></div><p class="right" style="color: #ADADAD;margin-top: 20px;"><span>剩余</span>'+creditBalance+'</p></div><div class="weui-slider" style="padding: 0;margin-top: 15px;"><div class="weui-slider-inner" style="height: 4px;position: relative"><div style="position: absolute;top: -20px;left: calc( '+progress+'% - 7px);"><img style="width: 12px;" src="../../images/pic_slide_blue@3x.png"></div><div style="width: '+progress+'%;height: 4px;" class="weui-slider-track"></div></div></div><div style="font-size: 14px;margin-top: 5px"><span style="color: #ADADAD">我的额度:</span><span>'+creditGrant+'</span></div></a>'
+                            var str ='<a href="ordermdbt/myLoan.html?userId='+userid+'&cardId='+resData.mdbt.cardId+'" class="card">\n' +
+                                '            <div class="clearfix">\n' +
+                                '                <div class="left">\n' +
+                                '                <img style="width: 31px;" src="../../images/icon_lous@3x.png">\n' +
+                                '                    <span style="vertical-align: middle;font-weight: bold;display: inline-block;margin-top: -30px; margin-left: 10px;">面单白条</span>\n' +
+                                '                </div>\n' +
+                                '                <div class="right" style="color: #ADADAD;font-size: 11px;margin-top: 5px;">\n' +
+                                '                    <div class="clearfix">\n' +
+                                '                        <div class="right" style="width: 71px;height: 21px;color:#00B0EC;border: 1px solid #00B0EC;line-height: 21px;text-align: center;border-radius: 15px;">立即借款</div>\n' +
+                                '                    </div>\n' +
+                                '                </div>\n' +
+                                '            </div>\n' +
+                                '            <div class="weui-slider" style="padding: 0;margin-top: 15px;">\n' +
+                                '                <div class="weui-slider-inner" style="height: 4px;position: relative">\n' +
+                                '                    <div style="position: absolute;top: -20px;left: calc( '+progress+'% - 5px);">\n' +
+                                '                        <img style="width: 10px;" src="../../images/pic_slide_blue@3x.png">\n' +
+                                '                    </div>\n' +
+                                '                    <div style="width: '+progress+'%;height: 4px;" class="weui-slider-track"></div>\n' +
+                                '                </div>\n' +
+                                '            </div>\n' +
+                                '            <div class="clearfix" style="font-size: 14px;margin-top: 5px;font-size: 12px;">\n' +
+                                '                <div class="left">\n' +
+                                '                    <span style="color: #8C8C8C">我的额度:</span>\n' +
+                                '                    <span>'+creditGrant+'</span>\n' +
+                                '                </div>\n' +
+                                '                <div class="right" style="color: #8C8C8C;">\n' +
+                                '                    <span>剩余</span>'+creditBalance+'\n' +
+                                '                </div>\n' +
+                                '            </div>\n' +
+                                '        </a>'
+
+                            $('#cardBg').append(str)
+                        },
+                        dataType: 'json'
+                    })
+
+                }
+                //员工
+                if(!resData.mdbt.cardId && resData.companyMDBT){
+                    $.ajax({
+                        type: 'GET',
+                        url: '/rest/creditcards/'+resData.companyMDBT.cardId,
+                        data: {},
+                        headers: {
+                            app_code: "WULIUQIANZHUANG",
+                            client: "wechat"
+                        },
+                        success: function (res) {
+                            var creditBalance =Number(res.creditBalance).toLocaleString();
+                            var creditGrant =Number(res.creditGrant).toLocaleString();
+
+                            var progress = (Number(res.creditBalance)/Number(res.creditGrant))*100
+                            //var str ='<a href="ordermdbt/myLoan.html?userId='+userid+'&cardId='+resData.companyMDBT.cardId+'" class="card"><div class="clearfix"><h4 class="left">网点面单白条</h4><p class="right" style="font-size: 14px;">最高提现3000万</p></div><div class="clearfix"><h4 class="left" id="leftAmount">'+creditBalance+'</h4><h4 class="right">'+creditGrant+'</h4></div><div class="weui-slider" style="padding: 0;margin-top: 10px;"><div class="weui-slider-inner" style="height: 5px"><div style="width: '+ progress+'%;height: 5px;" class="weui-slider-track"></div></div></div><div style="text-align: center;font-size: 14px;margin-top: 5px">申请额度(元)</div></a>\n'
+
+                            //var str ='<a href="ordermdbt/myLoan.html?userId='+userid+'&cardId='+resData.companyMDBT.cardId+'" class="card"><div class="clearfix"><div class="left"><img style="width: 40px;" src="../../images/icon_lous@3x.png"><span style="vertical-align: middle;font-weight: bold;display: inline-block;margin-top: -30px; margin-left: 10px;">面单白条</span></div><p class="right" style="color: #ADADAD;margin-top: 20px;"><span>剩余</span>'+creditBalance+'</p></div><div class="weui-slider" style="padding: 0;margin-top: 15px;"><div class="weui-slider-inner" style="height: 4px;position: relative"><div style="position: absolute;top: -20px;left: calc( '+progress+'% - 7px);"><img style="width: 12px;" src="../../images/pic_slide_blue@3x.png"></div><div style="width: '+progress+'%;height: 4px;" class="weui-slider-track"></div></div></div><div style="font-size: 14px;margin-top: 5px"><span style="color: #ADADAD">我的额度:</span><span>'+creditGrant+'</span></div></a>'
+
+                            var str ='<a href="ordermdbt/myLoan.html?userId='+userid+'&cardId='+resData.companyMDBT.cardId+'" class="card">\n' +
+                                '            <div class="clearfix">\n' +
+                                '                <div class="left">\n' +
+                                '                <img style="width: 31px;" src="../../images/icon_lous@3x.png">\n' +
+                                '                    <span style="vertical-align: middle;font-weight: bold;display: inline-block;margin-top: -30px; margin-left: 10px;">面单白条</span>\n' +
+                                '                </div>\n' +
+                                '                <div class="right" style="color: #ADADAD;font-size: 11px;margin-top: 5px;">\n' +
+                                '                    <div class="clearfix">\n' +
+                                '                        <div class="right" style="width: 71px;height: 21px;color:#00B0EC;border: 1px solid #00B0EC;line-height: 21px;text-align: center;border-radius: 15px;">立即借款</div>\n' +
+                                '                    </div>\n' +
+                                '                </div>\n' +
+                                '            </div>\n' +
+                                '            <div class="weui-slider" style="padding: 0;margin-top: 15px;">\n' +
+                                '                <div class="weui-slider-inner" style="height: 4px;position: relative">\n' +
+                                '                    <div style="position: absolute;top: -20px;left: calc( '+progress+'% - 5px);">\n' +
+                                '                        <img style="width: 10px;" src="../../images/pic_slide_blue@3x.png">\n' +
+                                '                    </div>\n' +
+                                '                    <div style="width: '+progress+'%;height: 4px;" class="weui-slider-track"></div>\n' +
+                                '                </div>\n' +
+                                '            </div>\n' +
+                                '            <div class="clearfix" style="font-size: 14px;margin-top: 5px;font-size: 12px;">\n' +
+                                '                <div class="left">\n' +
+                                '                    <span style="color: #8C8C8C">我的额度:</span>\n' +
+                                '                    <span>'+creditGrant+'</span>\n' +
+                                '                </div>\n' +
+                                '                <div class="right" style="color: #8C8C8C;">\n' +
+                                '                    <span>剩余</span>'+creditBalance+'\n' +
+                                '                </div>\n' +
+                                '            </div>\n' +
+                                '        </a>'
+                            $('#cardBg').append(str)
+                        },
+                        dataType: 'json'
+                    })
+
+                }
+
+            },
+            dataType: 'json'
+        })
+    }
+</script>

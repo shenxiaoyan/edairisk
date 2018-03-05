@@ -1,0 +1,311 @@
+<script>
+    app.controller("roleFormController",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "$state",
+            "entity",
+            function ($rootScope, $scope, $http, $stateParams, $state, entity) {
+
+                $scope.id = $stateParams.id;
+
+                $scope.ownMenus           = null;
+                $scope.allMenus           = null;
+                $scope.departmenttype     = null;
+                $scope.allDepartmenttypes = null;
+                $scope.state              = null;
+                $scope.allStates          = null;
+
+                $scope.getMenu = function (ownMenus) {
+                    $scope.allMenus = $rootScope.menus;
+                    angular.forEach($scope.allMenus, function (value, index) {
+                        value.isSelected = false;
+                        angular.forEach(ownMenus, function (v2, i2) {
+                            if (v2.id === value.id) {
+                                value.isSelected = true;
+                            }
+                        });
+                        if (value.children) {
+                            angular.forEach(value.children, function (value, index) {
+                                value.isSelected = false;
+                                angular.forEach(ownMenus, function (v2, i2) {
+                                    if (v2.id === value.id) {
+                                        value.isSelected = true;
+                                    }
+                                });
+                            });
+                        }
+                    });
+                };
+
+
+//              $scope.debtortypeCode = $rootScope.allEntitiesInfo["capitalproduct"].debtortypeCode.values;
+
+                if ($scope.id) {
+
+                    entity.getDetail("rest/roles/" + $scope.id, ["visibleMenus", "departmenttype", "state"]).then(function (resResult) {
+
+                        $scope.form = resResult;
+
+                        $scope.ownMenus = $scope.form.visibleMenus._embeddedItems;
+                        $scope.getMenu($scope.ownMenus);
+
+                        //获取所有部门类型
+                        entity.getList("rest/departmenttypes").then(function (departtypeResResult) {
+                            $scope.allDepartmenttypes = departtypeResResult._embeddedItems;
+                            //获取关联的部门类型
+                            $scope.departmenttype     = entity.getSelectedMyOwn($scope.allDepartmenttypes, $scope.form.departmenttype);
+                        });
+
+                        entity.getList("rest/roleStates").then(function (stateResResult) {
+                            $scope.allStates = stateResResult._embeddedItems;
+                            //获取关联的部门类型
+                            $scope.state     = entity.getSelectedMyOwn($scope.allStates, $scope.form.state);
+                        });
+
+                    });
+
+                } else {
+                    $scope.form = {};
+
+                    entity.getList("rest/departmenttypes").then(function (resResult) {
+                        $scope.allDepartmenttypes = resResult._embeddedItems;
+                        $scope.departmenttype     = $scope.allDepartmenttypes[0];
+                    });
+
+                    entity.getList("rest/roleStates").then(function (stateResResult) {
+                        $scope.allStates = stateResResult._embeddedItems;
+                        //获取关联的部门类型
+                        $scope.state     = $scope.allStates[0];
+                    });
+                }
+
+                $scope.roleSave = function () {
+
+                    $scope.form.departmenttype = $scope.departmenttype ? $scope.departmenttype._links.self.href : null;
+                    $scope.form.state          = $scope.state ? $scope.state._links.self.href : null;
+
+                    if ($scope.form._links) {
+
+                        $scope.form.act = "update";
+
+                        $http({
+                            url: $scope.form._links.self.href,
+                            method: "PATCH",
+                            data: $scope.form
+                        }).success(function (resResult) {
+                            $state.go("auditEntity.home.profile.info", {
+                                id: resResult.id,
+                                entity_key: "role"
+                            }, {reload: true});
+                            $rootScope.toasterSuccess("成功！", "修改成功！");
+                        });
+
+                    } else {
+
+                        $scope.form.act = "create";
+
+                        $http.post("rest/roles", $scope.form).success(function (resResult) {
+                            $state.go("auditEntity.form", {id: resResult.id, entity_key: "role"}, {reload: true});
+                            $rootScope.toasterSuccess("成功！", "新建成功！");
+                        });
+
+                    }
+                };
+
+                /*
+                 *
+                 * */
+                $scope.changeMenuRole = function (menu) {
+
+                    //增加
+                    if (menu.isSelected) {
+                        $http({
+                            method: "PATCH",
+//                            url: $scope.form._links.self.href,
+                            url: "rest/menus/" + menu.id + "/visibleRoles",
+                            data: $scope.form._links.self.href,
+                            headers: {"Content-Type": "text/uri-list"}
+                        }).success(function (resResult) {
+                            $rootScope.toasterSuccess("成功！", "关联成功！");
+                        });
+                    } else {//删除
+                        $http({
+                            method: "DELETE",
+                            url: $scope.form._links.visibleMenus.href + "/" + menu.id
+                        }).success(function (resResult) {
+                            $rootScope.toasterInfo("成功！", "已取消关联！");
+                        });
+                    }
+
+                };
+
+            }
+        ]
+    );
+</script>
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs" ng-controller="roleFormController">
+    <!-- column -->
+    <div class="col">
+        <div class="vbox">
+            <div class="wrapper b-b" ng-if="!form._links">
+                <div class="font-thin h4">
+                    <span translate="role.self.label"></span>新建
+                </div>
+            </div>
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner">
+                        <div class="wrapper">
+                            <form name="role_form" class="form-horizontal">
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">
+                                        <span class="text-danger">*</span>
+                                        <span translate="role.label.label"></span>
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="label"
+                                               ng-model="form.label"
+                                               required>
+                                        <span class="help-block text-danger"
+                                              ng-show="role_form.label.$dirty && role_form.label.$invalid">
+                                            <i class="fa fa-exclamation-circle text-danger"></i>&ensp;名称为必填
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">
+                                        <span class="text-danger">*</span>
+                                        <span translate="role.roleCode.label"></span>
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="roleCode"
+                                               ng-model="form.roleCode"
+                                               required
+                                               pattern="^[A-Z]{1,}$">
+                                        <span class="help-block text-danger"
+                                              ng-show="role_form.roleCode.$dirty && role_form.roleCode.$invalid">
+                                            <i class="fa fa-exclamation-circle text-danger"></i>&ensp;角色Code为必填，且为大写字母
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">
+                                        <span class="text-danger">*</span>
+                                        <span translate="role.departmenttype.label"></span>
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control"
+                                                ng-model="departmenttype"
+                                                name="departmenttype"
+                                                ng-options="x.label for x in allDepartmenttypes"
+                                                required></select>
+                                        <span class="help-block text-danger"
+                                              ng-show="role_form.departmenttype.$dirty && role_form.departmenttype.$invalid">
+                                            <i class="fa fa-exclamation-circle text-danger"></i>&ensp;部门状态为必填
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">
+                                        <span class="text-danger">*</span>
+                                        <span translate="role.state.label"></span>
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control"
+                                                ng-model="state"
+                                                name="state"
+                                                ng-options="state.label for state in allStates"
+                                                required></select>
+                                        <span class="help-block text-danger"
+                                              ng-show="role_form.state.$dirty && role_form.state.$invalid">
+                                            <i class="fa fa-exclamation-circle text-danger"></i>&ensp;状态为必填
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-4 col-sm-offset-2">
+                                        <button ng-if="form._links"
+                                                ui-sref="auditEntity.home.profile.info({id:id,entity_key:'role'})"
+                                                class="btn btn-default">返回
+                                        </button>
+                                        <button ng-if="!form._links"
+                                                ui-sref="auditEntity.list({entity_key:'role'})"
+                                                class="btn btn-default">返回
+                                        </button>
+                                        <button type="button"
+                                                class="btn btn-primary"
+                                                ng-disabled="role_form.$invalid"
+                                                ng-click="roleSave()">
+                                            保存
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /column -->
+    <div class="col lter b-l" ng-if="form._links">
+        <div class="vbox">
+            <div class="wrapper b-b">
+                <div class="font-thin h4">
+                    选择可读菜单
+                </div>
+            </div>
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner">
+                        <div class="wrapper">
+                            <div class="table-responsive m-t-xs">
+                                <table class="table table-striped b-t b-light" ng-repeat="menu in allMenus">
+                                    <thead>
+                                    <tr>
+                                        <th class="w-sm">
+                                            <label class="i-checks m-b-none">
+                                                <input type="checkbox"
+                                                       ng-model="menu.isSelected"
+                                                       ng-change="changeMenuRole(menu);">
+                                                <i></i>
+                                            </label>
+                                        </th>
+                                        <th class="w-sm">{{menu.label}}</th>
+                                        <th class="w-sm"></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="menuChildren in menu.children">
+                                        <td class="w-sm"></td>
+                                        <td class="w-sm">
+                                            <label class="i-checks m-b-none">
+                                                <input type="checkbox"
+                                                       ng-model="menuChildren.isSelected"
+                                                       ng-change="changeMenuRole(menuChildren);">
+                                                <i></i>
+                                            </label>
+                                        </td>
+                                        <td class="w-sm">
+                                            <span class="text-ellipsis">{{menuChildren.label}}</span>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /hbox layout -->

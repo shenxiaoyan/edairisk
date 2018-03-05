@@ -1,0 +1,435 @@
+<div class="wrapper-md" style="padding-bottom: 0">
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            客户信息
+        </div>
+        <table class="table table-striped m-b-none">
+            <tbody>
+            <tr>
+                <td class="v-middle text-right w-sm">产品类型：</td>
+                <td class="v-middle w-xl">{{ info.productLabel }}</td>
+                <td class="v-middle text-right w-sm">借款人：</td>
+                <td class="v-middle w-xl">{{ info.name }}</td>
+            </tr>
+            <tr>
+                <td class="v-middle text-right w-sm">网点名称：</td>
+                <td class="v-middle w-xl">{{ info.branchesName }}</td>
+                <td class="v-middle text-right w-sm">客户联系方式：</td>
+                <td class="v-middle w-xl">{{ info.telephone }}</td>
+            </tr>
+            <tr>
+                <td class="v-middle text-right w-sm">快递品牌：</td>
+                <td class="v-middle w-xl">{{ info.agentBrand }}</td>
+                <td class="v-middle text-right w-sm">经营区域：</td>
+                <td class="v-middle w-xl">{{ info.businessArea }}</td>
+            </tr>
+            <tr>
+                <td class="v-middle text-right w-sm">身份证号：</td>
+                <td class="v-middle w-xl">{{ info.identity }}</td>
+                <td class="v-middle text-right w-sm">保证金(元)</td>
+                <td class="v-middle w-xl">{{ info.margin }}</td>
+            </tr>
+            <tr>
+                <td class="v-middle text-right">授信额度(元)：</td>
+                <td class="v-middle">{{ info.creditGrant }}</td>
+                <td class="v-middle text-right">已用额度(元)：</td>
+                <td class="v-middle">{{ info.creditLoan }}</td>
+            </tr>
+            <tr>
+                <td class="v-middle text-right">剩余额度(元)：</td>
+                <td class="v-middle">{{ info.creditBalance }}</td>
+                <td class="v-middle text-right">业务员：</td>
+                <td class="v-middle">{{ info.serviceName ? info.serviceName : '未分配业务员' }}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="wrapper-md" ng-if="profile.length < 1">
+    <p class="alert alert-warning alert-dismissable">暂无借款信息!</p>
+</div>
+<div class="wrapper-md" ng-if="sjshShow">
+    <div class="tapd_list" ng-repeat="item in profile" ng-class="{true: 'borderblue', false: ''}[item.show]">
+                <ul class="list-inline row" style="padding: 20px;margin: 0" ng-class="{true: 'backgroundBule', false: ''}[item.show]">
+                    <li class=" col-xs-1">
+                        <span ng-click="trToggle(item.index)" style="cursor: pointer" ng-class="{true: 'glyphicon glyphicon-minus', false: 'glyphicon glyphicon-plus'}[item.show]" ></span> <span>序号:</span> {{ item.index }}
+                    </li>
+                    <li class=" col-xs-2">
+                        <span>借款金额: </span>{{item.loanAmount +'(元)'}}
+                    </li>
+                    <li class=" col-xs-2">
+                        <span>借款日期: </span> {{ item.loanDate.substring(0,4) +'-' +item.loanDate.substring(4,6) + '-' + item.loanDate.substring(6,8)}}
+                    </li>
+                    <li class=" col-xs-2">
+                        <span>借款期限: </span>{{ item.loanLimitDate.substring(0,4) +'-' +item.loanLimitDate.substring(4,6) + '-' + item.loanLimitDate.substring(6,8)}}
+                    </li>
+                    <li class=" col-xs-1">
+                        <span>年化利率: </span> {{item.yearRate ? item.yearRate : '暂无'}}
+                    </li>
+                    <li class=" col-xs-2">
+                        <span>前置服务费(元): </span> {{item.forwordAmount ? item.forwordAmount : '暂无'}}
+                    </li>
+                    <li class=" col-xs-2">
+                        <span>是否已结算: </span>{{item.settlement ? item.settlement : '暂无' }}
+                    </li>
+                </ul>
+        <div ng-if="item.show" style="background: #fff">
+            <p style="margin: 0;padding: 20px;" ng-if="item.paymentingInfos.length == 0">暂无还款信息</p>
+            <table ng-if="item.paymentingInfos.length > 0"  class="table table-hover b-light">
+                <thead>
+                <tr style="background: #f7f7f7">
+                    <th>还款日期</th>
+                    <th>还款本金</th>
+                    <th>还款余额</th>
+                    <th>还款利息</th>
+                    <th>是否逾期</th>
+                    <th>逾期罚息</th>
+                    <th>是否已还款</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="item2 in item.paymentingInfos">
+                    <td class="v-middle">
+                        {{ item2.payDate }}
+                    </td>
+
+                    <td class="v-middle">
+                        {{ item2.principal }}
+                    </td>
+
+                    <td class="v-middle">
+                        {{ item2.paymantRemain }}
+                    </td>
+
+                    <td class="v-middle">
+                        {{ item2.interinest }}
+                    </td>
+
+                    <td class="v-middle" ng-class="{true: 'color_red', false: 'color_black'}[(item2.overdue == '1')]">
+                        {{ item2.overdue == '1'? '是' : "否" }}
+                    </td>
+
+                    <td class="v-middle">
+                        {{ item2.punishInterinest }}
+                    </td>
+
+                    <td class="v-middle" ng-class="{true: 'color_black', false: 'color_red'}[(item2.payof == '1')]">
+                        {{ item2.payof == '1' ? '是' : '否' }}
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<div class="wrapper-md" ng-if="mdbtShow">
+    <div class="tapd_list" ng-repeat="item in profile" ng-class="{true: 'borderblue', false: ''}[item.show]">
+        <ul class="list-inline row" style="padding: 20px;margin: 0" ng-class="{true: 'backgroundBule', false: ''}[item.show]">
+            <li class=" col-xs-1">
+                <span ng-click="trToggle(item.index)" style="cursor: pointer" ng-class="{true: 'glyphicon glyphicon-minus', false: 'glyphicon glyphicon-plus'}[item.show]" ></span> <span>序号:</span> {{ item.index }}
+            </li>
+            <li class=" col-xs-2">
+                <span>借款金额: </span>{{item.loanAmount +'(元)'}}
+            </li>
+            <li class=" col-xs-2">
+                <span>借款日期: </span> {{item.loanDate.split(' ')[0] }}
+            </li>
+            <li class=" col-xs-2">
+                <span>借款期限: </span>{{item.loanLimitDate.split(' ')[0] }}
+            </li>
+            <li class=" col-xs-1">
+                <span>年化利率: </span> {{item.yearRate ? item.yearRate : '暂无'}}
+            </li>
+            <li class=" col-xs-2">
+                <span>前置服务费(元): </span> {{item.forwordAmount ? item.forwordAmount : '暂无'}}
+            </li>
+            <li class=" col-xs-2">
+                <span>是否已结算: </span>{{item.settlement ? item.settlement : '暂无' }}
+            </li>
+        </ul>
+        <div ng-if="item.show" style="background: #fff">
+            <p style="margin: 0;padding: 20px;" ng-if="item.paymentingInfos.length == 0">暂无还款信息</p>
+            <table ng-if="item.paymentingInfos.length > 0"  class="table table-hover b-light">
+                <thead>
+                <tr style="background: #f7f7f7">
+                    <th>还款日期</th>
+                    <th>还款本金</th>
+                    <th>还款利息</th>
+                    <th>还款余额</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="item2 in item.paymentingInfos">
+                    <td class="v-middle">
+                        {{ item2.payDate }}
+                    </td>
+
+                    <td class="v-middle">
+                        {{ item2.principal }}
+                    </td>
+
+                    <td class="v-middle">
+                        {{ item2.interinest }}
+                    </td>
+
+                    <td class="v-middle">
+                        {{ item2.paymantRemain }}
+                    </td>
+
+                </tr>
+                </tbody>
+            </table>
+            <p style="margin: 0;padding: 20px;" ng-if="item.loanoverdues.length == 0">暂无逾期信息</p>
+            <table ng-if="item.loanoverdues.length > 0"  class="table table-hover b-light">
+                <thead>
+                <tr style="background: #f7f7f7">
+                    <th>逾期天数</th>
+                    <th>逾期罚息</th>
+                    <th>是否已还款</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="item3 in item.loanoverdues">
+                    <td class="v-middle">
+                        {{ item3.overdueDays }}
+                    </td>
+
+                    <td class="v-middle">
+                        {{ item3.penalSum }}
+                    </td>
+
+                    <td class="v-middle" ng-class="{true: 'color_black', false: 'color_red'}[(item2.status == '1')]">
+                        {{ item3.status == '1' ? '是' : '否' }}
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<!--<div class="wrapper-md" ng-if="sjshShow">-->
+<!--<div class="panel panel-default">-->
+    <!--<div class="panel-heading">-->
+        <!--借款信息-->
+    <!--</div>-->
+    <!--<div class="panel-heading" ng-if="profile.length < 1">-->
+        <!--暂无数据！-->
+    <!--</div>-->
+    <!--<div class="table-responsive" ng-if="profile.length > 0">-->
+        <!--<table class="table-striped table table-hover b-light repeatTable">-->
+            <!--<thead>-->
+            <!--&lt;!&ndash;<tr>&ndash;&gt;-->
+                <!--&lt;!&ndash;<th>序号</th>&ndash;&gt;-->
+                <!--&lt;!&ndash;<th>借款金额(元)</th>&ndash;&gt;-->
+                <!--&lt;!&ndash;<th>借款日期</th>&ndash;&gt;-->
+                <!--&lt;!&ndash;<th>借款期限</th>&ndash;&gt;-->
+                <!--&lt;!&ndash;<th>年化利率</th>&ndash;&gt;-->
+                <!--&lt;!&ndash;<th>前置服务费(元)</th>&ndash;&gt;-->
+                <!--&lt;!&ndash;<th>是否已结算</th>&ndash;&gt;-->
+            <!--&lt;!&ndash;</tr>&ndash;&gt;-->
+            <!--</thead>-->
+            <!--<tbody ng-repeat="item in profile" style="border-top: none">-->
+            <!--<tr>-->
+                <!--<td class="v-middle">-->
+                    <!--<span>序号:</span> <span ng-click="trToggle(item.index)" style="cursor: pointer" ng-class="{true: 'glyphicon glyphicon-minus', false: 'glyphicon glyphicon-plus'}[item.show]" ></span> {{ item.index }}-->
+                <!--</td>-->
+                <!--<td class="v-middle">-->
+                    <!--<span>借款金额(元):</span>{{item.loanAmount}}-->
+                <!--</td>-->
+                <!--<td class="v-middle">-->
+                    <!--<span>借款日期</span> {{item.loanDate}}-->
+                <!--</td>-->
+                <!--<td class="v-middle">-->
+                    <!--<span>借款期限</span>{{item.loanLimitDate}}-->
+                <!--</td>-->
+                <!--<td class="v-middle">-->
+                    <!--<span>年化利率</span> {{item.yearRate ? item.yearRate : '暂无'}}-->
+                <!--</td>-->
+                <!--<td class="v-middle">-->
+                     <!--<span>前置服务费(元)</span> {{item.forwordAmount ? item.forwordAmount : '暂无'}}-->
+                <!--</td>-->
+                <!--<td class="v-middle">-->
+                    <!--<span>是否已结算</span>{{item.settlement}}-->
+                <!--</td>-->
+            <!--</tr>-->
+            <!--<tr ng-if="item.show">-->
+                <!--<td colspan="7"  >-->
+                    <!--<p ng-if="item.paymentingInfos.length == 0">暂无还款信息</p>-->
+                    <!--<table ng-if="item.paymentingInfos.length > 0"  class="table table-hover b-light">-->
+                        <!--<thead>-->
+                        <!--<tr>-->
+                            <!--<th>还款日期</th>-->
+                            <!--<th>还款本金</th>-->
+                            <!--<th>还款余额</th>-->
+                            <!--<th>还款利息</th>-->
+                            <!--<th>是否逾期</th>-->
+                            <!--<th>逾期罚息</th>-->
+                            <!--<th>是否已还款</th>-->
+                        <!--</tr>-->
+                        <!--</thead>-->
+                        <!--<tbody>-->
+                        <!--<tr ng-repeat="item2 in item.paymentingInfos">-->
+                            <!--<td class="v-middle">-->
+                                <!--{{ item2.payDate }}-->
+                            <!--</td>-->
+
+                            <!--<td class="v-middle">-->
+                            <!--{{ item2.principal }}-->
+                            <!--</td>-->
+
+                            <!--<td class="v-middle">-->
+                            <!--{{ item2.paymantRemain }}-->
+                            <!--</td>-->
+
+                            <!--<td class="v-middle">-->
+                            <!--{{ item2.interinest }}-->
+                            <!--</td>-->
+
+                            <!--<td class="v-middle" ng-class="{true: 'color_red', false: 'color_black'}[(item2.overdue == '1')]">-->
+                            <!--{{ item2.overdue == '1'? '是' : "否" }}-->
+                            <!--</td>-->
+
+                            <!--<td class="v-middle">-->
+                            <!--{{ item2.punishInterinest }}-->
+                            <!--</td>-->
+
+                            <!--<td class="v-middle" ng-class="{true: 'color_black', false: 'color_red'}[(item2.payof == '1')]">-->
+                            <!--{{ item2.payof == '1' ? '是' : '否' }}-->
+                            <!--</td>-->
+                        <!--</tr>-->
+                        <!--</tbody>-->
+                    <!--</table>-->
+                <!--</td>-->
+            <!--</tr>-->
+            <!--</tbody>-->
+        <!--</table>-->
+    <!--</div>-->
+<!--</div>-->
+<!--</div>-->
+
+
+<!--<div class="wrapper-md" ng-if="mdbtShow">-->
+    <!--<div class="panel panel-default">-->
+        <!--<div class="panel-heading">-->
+            <!--借款信息-->
+        <!--</div>-->
+        <!--<div class="panel-heading" ng-if="profile.length < 1">-->
+            <!--暂无数据！-->
+        <!--</div>-->
+        <!--<div class="table-responsive" ng-if="profile.length > 0">-->
+            <!--<table class="table table-hover b-light">-->
+                <!--<thead>-->
+                <!--<tr>-->
+                    <!--<th>序号</th>-->
+                    <!--<th>借款金额(元)</th>-->
+                    <!--<th>借款日期</th>-->
+                    <!--<th>借款期限</th>-->
+                    <!--<th>年化利率</th>-->
+                    <!--<th>前置服务费(元)</th>-->
+                    <!--<th>是否已结算</th>-->
+                    <!--&lt;!&ndash;<th>还款日期</th>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<th>还款本金</th>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<th>还款余额</th>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<th>还款利息</th>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<th>逾期天数</th>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<th>逾期罚息</th>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<th>是否已还款</th>&ndash;&gt;-->
+                <!--</tr>-->
+                <!--</thead>-->
+                <!--<tbody>-->
+                <!--<tr ng-repeat="item in profile">-->
+                    <!--<td class="v-middle">-->
+                        <!--{{ $index + 1 }}-->
+                    <!--</td>-->
+                    <!--<td class="v-middle">-->
+                        <!--{{item.loanAmount}}-->
+                    <!--</td>-->
+                    <!--<td class="v-middle">-->
+                        <!--{{item.loanDate.split(' ')[0]}}-->
+                    <!--</td>-->
+                    <!--<td class="v-middle">-->
+                        <!--{{item.loanLimitDate.split(' ')[0] }}-->
+                    <!--</td>-->
+                    <!--<td class="v-middle">-->
+                        <!--{{item.yearRate ? item.yearRate : '暂无'}}-->
+                    <!--</td>-->
+                    <!--<td class="v-middle">-->
+                        <!--{{item.forwordAmount ? item.forwordAmount : '暂无'}}-->
+                    <!--</td>-->
+                    <!--<td class="v-middle">-->
+                        <!--{{item.settlement}}-->
+                    <!--</td>-->
+                    <!--<td style="padding: 0">-->
+                        <!--<table class="table b-light childTable">-->
+                            <!--<tr ng-repeat="item2 in item.paymentingInfos">-->
+                                <!--<td class="v-middle">-->
+                                    <!--{{ item2.payDate.split(' ')[0] }}-->
+                                <!--</td>-->
+                            <!--</tr>-->
+                        <!--</table>-->
+                    <!--</td>-->
+                    <!--<td  style="padding: 0">-->
+                        <!--<table class="table b-light childTable">-->
+                            <!--<tr ng-repeat="item2 in item.paymentingInfos">-->
+                                <!--<td class="v-middle">-->
+                                    <!--{{ item2.principal }}-->
+                                <!--</td>-->
+                            <!--</tr>-->
+                        <!--</table>-->
+                    <!--</td>-->
+                    <!--<td  style="padding: 0">-->
+                        <!--<table class="table b-light childTable">-->
+                            <!--<tr ng-repeat="item2 in item.paymentingInfos">-->
+                                <!--<td class="v-middle">-->
+                                    <!--{{ item2.paymantRemain }}-->
+                                <!--</td>-->
+                            <!--</tr>-->
+                        <!--</table>-->
+                    <!--</td>-->
+                    <!--<td  style="padding: 0">-->
+                        <!--<table class="table b-light childTable">-->
+                            <!--<tr ng-repeat="item2 in item.paymentingInfos">-->
+                                <!--<td class="v-middle">-->
+                                    <!--{{ item2.interinest }}-->
+                                <!--</td>-->
+                            <!--</tr>-->
+                        <!--</table>-->
+                    <!--</td>-->
+                    <!--<td  style="padding: 0">-->
+                        <!--<table class="table b-light childTable">-->
+                            <!--<tr ng-repeat="item3 in item.loanoverdues">-->
+                                <!--<td class="v-middle" ng-class="{true: 'color_red', false: 'color_black'}[(item3.loanoverdueDays)]">-->
+                                    <!--{{ item3.loanoverdueDays ? item3.loanoverdueDays : 0 }}-->
+                                <!--</td>-->
+                            <!--</tr>-->
+                        <!--</table>-->
+                    <!--</td>-->
+                    <!--<td  style="padding: 0">-->
+                        <!--<table class="table b-light childTable">-->
+                            <!--<tr ng-repeat="item3 in item.loanoverdues">-->
+                                <!--<td class="v-middle">-->
+                                    <!--{{ item3.punishInterinest ?punishInterinest:0}}-->
+                                <!--</td>-->
+                            <!--</tr>-->
+                        <!--</table>-->
+                    <!--</td>-->
+                    <!--<td  style="padding: 0">-->
+                        <!--<table class="table b-light childTable">-->
+                            <!--<tr ng-repeat="item3 in item.loanoverdues">-->
+                                <!--<td class="v-middle" ng-class="{true: 'color_black', false: 'color_red'}[(item3.payof == '1')]">-->
+                                    <!--{{ item3.payof == '1' ? '是' : '否' }}-->
+                                <!--</td>-->
+                            <!--</tr>-->
+                        <!--</table>-->
+                    <!--</td>-->
+                <!--</tr>-->
+                <!--</tbody>-->
+            <!--</table>-->
+        <!--</div>-->
+    <!--</div>-->
+<!--</div>-->

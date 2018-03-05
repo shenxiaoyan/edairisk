@@ -1,0 +1,80 @@
+<div class="wrapper">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    逾期详细信息
+                </div>
+                <table class="table table-striped m-b-none">
+                    <tbody>
+                    <tr>
+                        <td class="v-middle text-right w-sm"> 借款单号:</td>
+                        <td class="v-middle w-xl">{{ profile.loan.orderNo }}</td>
+                        <td class="v-middle text-right w-sm">姓名:</td>
+                        <td class="v-middle w-xl">{{ overdueUserInfo.name }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right w-sm"> 手机号:</td>
+                        <td class="v-middle w-xl">{{ overdueUserInfo.phone }}</td>
+                        <td class="v-middle text-right w-sm">本金(元):</td>
+                        <td class="v-middle w-xl">{{ overdueUserInfo.principal }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right w-sm">逾期金额(元)</td>
+                        <td class="v-middle w-xl">{{ profile.overdueAmount }}</td>
+                        <td class="v-middle text-right w-sm">逾期天数:</td>
+                        <td class="v-middle w-xl">{{ profile.overdueDays  }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right w-sm">逾期罚金(元)</td>
+                        <td class="v-middle w-xl">{{ profile.penalSum }}</td>
+                        <td class="v-middle text-right w-sm">逾期累加金额(元)</td>
+                        <td class="v-middle w-xl">{{ profile.historyAmount  }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right w-sm">逾期时间</td>
+                        <td class="v-middle w-xl">{{ profile.createdAt |datetime  }}</td>
+                        <td class="v-middle text-right w-sm">结清时间</td>
+                        <td ng-class="{true: 'color_black', false: 'color_red'}[!(profile.finishAt == null)]" class="v-middle w-xl">{{ profile.finishAt ? (profile.finishAt |datetime) : '尚未结清' }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<!--<div class="wrapper bg-white clearfix">-->
+    <!--<div class="panel panel-default">-->
+        <!--<div class="panel-heading">-->
+            <!--公司成员-->
+        <!--</div>-->
+        <!--<div class="table-responsive">-->
+            <!--<table class="table table-hover b-light">-->
+                <!--<thead>-->
+                <!--<tr>-->
+                    <!--<th>姓名</th>-->
+                    <!--<th>手机号</th>-->
+                    <!--<th>公司角色</th>-->
+                    <!--<th>创建时间</th>-->
+                <!--</tr>-->
+                <!--</thead>-->
+                <!--<tbody>-->
+                <!--<tr ng-repeat="item in companyUsers">-->
+                    <!--<td class="v-middle">-->
+                        <!--{{ item.realname ? item.realname :info.companyPersonName }}-->
+                    <!--</td>-->
+                    <!--<td class="v-middle">-->
+                        <!--{{ item.username }}-->
+                    <!--</td>-->
+                    <!--<td class="v-middle">-->
+                        <!--{{ item.companyRole == 'manager' ? '法人' :'职员'}}-->
+                    <!--</td>-->
+                    <!--<td class="v-middle">-->
+                        <!--{{ item.createdAt | datetime }}-->
+                    <!--</td>-->
+                <!--</tr>-->
+                <!--</tbody>-->
+            <!--</table>-->
+        <!--</div>-->
+    <!--</div>-->
+<!--</div>-->

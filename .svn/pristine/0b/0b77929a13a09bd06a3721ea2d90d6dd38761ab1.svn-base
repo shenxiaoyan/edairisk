@@ -1,0 +1,456 @@
+package com.liyang.service;
+
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import javax.annotation.PostConstruct;
+
+import com.liyang.domain.capitalproduct.Capitalproduct;
+import com.liyang.domain.capitalproduct.Capitalproduct.RepaymentMethodCode;
+import com.liyang.domain.creditcard.Creditcard;
+import com.liyang.domain.ordercdd.Ordercdd;
+import com.liyang.domain.ordermdbt.Ordermdbt;
+import com.liyang.domain.ordermdbt.OrdermdbtRepository;
+import com.liyang.domain.product.Product;
+import com.liyang.domain.productstorefee.Productstorefee;
+import com.liyang.domain.productstorefee.ProductstorefeeRepository;
+import com.liyang.util.OrderUtil;
+import com.liyang.util.ProductUtil;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.annotation.Order;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.liyang.domain.base.AbstractAuditorAct.ActGroup;
+import com.jpa.query.expression.QueryExpSpecificationBuilder;
+import com.jpa.query.expression.generic.GenericQueryExpSpecification;
+import com.liyang.Enum.OrderTypeEnum;
+import com.liyang.domain.base.ActRepository;
+import com.liyang.domain.base.AuditorEntityRepository;
+import com.liyang.domain.base.LogRepository;
+import com.liyang.domain.loan.Loan;
+import com.liyang.domain.loan.Loan.LoanType;
+import com.liyang.domain.loan.Loan.PeriodCode;
+import com.liyang.domain.loan.LoanAct;
+import com.liyang.domain.loan.LoanActRepository;
+import com.liyang.domain.loan.LoanFile;
+import com.liyang.domain.loan.LoanLog;
+import com.liyang.domain.loan.LoanLogRepository;
+import com.liyang.domain.loan.LoanRepository;
+import com.liyang.domain.loan.LoanState;
+import com.liyang.domain.loan.LoanStateRepository;
+import com.liyang.domain.loan.LoanWorkflow;
+import com.liyang.domain.loan.LoanWorkflowRepository;
+import com.liyang.domain.loan.Loanoverdue;
+import com.liyang.domain.loan.LoanoverdueRepository;
+import com.liyang.domain.orderwdsjsh.Orderwdsjsh;
+import com.liyang.domain.orderwdsjsh.OrderwdsjshRepository;
+import com.liyang.domain.role.RoleRepository;
+import com.liyang.domain.user.User;
+import com.liyang.util.DateUtil;
+import com.liyang.util.FailReturnObject;
+import com.liyang.util.ReturnObject.Level;
+import com.timevale.tgtext.awt.geom.s;
+import com.timevale.tgtext.text.pdf.PdfStructTreeController.returnType;
+
+import org.springframework.util.Assert;
+
+import static com.liyang.domain.capitalproduct.Capitalproduct.RepaymentMethodCode.BEFORE_INTEREST_AFTER_PRINCIPAL;
+import static org.hamcrest.CoreMatchers.nullValue;
+
+@Service
+@Order(37)
+public class LoanService extends AbstractWorkflowService<Loan, LoanWorkflow, LoanAct, LoanState, LoanLog, LoanFile> {
+
+	@Value("${spring.wlqz.wechat.OPEN_ACC_SUCCESS}")
+	private String OPEN_ACC_SUCCESS;
+
+	@Autowired
+	LoanActRepository loanActRepository;
+
+	@Autowired
+	LoanStateRepository loanStateRepository;
+
+	@Autowired
+	LoanLogRepository loanLogRepository;
+
+	@Autowired
+	LoanRepository loanRepository;
+	@Autowired
+	LoanService loanService;
+	//
+	@Autowired
+	LoanWorkflowRepository loanWorkflowRepository;
+	@Autowired
+	RoleRepository roleRepository;
+	@Autowired
+	WlqzWechatPubService wechatPubService;
+	@Autowired
+	OrderwdsjshRepository orderwdsjshRepository;
+	@Autowired
+	CreditrepayplanService creditrepayplanService;
+	@Autowired
+	ProductstorefeeRepository productstorefeeRepository;
+	@Autowired
+	XinGePushService xinGePushService;
+	@Autowired
+	SmsService smsService;
+	@Autowired
+	OrdermdbtRepository ordermdbtRepository;
+	@Autowired
+	LoanoverdueRepository loanoverdueRepository;
+
+	@Override
+	@PostConstruct
+	public void sqlInit() {
+
+		long findAll = loanActRepository.count();
+		if (findAll == 0) {
+			LoanAct save1 = loanActRepository.save(new LoanAct("创建", "create", 10, ActGroup.UPDATE));
+			LoanAct save2 = loanActRepository.save(new LoanAct("读取", "read", 20, ActGroup.READ));
+			LoanAct save3 = loanActRepository.save(new LoanAct("更新", "update", 30, ActGroup.UPDATE));
+			LoanAct save4 = loanActRepository.save(new LoanAct("删除", "delete", 40, ActGroup.UPDATE));
+			LoanAct save5 = loanActRepository.save(new LoanAct("自己的列表", "listOwn", 50, ActGroup.READ));
+			LoanAct save6 = loanActRepository.save(new LoanAct("部门的列表", "listOwnDepartment", 60, ActGroup.READ));
+			LoanAct save7 = loanActRepository
+					.save(new LoanAct("部门和下属部门的列表", "listOwnDepartmentAndChildren", 70, ActGroup.READ));
+			LoanAct save8 = loanActRepository.save(new LoanAct("通知其他人", "noticeOther", 80, ActGroup.NOTICE));
+			LoanAct save9 = loanActRepository.save(new LoanAct("通知操作者", "noticeActUser", 90, ActGroup.NOTICE));
+			LoanAct save10 = loanActRepository.save(new LoanAct("通知展示人", "noticeShowUser", 100, ActGroup.NOTICE));
+
+			LoanState newState = new LoanState("已创建", 0, "CREATED");
+			newState = loanStateRepository.save(newState);
+
+			LoanState enableState = new LoanState("有效", 100, "ENABLED");
+			enableState.setActs(Arrays.asList(save1, save2, save3, save4, save5, save6, save7).stream()
+					.collect(Collectors.toSet()));
+			loanStateRepository.save(enableState);
+			loanStateRepository.save(new LoanState("无效", 200, "DISABLED"));
+			loanStateRepository.save(new LoanState("已删除", 300, "DELETED"));
+
+		}
+
+	}
+
+	@Override
+	public LogRepository<LoanLog> getLogRepository() {
+		// TODO Auto-generated method stub
+		return loanLogRepository;
+	}
+
+	@Override
+	public AuditorEntityRepository<Loan> getAuditorEntityRepository() {
+
+		return loanRepository;
+	}
+
+	@Override
+	@PostConstruct
+	public void injectLogRepository() {
+		new Loan().setLogRepository(loanLogRepository);
+
+	}
+
+	@Override
+	public LoanLog getLogInstance() {
+		// TODO Auto-generated method stub
+		return new LoanLog();
+	}
+
+	@Override
+	public ActRepository<LoanAct> getActRepository() {
+		// TODO Auto-generated method stub
+		return loanActRepository;
+	}
+
+	@Override
+	@PostConstruct
+	public void injectEntityService() {
+		new Loan().setService(this);
+
+	}
+
+	@Override
+	public LoanFile getFileLogInstance() {
+		// TODO Auto-generated method stub
+		return new LoanFile();
+	}
+
+	/**
+	 * applyUser = userService.doBeforeAct(applyUser, actApply, null, fromUser);
+	 * applyUser = userRepository.save(applyUser);
+	 * timService.addUser(applyUser.getOpenid(), applyUser.getNickname(),
+	 * applyUser.getHeadimgurl()); userService.doAfterAct(applyUser, null,
+	 * fromUser);
+	 * 
+	 * @param loan
+	 */
+	@Transactional
+	public void save(Loan loan, String message, Object type) {
+		LoanAct loanAct = loanActRepository.findByActCode("loanAction");
+		if (null == loanAct) {
+			throw new FailReturnObject(9945, "未能获取编码为loanAction的LoanAct动作对象", Level.ERROR);
+		}
+		loanService.doBeforeAct(loan, loanAct, null, null);
+		loanRepository.save(loan);
+		loanService.doAfterAct(loan, null, null);
+		Orderwdsjsh orderwdsjsh = orderwdsjshRepository
+				.getByTelephoneAndStatCode(loan.getCreditcard().getCreditcardIdentity() + "", "ENABLED");
+		if (type != null && "2".equals(type.toString())) {
+			wechatPubService.pushLoanMessage(orderwdsjsh.getCreatedBy(), orderwdsjsh.getRealName(),
+					loan.getPrincipal().intValue() + "", message, "个人贷款", OPEN_ACC_SUCCESS);
+		} else if (type != null && "1".equals(type.toString())) {
+			wechatPubService.pushLoanMessage(orderwdsjsh.getCreatedBy(), orderwdsjsh.getRealName(),
+					loan.getPrincipal().intValue() + "", message, "公司", OPEN_ACC_SUCCESS);
+		}
+	}
+
+	public void doLoan(Loan loan) {
+		if (loan.getLoanType() == null) {
+			throw new FailReturnObject(1843, "请传入还款类型:loanType", Level.ERROR);
+		}
+		switch (loan.getLoanType()) {
+		case ORDERCDD:
+			creditrepayplanService.insertPlayPlanByOrdercdd(loan);
+			break;
+		default:
+			throw new FailReturnObject(1743, "放款类型不存在:" + loan.getLoanType(), Level.FATAL);
+		}
+		Ordercdd ordercdd = loan.getOrdercdd();
+		wechatPubService.pushOpenAccMessage(ordercdd.getUser(), "已放款", ordercdd.getRealName(),
+				ordercdd.getApplyMobile(), null, "");
+	}
+
+	// 产品申请授信
+	public Loan save(Ordercdd ordercdd, Creditcard creditcard) {
+		Product product = ordercdd.getProduct();
+		Capitalproduct capitalproduct = product.getCapitalproduct();
+		Loan loan = new Loan();
+		loan.setState(loanStateRepository.findByStateCode("NOTLEND"));// 具体状态问项目经理
+		creditcard.setCreditBalance(BigDecimal.valueOf(0));
+		loan.setCreditcard(creditcard);// 所属授信账户
+		loan.setRepaymentMethodCode(BEFORE_INTEREST_AFTER_PRINCIPAL);// 先息后本
+		loan.setPrincipal(creditcard.getCreditGrant());// 贷款本金
+		loan.setPeriodCode(capitalproduct.getPeriodCode());// 贷款分期时间单位 类型冲突
+															// 为了统一类型，全部放在了loan.PeriodCode
+		loan.setPeriodNumber(ordercdd.getApplyPeriodNumber());// 贷款分期期数
+
+		// if(product.getDebtorInterest()==null){
+		// throw new FailReturnObject(1634,"销售产品的借方利率不能为空",Level.INFO);
+		// }
+		Assert.notNull(product.getDebtorInterest(), "销售产品的借方利率不能为空");
+		loan.setDebtorInterest(product.getDebtorInterest());// 借方利率
+		loan.setStoreInterest(product.getStoreInterest());// 给门店利率
+		loan.setCreditorInterest(capitalproduct.getCreditorInterest());// 贷方供应利率
+		// loan.setDebtorReceiveBankcard();//借方收款账户
+		loan.setCreditorRepaymentDay(capitalproduct.getCreditorRepaymentDay());// 还给资方的日期
+
+		// loan.setDebtorRepaymentDay(/**product.getDebtorRepaymentDay()**/1);//借方还款的时间
+		// 没卵用，已注释
+		loan.setDebtorExtentedRepaymentDays(capitalproduct.getOverdueGraceDays());// 借方还款宽限日期数
+																					// --这里取的的资金产品的逾期天数，不知对不对
+		// 说明
+		// 内部备注
+		if (product.getPunishinterestrule() != null) {
+			loan.setPunishinterestrule(product.getPunishinterestrule());
+		} else {
+			loan.setPunishinterestrule(capitalproduct.getPunishinterestrule());
+		} // 罚息规则
+		loan.setDebtorUser(ordercdd.getUser());// 贷款人
+		loan.setDebtorPerson(ordercdd.getPerson());// 贷款自然人
+		// loan.setCreditorLoanSn(ordercdd.getCddSn());//资方贷款单号
+		loan.setServiceUserName(ordercdd.getServiceName());// 业务员姓名
+		loan.setServiceUser(ordercdd.getServiceUser());// 业务员id
+		loan.setLoanSn(OrderUtil.generateSn());
+		loan.setOrdercdd(ordercdd);
+		loan.setDebtorName(ordercdd.getRealName());
+
+		// 授信金额
+
+		List<Productstorefee> storeFee = productstorefeeRepository.findAllByProduct(product);
+		BigDecimal oneTimeFee = new BigDecimal(0);
+		for (Productstorefee productstorefee : storeFee) {
+			if (productstorefee.getFeeRate() != null) {
+
+				oneTimeFee = oneTimeFee.add(loan.getPrincipal().multiply(productstorefee.getFeeRate()));
+			} else if (productstorefee.getFeeAmount() != null) {
+				oneTimeFee = oneTimeFee.add(productstorefee.getFeeAmount());
+			}
+		}
+		loan.setDebtorRealityAmount(loan.getPrincipal().subtract(oneTimeFee));
+		loan.setOneTimeFee(oneTimeFee);
+
+		// Optional<Productstorefee>
+		// optionalBond=storeFee.stream().filter(item->
+		// Objects.equals(item.getLabel(), "保证金")).findFirst();
+		// Optional<Productstorefee>
+		// optionalDeposit=storeFee.stream().filter(item->
+		// Objects.equals(item.getLabel(), "押金")).findFirst();
+		Productstorefee bond = getStoreFeeBylable(product, "保证金");
+		Productstorefee deposit = getStoreFeeBylable(product, "押金");
+		// if(optionalBond.isPresent()){
+		// bond =optionalBond.get();
+		// }
+		// if(optionalDeposit.isPresent()){
+		// deposit = optionalDeposit.get();
+		// }
+
+		// BigDecimal bondFee=(bond!=null&&bond.getFeeRate()!=null)?
+		// (loan.getPrincipal().multiply(bond.getFeeRate())):
+		// (bond!=null?bond.getFeeAmount():(BigDecimal.valueOf(0)));
+		// BigDecimal depositFee=(deposit!=null&&deposit.getFeeRate()!=null)?
+		// (loan.getPrincipal().multiply(deposit.getFeeRate())):
+		// (deposit!=null?deposit.getFeeAmount():(BigDecimal.valueOf(0)));
+		BigDecimal bondFee = StoreFeeUtil.calculate(loan.getPrincipal(), bond);
+		BigDecimal depositFee = StoreFeeUtil.calculate(loan.getPrincipal(), deposit);
+		loan.setRetreatFee(bondFee.add(depositFee));
+
+		loanRepository.save(loan);
+		return loan;
+	}
+
+	public void doStoreloan(Loan loan) {
+
+	}
+
+	private Productstorefee getStoreFeeBylable(Product product, String lable) {
+		List<Productstorefee> storeFee = productstorefeeRepository.findAllByProduct(product);
+		Optional<Productstorefee> optional = storeFee.stream().filter(item -> Objects.equals(item.getLabel(), lable))
+				.findFirst();
+
+		Productstorefee productstorefee = null;
+		if (optional.isPresent()) {
+			productstorefee = optional.get();
+		}
+		return productstorefee;
+	}
+
+	private static class StoreFeeUtil {
+		static BigDecimal calculate(BigDecimal fee, Productstorefee productstorefee) {
+			return (productstorefee != null && productstorefee.getFeeRate() != null)
+					? (fee.multiply(productstorefee.getFeeRate()))
+					: (productstorefee != null ? productstorefee.getFeeAmount() : (BigDecimal.valueOf(0)));
+		}
+	}
+
+	/**
+	 * 借款记录搜索
+	 * 
+	 * @param realname
+	 * @param telephone
+	 * @param productid
+	 * @param pageable
+	 * @return
+	 */
+	public Page<Loan> getLoanRecordBySearch(String realname, String telephone, Integer productid, Pageable pageable,
+			String stateCode, String orderNo,Integer overdue) {
+		GenericQueryExpSpecification<Loan> queryExpression = new GenericQueryExpSpecification<Loan>();
+		queryExpression.add(QueryExpSpecificationBuilder.eq("debtorPerson.name", realname, true));
+		queryExpression.add(QueryExpSpecificationBuilder.eq("debtorPerson.telephone", telephone, true));
+		queryExpression.add(QueryExpSpecificationBuilder.eq("creditcard.product.id", productid, true));
+		queryExpression.add(QueryExpSpecificationBuilder.eq("state.stateCode", stateCode, true));
+		queryExpression.add(QueryExpSpecificationBuilder.eq("orderNo", orderNo, true));
+		queryExpression.add(QueryExpSpecificationBuilder.eq("overdue", overdue, true));
+		Page<Loan> page = loanRepository.findAll(queryExpression, pageable);
+		return page;
+	}
+
+	/**
+	 * 逾期记录搜索
+	 * 
+	 * @param pageable
+	 * @return
+	 */
+	public Page<Loanoverdue> getOverdueBySearch(String name, String phone, Integer status, String loanSn,
+			Pageable pageable) {
+		GenericQueryExpSpecification<Loanoverdue> queryExpression = new GenericQueryExpSpecification<Loanoverdue>();
+		queryExpression.add(QueryExpSpecificationBuilder.eq("loan.debtorPerson.name", name, true));
+		queryExpression.add(QueryExpSpecificationBuilder.eq("loan.debtorPerson.telephone", phone, true));
+		queryExpression.add(QueryExpSpecificationBuilder.eq("status", status, true));
+		queryExpression.add(QueryExpSpecificationBuilder.eq("loan.orderNo", loanSn, true));
+		Page<Loanoverdue> page = loanoverdueRepository.findAll(queryExpression, pageable);
+		return page;
+	}
+
+	/**
+	 * 借款提交申请动作
+	 * 
+	 * @param loan
+	 */
+	public void doCreate(Loan loan) {
+		switch (loan.getLoanType()) {
+		case ORDERMDBT:
+			loan.setWorkflow(loanWorkflowRepository.findOne(1));
+			loan.setOverdue(0);
+			loan.setPeriodNumber(3);
+			loan.setRepaymentMethodCode(BEFORE_INTEREST_AFTER_PRINCIPAL);
+			loan.setPeriodCode(PeriodCode.DAY);
+			loan.setOrderNo(ProductUtil.modify(loan.getCreditcard().getProduct().getLabel(), OrderTypeEnum.LOAN));
+			loan.setDebtorPerson(loan.getCreditcard().getPerson());
+			loan.setRemainAmount(BigDecimal.valueOf(0));
+			loan.setDebtorExtentedRepaymentDays(3);
+			if ("manager".equals(loan.getDebtorUser().getCompanyRole())) {
+				loan.setDebtorName(loan.getDebtorPerson().getName());
+			} else {
+				loan.setDebtorName(loan.getDebtorUser().getRealname());
+			}
+			Ordermdbt ordermdbt = ordermdbtRepository.findByApplyMobile(loan.getCreditcard().getCreditcardIdentity());
+			if (ordermdbt == null) {
+				throw new FailReturnObject(1684, "查询面单白条订单出错", Level.WARNING);
+			}
+			loan.setPurchasingUnit(ordermdbt.getAgentBrand());
+			
+			List<Loan> loanDay = loanRepository.findByCreditcardAndApplyDateDay(loan.getCreditcard().getId());
+			if (null != loanDay && loanDay.size() > 0) {
+				throw new FailReturnObject(2345, "您公司今天已经有人申请过借款", Level.WARNING);
+			}
+			List<Loan> loanMonth = loanRepository.findByCreditcardAndApplyDateMonth(loan.getCreditcard().getId());
+			if (null != loanMonth && loanMonth.size() >= 3) {
+				throw new FailReturnObject(2368, "您公司当月已经申请借款三次", Level.WARNING);
+			}
+
+			smsService.sendCommitMessage(loan.getOrderNo(), "借款", "面单白条");
+			break;
+		default:
+			break;
+		}
+
+	}
+
+	/**
+	 * 借款通过审核
+	 * 
+	 * @param loan
+	 */
+	public void doAdopt(Loan loan) {
+		switch (loan.getLoanType()) {
+		case ORDERMDBT:
+			loan.setState(loanStateRepository.findByStateCode("ENABLED"));
+			Creditcard creditcard = loan.getCreditcard();
+			creditcard.setCreditBalance(creditcard.getCreditBalance().subtract(loan.getPrincipal()));
+			loan.setRemainAmount(loan.getPrincipal().add(loan.getTotalInterest()));
+			loan = loanRepository.save(loan);
+			creditrepayplanService.insertPlayPlanByMdbt(loan);
+			wechatPubService.pushLoanMessage(loan.getCreatedBy(), loan.getDebtorName(),
+					loan.getPrincipal().setScale(2).toString(), null, "面单白条", null);
+			String content = xinGePushService.getMdbtLoanPassMessage(loan);
+			xinGePushService.pushAppMessage(loan.getCreatedBy(), loan.getCreditcard().getProduct(), "借款进度通知", content,
+					2);
+			break;
+
+		default:
+			break;
+		}
+
+	}
+
+}

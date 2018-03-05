@@ -1,0 +1,28 @@
+<div class="wrapper">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    信息
+                </div>
+                <table class="table table-striped m-b-none">
+                    <tbody>
+                    <tr>
+                        <td class="v-middle text-right w-sm">姓名：</td>
+                        <td class="v-middle w-xl">{{ profile.realName }}</td>
+                        <td class="v-middle text-right w-sm">卡号：</td>
+                        <td class="v-middle w-xl">{{ profile.accountIdentity }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right w-sm">银行支行支行：</td>
+                        <td class="v-middle w-xl">{{ profile.branchName }}</td>
+                        <td class="v-middle text-right w-sm">是否网银：</td>
+                        <td class="v-middle w-xl">{{ profile.isOnline?"否":"是" }}</td>
+                    </tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

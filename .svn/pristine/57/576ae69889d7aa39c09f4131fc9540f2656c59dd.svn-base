@@ -1,0 +1,86 @@
+package com.liyang.controller;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.liyang.domain.orderwdxyd.Orderwdxyd;
+import com.liyang.domain.user.User;
+import com.liyang.dto.OrderwdxydInfo;
+import com.liyang.service.OrderwdxydService;
+import com.liyang.util.CommonUtil;
+import com.liyang.util.ExceptionResultEnum;
+import com.liyang.util.FailReturnObject;
+import com.liyang.util.PageInfo;
+import com.liyang.util.ResponseBody;
+import com.liyang.util.ReturnObject.Level;
+
+@RestController
+@RequestMapping("/orderwdxyd")
+public class OrderwdxydController {
+	
+	@Autowired
+	OrderwdxydService orderwdxydService;
+	 
+	@GetMapping("/list")
+	public ResponseBody getOrderwdxydList(Orderwdxyd orderwdxyd,String stateCode,Integer serviceUserId,Pageable pageable){
+		
+		Page<Orderwdxyd> orderwdxydPage = orderwdxydService.getOrderwdxyd(orderwdxyd,stateCode,serviceUserId,pageable);
+		Integer number = orderwdxydPage.getNumber();
+		Integer size = orderwdxydPage.getSize();
+		long totalElements = orderwdxydPage.getTotalElements();
+		Integer totalPages = orderwdxydPage.getTotalPages();		
+		List<OrderwdxydInfo> orderwdxydInfoList = new ArrayList<>();
+		for (Orderwdxyd wdxyd : orderwdxydPage) {
+			
+			OrderwdxydInfo orderwdxydInfo  = new OrderwdxydInfo();
+			BeanUtils.copyProperties(wdxyd, orderwdxydInfo);
+			orderwdxydInfo.setStateLabel(wdxyd.getState().getLabel());
+			orderwdxydInfoList.add(orderwdxydInfo);	
+			
+		}
+		//自定义的page对象
+		PageInfo pageInfo = new PageInfo(number, size, totalElements, totalPages, orderwdxydInfoList);
+		//返回的最外层对象
+		ResponseBody  responseBody = new ResponseBody(pageInfo);
+		return responseBody;
+	}
+	
+	
+	@GetMapping("/commissionerlist")
+	public ResponseBody getCommissionerOrderwdxydList(Orderwdxyd orderwdxyd,String stateCode,Pageable pageable){
+		
+		//获取当前登陆用户对象
+		User user = CommonUtil.getPrincipal();
+		orderwdxyd.setServiceUser(user);
+		
+		Page<Orderwdxyd> orderwdxydPage = orderwdxydService.getCommissionerListOrderwdxyd(orderwdxyd,stateCode,pageable);
+		Integer number = orderwdxydPage.getNumber();
+		Integer size = orderwdxydPage.getSize();
+		long totalElements = orderwdxydPage.getTotalElements();
+		Integer totalPages = orderwdxydPage.getTotalPages();		
+		List<OrderwdxydInfo> orderwdxydInfoList = new ArrayList<>();
+		for (Orderwdxyd wdxyd : orderwdxydPage) {
+			
+			OrderwdxydInfo orderwdxydInfo  = new OrderwdxydInfo();
+			BeanUtils.copyProperties(wdxyd, orderwdxydInfo);
+			orderwdxydInfo.setStateLabel(wdxyd.getState().getLabel());
+			orderwdxydInfoList.add(orderwdxydInfo);	
+			
+		}
+		//自定义的page对象
+		PageInfo pageInfo = new PageInfo(number, size, totalElements, totalPages, orderwdxydInfoList);
+		//返回的最外层对象
+		ResponseBody  responseBody = new ResponseBody(pageInfo);
+		return responseBody;
+	}
+	
+	
+}

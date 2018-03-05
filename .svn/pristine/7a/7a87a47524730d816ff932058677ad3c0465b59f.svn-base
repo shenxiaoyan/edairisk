@@ -1,0 +1,53 @@
+<div class="vbox bg-white">
+    <div class="wrapper-md b-b b-light">
+        <div class="h4">容儿：这是还款记录页</div>
+    </div>
+
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner">
+                <div class="wrapper-sm">
+                    
+
+                    <div class="panel panel-default">
+
+
+                        <div class="panel-heading">
+                            <span class="label bg-danger pull-right m-t-xs">还剩 4 笔</span>
+                            还款列表
+                        </div>
+
+
+                        <table class="table table-striped m-b-none">
+                            <thead>
+                                <tr>
+                                    <th>标的</th>
+                                    <th>还款日期</th>
+                                    <th>入账账户</th>
+                                    <th>备注</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>容儿 80万</td>
+                                    <td>2017-07-05</td>
+                                    <td>总部谁的账户</td>
+                                    <td>这是账户</td>
+                                    <td><a href="" class="active" ui-toggle-class=""><i class="fa fa-check text-success text-active"></i><i class="fa fa-times text-danger text"></i></a></td>
+                                    <td>
+                                        <a href="" class="btn btn-default btn-xs" ui-toggle-class=""><i class='fa fa-money'></i> 确认入账</a>
+                                        <a href="" class="btn btn-default btn-xs" ui-toggle-class=""><i class='fa fa-money'></i> 分配</a>
+                                        <a href="" class="btn btn-default btn-xs" ui-toggle-class=""><i class='fa fa-money'></i> 催收</a>
+                                    </td>
+                                </tr>
+                               
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

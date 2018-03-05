@@ -1,0 +1,196 @@
+<script>
+    /*
+     * 创建人：刘雅倩
+     * 创建时间：2017/07/31
+     * 征信成单率统计表
+     *
+     * */
+    "use strict";
+    app.controller("creditCtrl",
+        [
+            "$scope",
+            function ($scope) {
+//                  测试用的
+
+                $scope.branchList = [
+                    {
+                        name: "康桥网点",
+                        employee: "上海1",
+                        pickup: "560000",
+                        dispatch: "5120000"
+                    },
+                    {
+                        name: "城西网点",
+                        employee: "上海1",
+                        pickup: "560000",
+                        dispatch: "5120000"
+                    },
+                    {
+                        name: "滨江网点",
+                        employee: "上海1",
+                        pickup: "560000",
+                        dispatch: "5120000"
+                    },
+                    {
+                        name: "萧山网点",
+                        employee: "上海1",
+                        pickup: "560000",
+                        dispatch: "5120000"
+                    }
+                ]
+
+//                echarts，数据是假的
+                $scope.brandChart = echarts.init(document.getElementById('branch_dashboard_chart'));
+
+                $scope.option = {
+//                    title : {
+//                        text: '征信成单率统计表'
+//                    },
+                    tooltip : {
+                        trigger: 'item',
+                        formatter: "{a} <br/>{b} : {c} ({d}%)"
+                    },
+                    legend: {
+                        orient : 'vertical',
+                        x : 'left',
+                        data:['逾期','风险','滞留','出险']
+                    },
+                    toolbox: {
+                        show : true,
+                        feature : {
+                            mark : {show: true},
+                            dataView : {show: true, readOnly: false},
+                            magicType : {
+                                show: true,
+                                type: ['pie', 'funnel'],
+                                option: {
+                                    funnel: {
+                                        x: '25%',
+                                        width: '50%',
+                                        funnelAlign: 'center',
+                                        max: 1548
+                                    }
+                                }
+                            },
+                            restore : {show: true},
+                            saveAsImage : {show: true}
+                        }
+                    },
+                    calculable : true,
+                    series : [
+                        {
+                            name:'访问来源',
+                            type:'pie',
+                            radius : ['50%', '70%'],
+                            itemStyle : {
+                                normal : {
+                                    label : {
+                                        show : false
+                                    },
+                                    labelLine : {
+                                        show : false
+                                    }
+                                },
+                                emphasis : {
+                                    label : {
+                                        show : true,
+                                        position : 'center',
+                                        textStyle : {
+                                            fontSize : '30',
+                                            fontWeight : 'bold'
+                                        }
+                                    }
+                                }
+                            },
+                            data:[
+                                {value:335, name:'逾期'},
+                                {value:310, name:'风险'},
+                                {value:234, name:'滞留'},
+                                {value:135, name:'出险'}
+                            ]
+                        }
+                    ]
+                };
+
+                $scope.brandChart.setOption($scope.option);
+
+                //窗口大小改变时重新绘制图表
+                $(window).resize(function () {
+                    $scope.brandChart.resize();
+                });
+            }
+        ]
+    );
+</script>
+
+<div class="hbox hbox-auto-xs lter" ng-controller="creditCtrl">
+    <!-- column -->
+    <div class="col">
+        <div class="vbox">
+            <div class="bg-light lter b-b clearfix" style="padding: 14px 20px;">
+                <select class="pull-left m-r-sm input-sm form-control w-sm inline v-middle"
+                            ng-options="branch.name for branch in branchList"
+                            ng-model="branch">
+                <option value=""> --请选择-- </option>
+                </select>
+                <!--<div class="btn-group">-->
+                    <!--<button type="button" class="m-r btn btn-sm btn-addon btn-info">-->
+                        <!--<i class="fa fa-plus" ng-class="iconClass[btn]"></i><span tanslate="">打印</span>-->
+                    <!--</button>-->
+                <!--</div>-->
+                <div class="pull-right">
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-default" ng-click="changeView($event)">今天</button>
+                        <button class="btn btn-sm btn-default" ng-click="changeView($event)">昨天</button>
+                        <button class="btn btn-sm btn-default" ng-click="changeView($event)">前天</button>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-default" ng-click="changeView('agendaDay')">本周</button>
+                        <button class="btn btn-sm btn-default" ng-click="changeView('agendaWeek')">上周</button>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-default" ng-click="changeView('month')">本月</button>
+                        <button class="btn btn-sm btn-default" ng-click="changeView('month')">上月</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner wrapper-md">
+                        <div style="padding-top: 0;">
+                            <div class="panel wrapper">
+                                <div id="branch_dashboard_chart" style="height:400px;"></div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="table-responsive">
+                                <table class="table table-striped b-t b-light">
+                                    <thead>
+                                    <tr>
+                                        <th>地区</th>
+                                        <th>逾期</th>
+                                        <th>风险</th>
+                                        <th>滞留</th>
+                                        <th>出险</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="list in branchList">
+                                        <td><span class="pull-left waybill_item_number"><a ui-sref="release.detail({id:waybill.id})">{{ list.employee}}</a></span></td>
+                                        <td class="report_amount"><span class="text-ellipsis">{{ list.pickup }}</span></td>
+                                        <td class="report_amount"><span class="text-ellipsis">{{ list.dispatch }}</span></td>
+                                        <td class="report_amount"><span class="text-ellipsis">{{ list.dispatch }}</span></td>
+                                        <td class="report_amount"><span class="text-ellipsis">{{ list.dispatch }}</span></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,28 @@
+<div class="wrapper">
+    <div class="panel panel-default">
+        <table class="table table-striped m-b-none">
+            <tbody>
+            <tr>
+                <td class="v-middle text-right" style="width: 130px;">角色名：</td>
+                <td class="v-middle">{{ profile.label }}</td>
+            </tr>
+            <tr>
+                <td class="v-middle text-right">角色code：</td>
+                <td class="v-middle">{{ profile.roleCode }}</td>
+            </tr>
+            <tr>
+                <td class="v-middle text-right">部门类型：</td>
+                <td class="v-middle">{{ profile.departmenttype.label}}</td>
+            </tr>
+            <tr>
+                <td class="v-middle text-right">创建时间：</td>
+                <td class="v-middle">{{ profile.createdAt | datetime}}</td>
+            </tr>
+            <tr>
+                <td class="v-middle text-right">最后修改时间：</td>
+                <td class="v-middle">{{ profile.lastModifiedAt | datetime}}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

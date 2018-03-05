@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../../../css/weui.css">
+    <link rel="stylesheet" href="../../../css/weui2.css">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <title>还款</title>
+    <link rel="stylesheet" href="../../../css/icon.css">
+    <style>
+        .weui_cells{
+            margin-top: 0;
+        }
+        .btn{
+            width: 100%;
+            height: 40px;
+            background: #169BD5;
+            border-radius: 20px;
+            display: inline-block;
+            text-align: center;
+            line-height: 40px;
+            color: white;
+            font-size: 16px;
+        }
+        .btn:active{
+            background: #CCCCCC;
+            color: white;
+        }
+        .imgBtn{
+            cursor: pointer;
+        }
+        .delBtn{
+            position: absolute;
+            top: -8px;
+            right: -2px;
+            font-size: 20px;
+            color: #E64340;
+            width:20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #fff;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="weui_cells weui_cells_form">
+        <form id="form">
+            <div class="weui_cell">
+                <div class="weui_cell_hd"><label class="weui_label">还款期数</label></div>
+                <div class="weui_cell_bd weui_cell_primary">
+                    <p id="repaymentDateSn"></p>
+                </div>
+                <div class="weui_cell_ft">
+                    <i class="weui_icon_warn"></i>
+                </div>
+            </div>
+            <!--<div class="weui_cell">-->
+                <!--<div class="weui_cell_hd"><label class="weui_label" >应还金额</label></div>-->
+                <!--<div class="weui_cell_bd weui_cell_primary">-->
+                    <!--<input id="fees" readonly  class="weui_input" type="number" />-->
+                <!--</div>-->
+                <!--<div class="weui_cell_ft">-->
+                    <!--<i class="weui_icon_warn"></i>-->
+                <!--</div>-->
+            <!--</div>-->
+            <!--<div class="weui_cell">-->
+                <!--<div class="weui_cell_hd"><label class="weui_label" >应还本金</label></div>-->
+                <!--<div class="weui_cell_bd weui_cell_primary">-->
+                    <!--<input id="principal" readonly  class="weui_input" type="number" />-->
+                <!--</div>-->
+                <!--<div class="weui_cell_ft">-->
+                    <!--<i class="weui_icon_warn"></i>-->
+                <!--</div>-->
+            <!--</div>-->
+            <!--<div class="weui_cell">-->
+                <!--<div class="weui_cell_hd"><label class="weui_label" >应还利息</label></div>-->
+                <!--<div class="weui_cell_bd weui_cell_primary">-->
+                    <!--<input id="interest"  readonly class="weui_input" type="number" />-->
+                <!--</div>-->
+                <!--<div class="weui_cell_ft">-->
+                    <!--<i class="weui_icon_warn"></i>-->
+                <!--</div>-->
+            <!--</div>-->
+            <div class="weui_cell">
+                <div class="weui_cell_hd"><label class="weui_label" >本期应还</label></div>
+                <div class="weui_cell_bd weui_cell_primary">
+                    <input id="leftAmount"  readonly class="weui_input" type="number" />
+                </div>
+                <div class="weui_cell_ft">
+                    <i class="weui_icon_warn"></i>
+                </div>
+            </div>
+            <div class="weui_cell">
+                <div class="weui_cell_hd"><label class="weui_label" >逾期罚金</label></div>
+                <div class="weui_cell_bd weui_cell_primary">
+                    <input id="loanoverdues"  readonly class="weui_input" type="number" />
+                </div>
+                <div class="weui_cell_ft">
+                    <i class="weui_icon_warn"></i>
+                </div>
+            </div>
+            <div class="weui_cell">
+                <div class="weui_cell_hd"><label class="weui_label" >共计应还</label></div>
+                <div class="weui_cell_bd weui_cell_primary">
+                    <input id="totalAmount"  readonly class="weui_input" type="number" />
+                </div>
+                <div class="weui_cell_ft">
+                    <i class="weui_icon_warn"></i>
+                </div>
+            </div>
+            <div class="weui_cell">
+                <div class="weui_cell_hd"><label class="weui_label" >还款金额</label></div>
+                <div class="weui_cell_bd weui_cell_primary">
+                    <input id="payAmount" required class="weui_input" type="number" placeholder="请输入还款金额" emptyTips="请输入还款金额"/>
+                </div>
+                <div class="weui_cell_ft">
+                    <i class="weui_icon_warn"></i>
+                </div>
+            </div>
+            <div class="weui_cell" id="debtorRepaymentDateCell">
+                <div class="weui_cell_hd"><label class="weui_label" >还款时间</label></div>
+                <div class="weui_cell_bd weui_cell_primary">
+                    <input id="debtorRepaymentDate" required class="weui_input" type="text" placeholder="请输入还款时间" emptyTips="请输入还款时间"/>
+                </div>
+                <div class="weui_cell_ft">
+                    <i class="weui_icon_warn"></i>
+                </div>
+            </div>
+        </form>
+    </div>
+
+
+    <div class="weui_cells weui_cells_form" style="margin-top: 50px;">
+        <div class="weui_cells" style="margin-top: 0">
+            <div class="weui_cells_title">还款凭证</div>
+            <div class="weui_cell">
+                <div id="hkpz">
+                    <div id="hkpzBtn" class="imgUp" style="display: inline-block;width: 67px; height: 67px; background: url('../../../images/picture@3x.png') no-repeat;background-size:67px 67px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-bd-15" style="margin-top: 100px;">
+        <div class="btn" id="formSubmitBtn">确认上传</div>
+    </div>
+</body>
+<script src="../../../js/jquery-3.2.1.js"></script>
+<script src="../../../js/config.js"></script>
+<script src="../../../js/zepto.min.js"></script>
+<script src="../../../js/picker.js"></script>
+<script src="https://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+<script>
+    if(window.location.search){
+        var href = window.location.href;
+         window.loanid = href.split('&')[1];
+        window.loanid = window.loanid.split('=')[1];
+        window.planid = href.split('?')[1];
+        window.planid = window.planid.split('&')[0];
+        window.planid = window.planid.split('=')[1];
+        window.creditcardId =href.split('&')[2];
+        window.creditcardId=window.creditcardId.split('=')[1];
+        window.userId = href.split('&')[3];
+        window.userId = window.userId.split('=')[1];
+        console.log(window.loanid)
+        console.log(window.planid)
+    }
+    //jsSDK
+    var JsUrl =window.location.href;
+    $.ajax({
+        type: "get",
+        url: "/wechat/wlqz/getCofigure",
+        data:{'JsUrl':JsUrl},
+        dataType: "json",
+        success: function(res){
+            console.log(res)
+            wx.config({
+                debug: false,
+                appId:res.appId ,
+                timestamp: res.timestamp,
+                nonceStr: res.nonceStr,
+                signature: res.signature,
+                jsApiList: [
+                    'chooseImage',
+                    'uploadImage',
+                    'previewImage',
+                    // 所有要调用的 API 都要加到这个列表中
+                ]
+            });
+            wx.ready(function () {
+
+            });
+            wx.error(function(res){
+
+                // config信息验证失败会执行error函数，如签名过期导致验证失败，具体错误信息可以打开config的debug模式查看，也可以在返回的res参数中查看，对于SPA可以在这里更新签名。
+            });
+
+
+        }
+    })
+
+    //获取当前时间 yyyy-MM-dd HH:MM:SS
+    function getNowFormatDate() {
+        var date = new Date();
+        var seperator1 = "-";
+        var seperator2 = ":";
+        var month = date.getMonth() + 1;
+        var strDate = date.getDate();
+        if (month >= 1 && month <= 9) {
+            month = "0" + month;
+        }
+        if (strDate >= 0 && strDate <= 9) {
+            strDate = "0" + strDate;
+        }
+        var currentdate = date.getFullYear() + seperator1 + month + seperator1 + strDate
+            + " " + date.getHours() + seperator2 + date.getMinutes()
+            + seperator2 + date.getSeconds();
+        return currentdate;
+    }
+
+
+
+    $("#debtorRepaymentDate").datetimePicker({title:"选择日期时间",m:1});
+
+
+    //是否有待审核的单子，有就不让申请
+//    $.ajax({
+//        type: 'GET',
+//        url:'/rest/creditrepayplans/'+window.planid+'/creditrepayment',
+//        data: {} ,
+//        headers: {
+//            app_code:"WULIUQIANZHUANG",
+//            client:"wechat"
+//        },
+//        success: function (res) {
+//            var resArr = res._embedded.creditrepayments;
+//            var times =0;
+//            $.each(resArr,function (key,val) {
+//                $.ajax({
+//                    type: 'GET',
+//                    url:'/rest/creditrepayments/'+val.id+'/state',
+//                    data: {} ,
+//                    headers: {
+//                        app_code:"WULIUQIANZHUANG",
+//                        client:"wechat"
+//                    },
+//                    success: function (res) {
+//
+//                        val.stateCode=res.stateCode;
+//                        console.log(times)
+//                        times += 1;
+//                        if( resArr.length == times){
+//                            console.log(resArr);
+//                            $.each(resArr,function (k,v) {
+//                                if( v.stateCode == 'CREATED'){
+//                                    $.alert('只能有一条待审核的还款!')
+//                                    $('#formSubmitBtn').unbind();
+//                                    $('#formSubmitBtn').css('background','#ccc');
+//                                }
+//
+//                            })
+//                        }
+//
+//
+//                    } ,error:function (res) {
+//                        console.log(res)
+//                    },
+//                    dataType: 'json'
+//                });
+//            })
+//
+//        } ,error:function (res) {
+//            console.log(res)
+//        },
+//        dataType: 'json'
+//    });
+
+    $.ajax({
+        type: 'GET',
+        url:'/rest/users/'+ window.userId,
+        //data: {'code':code} ,
+        headers: {
+            app_code:"WULIUQIANZHUANG",
+            client:"wechat"
+        },
+        success: function (res) {
+            window.debtorName = res.realname;
+        } ,error:function (res) {
+            alert(res.responseJSON.message)
+        },
+        dataType: 'json'
+    });
+
+
+
+    $.ajax({
+        type: 'GET',
+        url:'/rest/creditrepayplans/search/getCreditRepayplanByLoan?loanId='+window.loanid,
+        data: {} ,
+        headers: {
+            app_code:"WULIUQIANZHUANG",
+            client:"wechat"
+        },
+        success: function (res) {
+            var dataArr = res._embedded.creditrepayplans;
+            $.each(dataArr,function (key,val) {
+                if(val.id == window.planid){
+                     window.planArr =val;
+//                    $('#fees').val(val.fees)
+//                    $('#principal').val(val.principal)
+//                    $('#interest').val(val.interest)
+                    $('#leftAmount').val(val.leftAmount)
+                    $('#repaymentDateSn').text('第'+(planArr.planSn).split('-')[1]+'期')
+
+                    $.ajax({
+                        type: 'GET',
+                        url:'/rest/loanoverdues/search/findEnable',
+                        data: {'loanId':window.loanid} ,
+                        headers: {
+                            app_code:"WULIUQIANZHUANG",
+                            client:"wechat"
+                        },
+                        success: function (res) {
+                            console.log(res)
+                            $('#loanoverdues').val(res.penalSum)
+
+                            var loanoverdues = $('#loanoverdues').val();
+                            $('#totalAmount').val(parseFloat(val.leftAmount) + parseFloat(res.penalSum))
+                        } ,error:function (res) {
+                            $('#loanoverdues').val(0)
+                            var loanoverdues = $('#loanoverdues').val();
+                            $('#totalAmount').val(parseFloat(val.leftAmount))
+                            //alert(res.responseJSON.message)
+                        },
+                        dataType: 'json'
+                    });
+
+                }
+            })
+
+        } ,error:function (res) {
+            console.log(res)
+        },
+        dataType: 'json'
+    });
+
+
+
+
+    //bug 修复 不去掉样式
+    $('#debtorRepaymentDate').change(function () {
+        $('#debtorRepaymentDateCell').removeClass('weui_cell_warn');
+    })
+
+
+    //递归上传图片
+    function wxuploadImage(localIds,obj1,target){
+        var localId = localIds.pop();
+        wx.uploadImage({
+            localId: localId, // 需要上传的图片的本地ID，由chooseImage接口获得
+            isShowProgressTips: 1, // 默认为1，显示进度提示
+            success: function (res) {
+                //console.log(res)
+                if(res.errMsg == 'uploadImage:ok'){
+                    var serverId = res.serverId; // 返回图片的服务器端ID
+                    if(localIds.length > 0){
+                        console.log(obj1)
+                        var img = '<div style="position: relative;display: inline-block"><div class="icon icon-72 delBtn"></div><img class="imgBtn" upsrc="'+serverId+'" src="'+localId+'" style="width: 67px; height: 67px;margin: 0 5px;"></div>'
+                        $(target).parent().prepend(img);
+                        //obj1.wechatFiles.push(serverId);
+                        arrData.push(serverId)
+                        wxuploadImage(localIds,obj1,target);
+                    }else {
+                        var img = '<div style="position: relative;display: inline-block"><div class="icon icon-72 delBtn"></div><img class="imgBtn" upsrc="'+serverId+'" src="'+localId+'" style="width: 67px; height: 67px;margin: 0 5px;"></div>'
+                        $(target).parent().prepend(img);
+                        //obj1.wechatFiles.push(serverId);
+                        arrData.push(serverId)
+                        console.log(arrData)
+                    }
+
+                }
+
+            }
+        });
+    }
+
+    var arrData = [];
+    $('#hkpzBtn').click(function (e) {
+        wx.chooseImage({
+            count: 5, // 默认9
+            sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
+            sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
+            success: function (res) {
+                if(res.errMsg == 'chooseImage:ok'){
+                    //console.log(res)
+
+                    var Obj = {};
+                    if($(e.target).parent().parent().prev().text() == '还款凭证类'){
+                        Obj.topcategory = '还款凭证类';
+                        Obj.subcategory = '还款凭证类';
+                    }
+                    var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
+                    var localIdslength1=localIds.length;
+
+                    wxuploadImage(localIds,Obj,e.target);
+                }
+
+            }
+        })
+
+    });
+
+    function removeByValue(arr, val) {
+        for(var i=0; i<arr.length; i++) {
+            if(arr[i] == val) {
+                arr.splice(i, 1);
+                break;
+            }
+        }
+    }
+
+    //删除按钮
+    $(document).on('click','.delBtn',function(e){
+        //奇怪的Jquery对象
+        //console.log($(e.target).siblings()[0].attributes[1].value)
+        //console.log($(e.target).parent().parent().parent().prev().text());
+        //微信SERVERID
+        var serverId = $(e.target).siblings()[0].attributes[1].value;
+
+        //DOM删除图片节点
+        $(e.target).parent().remove();
+        $.each(arrData,function(k,v){
+            if(v == serverId){
+                removeByValue(arrData,v);
+                return false;
+            }
+            console.log(v)
+        })
+    });
+
+
+    var $form = $("#form");
+    $form.form();
+    $("#formSubmitBtn").on("click", function(){
+        $form.validate(function(error){
+            if(error){
+
+            }else{
+                var totalAmount =$('#totalAmount').val();
+                var payAmount=$('#payAmount').val();
+
+                if(payAmount > totalAmount){
+                    $.alert('还款金额大于应还金额！')
+                }else {
+                    $.showLoading();
+                    var penalSum =$('#loanoverdues').val()
+                    var planArray = window.planArr;
+                    var debtorActualRepaymentDate =getNowFormatDate();  //当前时间
+                    var debtorName =$('#debtorName').val();
+                    var data={
+                        act:'create',
+//                    principal:planArray.principal,
+//                    interest:planArray.interest,
+                        loan:'/rest/loans/'+window.loanid,
+                        creditrepayplan:'/rest/creditrepayplans/'+planArray.id,
+                        loanSn:planArray.loanSn,
+                        planSn:planArray.planSn,
+                        repaymentType:'ORDERMDBT',
+                        debtorName:window.planArr.debtorName,
+                        debtorRepaymentDate:planArray.debtorRepaymentDate,
+                        debtorActualRepaymentDate:debtorActualRepaymentDate,
+                        creditcard:'/rest/creditcards/'+ window.creditcardId,
+                        payAmount:payAmount,
+                        fees:planArray.leftAmount,
+                        wechatFiles:arrData,
+                        punishinterest:penalSum
+                    }
+                    var upDate=JSON.stringify(data);
+                    $.ajax({
+                        type: 'post',
+                        url: '/rest/creditrepayments',
+                        headers: {
+                            "Content-Type":"application/json",
+                            app_code:"WULIUQIANZHUANG",
+                            client:"wechat",
+                        },
+                        data:upDate,
+                        success: function (res) {
+                            if(res.ActionStatus == 'FAIL'){
+                                alert(res.ErrorInfo)
+                                $.hideLoading();
+                            }else{
+                                $.toast('还款成功')
+                                setTimeout(function () {
+                                    window.history.back();
+                                    $.hideLoading();
+                                },1500)
+
+                            }
+
+                        },error:function(res){
+                            console.log(res)
+                            $.hideLoading();
+                            alert(res.responseJSON.message)
+                            //alert(JSON.stringify(res))
+                        },
+                        dataType: 'json'
+                    });
+                }
+
+            }
+        });
+
+    });
+</script>
+</html>

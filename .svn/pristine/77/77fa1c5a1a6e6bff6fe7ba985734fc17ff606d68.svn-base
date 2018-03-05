@@ -1,0 +1,709 @@
+<script>
+    app.controller("orderrzzlFormController",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "$state",
+            "entity",
+            "FileUploader",
+            function ($rootScope, $scope, $http, $stateParams, $state, entity, FileUploader) {
+
+                $scope.form_id = $stateParams.id;
+
+                $scope.form = {};
+
+                /*上传文件大数组*/
+                $scope.uploadVal = [];
+
+                /*上传文件时传入*/
+                $scope.actCode = null;
+
+                /*上传文件夹*/
+                $scope.subcategory = null;
+                $scope.topcategory = null;
+
+
+                $scope.modalMaxPhoto = null;
+
+                /*所有的上传的行为*/
+                $scope.canActs = [];
+
+
+                /*
+                * 初始化
+                * */
+                $scope.into = function () {
+                    entity.getDetail("rest/orderrzzls/" + $stateParams.id, ["state", "files", "workflow"]).then(function (resResult) {
+
+                        $scope.form = resResult;
+                        console.log($scope.form);
+                        $scope.productSelf = resResult._links.self.href;
+
+                        angular.forEach($scope.form.currentUserCanActList, function (val, key) {
+                            if (val.actGroup === "FILE_OPERATE") {
+                                $scope.canActs.push(val);
+                            }
+                        });
+
+                        $scope.canActs = $scope.canActs.sort(function (a, b) {
+                            return a.sort - b.sort;
+                        });
+
+                        console.log($scope.canActs)
+                        angular.forEach($scope.canActs, function (val, key) {
+                            val.actPhoto = [];
+                        });
+
+                        angular.forEach($scope.form.files._embeddedItems, function (val, key) {
+                            angular.forEach($scope.canActs, function (val1, key1) {
+                                if (val.actCode === val1.actCode) {
+                                    val1.actPhoto.push(val)
+                                }
+                            });
+                        });
+
+                        console.log($scope.canActs);
+                    });
+                };
+
+                $scope.into();
+
+
+                /*
+                * 保存操作
+                * */
+                $scope.orderrzzlSave = function () {
+
+                    delete $scope.form.workflow;
+                    delete $scope.form.state;
+                    delete $scope.form.files;
+
+                    $scope.form.act = "update";
+                    $http({
+                        url: $scope.form._links.self.href,
+                        method: "PATCH",
+                        data: $scope.form
+                    }).success(function (resResult) {
+                        $rootScope.toasterSuccess("成功！", "修改成功！");
+                    });
+                };
+
+                /*
+                * 上传照片
+                * */
+                $scope.uploadPhoto = function (act) {
+
+                    console.log(act);
+                    $scope.actCode = act.actCode;
+
+                    $scope.subcategory = act.subcategory;
+                    $scope.topcategory = act.topcategory;
+
+                    $scope.uploader.clearQueue();
+                    $("#orderrzzl_upload").modal("show");
+                };
+
+
+                /*
+                * 查看一张图片
+                * */
+                $scope.uploadOnePhoto = function (value) {
+                    console.log(value);
+                    $scope.modalMaxPhoto = value;
+                    $("#orderrzzl_upload_one_photo").modal("show");
+                };
+
+                /*
+                * 删除图片
+                * */
+                $scope.photoChargeDelete = function (fee) {
+                    if (fee) {
+                        $rootScope.sweetConfirm({
+                            title: "提示",
+                            text: "你是否要删除这张图片！",
+                            type: "warning",
+                            callback: function () {
+                                $http({
+                                    method: "GET",
+                                    url: "/rest/orderrzzls/" + $scope.form_id + "/files"
+                                }).success(function (resResult) {
+                                    angular.forEach(resResult._embedded.orderrzzlFiles, function (val, key) {
+                                        if (val.newFileName == fee.newFileName) {
+                                            $http({
+                                                method: "DELETE",
+//                                                url: "/rest/orderrzzls/" + $scope.form_id + "/files/" + val.id
+                                                url: "/rest/orderrzzlFiles/" + val.id + "/entity/" + $scope.form_id
+                                            }).success(function (resResult) {
+                                                $rootScope.toasterInfo("成功！", "删除成功");
+                                            });
+                                        }
+                                    })
+                                });
+
+
+                            }
+                        })
+                    }
+                };
+
+
+                /*上传文件*/
+                //以下是上传文件的动作详情参考前端框架示例 js/controllers/file-upload.js
+                $scope.uploadDone = false;
+
+                $scope.setUploadDone = function () {
+                    $scope.uploadDone = false;
+                };
+
+                $scope.uploader = new FileUploader({
+                    url: '/fileUpload'
+                });
+
+                $scope.uploader.filters.push({
+                    name: 'customFilter',
+                    fn: function (item, options) {
+                        return this.queue.length < 30;
+                    }
+                });
+
+                $scope.uploader.onAfterAddingFile = function (fileItem) {
+
+                    fileItem.actCode     = $scope.actCode;
+                    fileItem.subcategory = $scope.subcategory;
+                    fileItem.topcategory = $scope.topcategory;
+
+                    fileItem.formData = [{fileType: "file"}];
+
+//                    $("#audit_zip_file_input").val("");
+                };
+
+                $scope.uploader.onErrorItem = function (fileItem, response, status, headers) {
+                    $rootScope.toasterError("上传失败！", fileItem.file.name + " 上传失败！");
+                };
+
+                $scope.uploader.onSuccessItem = function (fileItem, response, status, headers) {
+                    $scope.uploadDone = true;
+
+                    console.log(response);
+                    response.result.actCode     = fileItem.actCode;
+                    response.result.subcategory = fileItem.subcategory;
+                    response.result.topcategory = fileItem.topcategory;
+
+                    angular.forEach($scope.canActs, function (val, key) {
+                        if (val.actCode == fileItem.actCode) {
+                            val.actPhoto.push(response.result);
+                        }
+                    });
+
+                    $http({
+                        method: "PATCH",
+                        url: "rest/orderrzzls/" + $scope.form_id,//这里是关联的实体
+                        data: {
+                            fileObject: response.result,//fileObject是上传完文件后的文件对象
+                            act: fileItem.actCode//上传文件的行为
+                        }
+                    }).success(function (data) {
+                        $rootScope.toasterSuccess("上传成功！", $scope.subcategory + "：" + fileItem.file.name + " 上传成功！");
+                    });
+
+
+                };
+
+
+            }
+        ]
+    );
+</script>
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light" ng-controller="orderrzzlFormController">
+    <!-- column -->
+    <div class="col">
+        <div class="wrapper b-b b-light">
+            <div class="font-thin h4">
+                <span translate="orderrzzl.self.label"></span>{{ form._links?"修改":"新建" }}
+            </div>
+        </div>
+
+        <div class="wrapper">
+            <tabset class="tab-container"
+                    ng-init="steps={percent:50, step1:true, step2:false }">
+                <tab heading="1.公司信息" active="steps.step1" select="steps.percent=50">
+                    <progressbar value="steps.percent" class="progress-xs" type="success"></progressbar>
+
+                    <form name="step1" class="form-horizontal form-validation">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">
+                                <span class="text-danger">*</span> <span translate="orderrzzl.realName.label"></span>
+                            </label>
+                            <div class="col-xs-10">
+                                <input type="text"
+                                       class="form-control"
+                                       ng-model="form.realName"
+                                       id="orderrzzl_realName"
+                                       name="orderrzzl_realName"
+                                       autocomplete="off"
+                                       pattern="^\s*[\u4E00-\u9FA5]+\s*$"
+                                       required
+                                >
+                                <span class="help-block text-danger"
+                                      ng-show="step1.orderrzzl_realName.$dirty && step1.orderrzzl_realName.$invalid && !step1.orderrzzl_realName.$error.required">
+                                      <i class="fa fa-exclamation-circle text-danger"></i>姓名必须为中文
+                                </span>
+                                <span class="help-block text-danger"
+                                      ng-show="step1.orderrzzl_realName.$dirty && step1.orderrzzl_realName.$error.required">
+                                    <i class="fa fa-exclamation-circle text-danger"></i>姓名为必填
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="line line-dashed b-b line-lg pull-in"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">
+                                <span class="text-danger">*</span> <span
+                                    translate="orderrzzl.applyMobile.label"></span>
+                            </label>
+                            <div class="col-xs-10">
+                                <input class="form-control"
+                                       ng-model="form.applyMobile"
+                                       id="orderrzzl_applyMobile"
+                                       name="orderrzzl_applyMobile"
+                                       type="text"
+                                       autocomplete="off"
+                                       pattern="^\s*\d+\s*$"
+                                       required
+                                >
+                                <span class="help-block text-danger"
+                                      ng-show="step1.orderrzzl_applyMobile.$dirty && step1.orderrzzl_applyMobile.$invalid && !step1.orderrzzl_applyMobile.$error.required">
+                                      <i class="fa fa-exclamation-circle text-danger"></i>&ensp;手机号必须为数字
+                                </span>
+                                <span class="help-block text-danger"
+                                      ng-show="step1.orderrzzl_applyMobile.$dirty && step1.orderrzzl_applyMobile.$error.required">
+                                    <i class="fa fa-exclamation-circle text-danger"></i>手机号为必填
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="line line-dashed b-b line-lg pull-in"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">
+                                <span class="text-danger">*</span> <span
+                                    translate="orderrzzl.applyIdentityNo.label"></span>
+                            </label>
+                            <div class="col-xs-10">
+                                <input class="form-control"
+                                       ng-model="form.applyIdentityNo"
+                                       id="orderrzzl_applyIdentityNo"
+                                       name="orderrzzl_applyIdentityNo"
+                                       type="text"
+                                       autocomplete="off"
+                                       disabled
+                                >
+                                <!--<span class="help-block text-danger"-->
+                                      <!--ng-show="step1.orderrzzl_applyIdentityNo.$dirty && step1.orderrzzl_applyIdentityNo.$invalid">-->
+                                      <!--<i class="fa fa-exclamation-circle text-danger"></i>&ensp;身份证为必填-->
+                                <!--</span>-->
+                            </div>
+                        </div>
+
+                        <div class="line line-dashed b-b line-lg pull-in"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label"
+                                   translate="orderrzzl.applyEnterpriseCity.label"></label>
+                            <div class="col-xs-10">
+                                <input class="form-control"
+                                       ng-model="form.applyEnterpriseCity"
+                                       name="orderrzzl_applyEnterpriseCity"
+                                       type="text"
+                                       pattern="^\s*[\u4E00-\u9FA5]+\s*$">
+                                <span class="help-block text-danger"
+                                      ng-show="step1.orderrzzl_applyEnterpriseCity.$dirty && step1.orderrzzl_applyEnterpriseCity.$invalid">
+                                      <i class="fa fa-exclamation-circle text-danger"></i>城市名必须为中文
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="line line-dashed b-b line-lg pull-in"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label"
+                                   translate="orderrzzl.applyEnterpriseDistrict.label"></label>
+                            <div class="col-xs-10">
+                                <input class="form-control"
+                                       ng-model="form.applyEnterpriseDistrict"
+                                       name="orderrzzl_applyEnterpriseDistrict"
+                                       type="text"
+                                       pattern="^\s*[\u4E00-\u9FA5]+\s*$">
+                                <span class="help-block text-danger"
+                                      ng-show="step1.orderrzzl_applyEnterpriseDistrict.$dirty && step1.orderrzzl_applyEnterpriseDistrict.$invalid">
+                                      <i class="fa fa-exclamation-circle text-danger"></i>区县名必须为中文
+                                </span>
+
+                            </div>
+                        </div>
+
+                        <div class="line line-dashed b-b line-lg pull-in"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label"
+                                   translate="orderrzzl.applyEnterpriseAddress.label"></label>
+                            <div class="col-xs-10">
+                                <input class="form-control"
+                                       ng-model="form.applyEnterpriseAddress"
+                                       name="orderrzzl_applyEnterpriseAddress"
+                                       type="text"
+                                       pattern="^\s*[\u4E00-\u9FA5a-zA-Z\d]+\s*$">
+                                <span class="help-block text-danger"
+                                      ng-show="step1.orderrzzl_applyEnterpriseAddress.$dirty && step1.orderrzzl_applyEnterpriseAddress.$invalid">
+                                      <i class="fa fa-exclamation-circle text-danger"></i>格式错误
+                                </span>
+
+                            </div>
+                        </div>
+
+                        <div class="line line-dashed b-b line-lg pull-in"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label"><span class="text-danger">*</span> <span
+                                    translate="orderrzzl.applyDayPatchExpress.label"></span></label>
+                            <div class="col-xs-10">
+                                <input class="form-control"
+                                       ng-model="form.applyDayPatchExpress"
+                                       id="orderrzzl_applyDayPatchExpress"
+                                       name="orderrzzl_applyDayPatchExpress"
+                                       type="text"
+                                       autocomplete="off"
+                                       pattern="^\s*\d+\s*$"
+                                       required
+                                >
+                                <span class="help-block text-danger"
+                                      ng-show="step1.orderrzzl_applyDayPatchExpress.$dirty && step1.orderrzzl_applyDayPatchExpress.$invalid && !step1.orderrzzl_applyDayPatchExpress.$error.required">
+                                      <i class="fa fa-exclamation-circle text-danger"></i>日派件量必须为数字
+                                </span>
+                                <span class="help-block text-danger"
+                                      ng-show="step1.orderrzzl_applyDayPatchExpress.$dirty && step1.orderrzzl_applyDayPatchExpress.$error.required">
+                                    <i class="fa fa-exclamation-circle text-danger"></i>日派件量为必填
+                                </span>
+
+                            </div>
+                        </div>
+
+                        <div class="line line-dashed b-b line-lg pull-in"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label"><span class="text-danger">*</span> <span
+                                    translate="orderrzzl.applyDayPickExpress.label"></span></label>
+                            <div class="col-xs-10">
+                                <input class="form-control"
+                                       ng-model="form.applyDayPickExpress"
+                                       name="orderrzzl_applyDayPickExpress"
+                                       type="text"
+                                       autocomplete="off"
+                                       pattern="^\s*\d+\s*$"
+                                       required
+                                >
+                                <span class="help-block text-danger"
+                                      ng-show="step1.orderrzzl_applyDayPickExpress.$dirty && step1.orderrzzl_applyDayPickExpress.$invalid && !step1.orderrzzl_applyDayPickExpress.$error.required">
+                                      <i class="fa fa-exclamation-circle text-danger"></i>日收件量必须为数字
+                                </span>
+                                <span class="help-block text-danger"
+                                      ng-show="step1.orderrzzl_applyDayPickExpress.$dirty && step1.orderrzzl_applyDayPickExpress.$error.required">
+                                    <i class="fa fa-exclamation-circle text-danger"></i>日收件量为必填
+                                </span>
+
+                            </div>
+                        </div>
+
+                        <div class="line line-dashed b-b line-lg pull-in"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label"><span class="text-danger">*</span> <span
+                                    translate="orderrzzl.applyEnterpriseName.label"></span></label>
+                            <div class="col-xs-10">
+                                <input class="form-control"
+                                       ng-model="form.applyEnterpriseName"
+                                       name="orderrzzl_applyEnterpriseName"
+                                       type="text"
+                                       autocomplete="off"
+                                       pattern="^\s*[\u4E00-\u9FA5a-zA-Z\d]+\s*$"
+                                       required
+                                >
+                                <span class="help-block text-danger"
+                                      ng-show="step1.orderrzzl_applyEnterpriseName.$dirty && step1.orderrzzl_applyEnterpriseName.$invalid && !step1.orderrzzl_applyEnterpriseName.$error.required">
+                                      <i class="fa fa-exclamation-circle text-danger"></i>格式错误
+                                </span>
+                                <span class="help-block text-danger"
+                                      ng-show="step1.orderrzzl_applyEnterpriseName.$dirty && step1.orderrzzl_applyEnterpriseName.$error.required">
+                                    <i class="fa fa-exclamation-circle text-danger"></i>网点名称为必填
+                                </span>
+
+                            </div>
+                        </div>
+
+                        <!--<div class="line line-dashed b-b line-lg pull-in"></div>-->
+                        <!--<div class="form-group">-->
+                            <!--<label class="col-sm-2 control-label"><span class="text-danger">*</span> <span-->
+                                    <!--translate="orderrzzl.comfirmComprehensiveLiabilities.label"></span></label>-->
+                            <!--<div class="col-xs-10">-->
+                                <!--<input class="form-control"-->
+                                       <!--ng-model="form.comfirmComprehensiveLiabilities"-->
+                                       <!--name="orderrzzl_comfirmComprehensiveLiabilities"-->
+                                       <!--type="text"-->
+                                       <!--autocomplete="off"-->
+                                       <!--pattern="^\s*\d+\s*$"-->
+                                       <!--required-->
+                                <!--&gt;-->
+                                <!--<span class="help-block text-danger"-->
+                                      <!--ng-show="step1.orderrzzl_comfirmComprehensiveLiabilities.$dirty && step1.orderrzzl_comfirmComprehensiveLiabilities.$invalid && !step1.orderrzzl_comfirmComprehensiveLiabilities.$error.required">-->
+                                      <!--<i class="fa fa-exclamation-circle text-danger"></i>综合负债必须为数字-->
+                                <!--</span>-->
+                                <!--<span class="help-block text-danger"-->
+                                      <!--ng-show="step1.orderrzzl_comfirmComprehensiveLiabilities.$dirty && step1.orderrzzl_comfirmComprehensiveLiabilities.$error.required">-->
+                                    <!--<i class="fa fa-exclamation-circle text-danger"></i>综合负债为必填-->
+                                <!--</span>-->
+
+                            <!--</div>-->
+                        <!--</div>-->
+
+                        <!--<div class="line line-dashed b-b line-lg pull-in"></div>-->
+                        <!--<div class="form-group">-->
+                            <!--<label class="col-sm-2 control-label"><span class="text-danger">*</span> <span-->
+                                    <!--translate="orderrzzl.comfirmMortgageLiabilities.label"></span></label>-->
+                            <!--<div class="col-xs-10">-->
+                                <!--<input class="form-control"-->
+                                       <!--ng-model="form.comfirmMortgageLiabilities"-->
+                                       <!--name="orderrzzl_comfirmMortgageLiabilities"-->
+                                       <!--type="text"-->
+                                       <!--autocomplete="off"-->
+                                       <!--pattern="^\s*\d+\s*$"-->
+                                       <!--required-->
+                                <!--&gt;-->
+                                <!--<span class="help-block text-danger"-->
+                                      <!--ng-show="step1.orderrzzl_comfirmMortgageLiabilities.$dirty && step1.orderrzzl_comfirmMortgageLiabilities.$invalid && !step1.orderrzzl_comfirmMortgageLiabilities.$error.required">-->
+                                      <!--<i class="fa fa-exclamation-circle text-danger"></i>抵押类负债必须为数字-->
+                                <!--</span>-->
+                                <!--<span class="help-block text-danger"-->
+                                      <!--ng-show="step1.orderrzzl_comfirmMortgageLiabilities.$dirty && step1.orderrzzl_comfirmMortgageLiabilities.$error.required">-->
+                                    <!--<i class="fa fa-exclamation-circle text-danger"></i>抵押类负债为必填-->
+                                <!--</span>-->
+
+                            <!--</div>-->
+                        <!--</div>-->
+
+                        <div class="line line-dashed b-b line-lg pull-in"></div>
+                        <div class="form-group">
+                            <div class="col-xs-10 col-xs-offset-2">
+                                <button ui-sref="workflowEntity.home.profile.info({id:id,entity_key:'orderrzzl'})"
+                                        class="btn btn-default btn-rounded">
+                                    返回
+                                </button>
+                                <!--<button ng-if="!form._links"-->
+                                <!--ui-sref="workflowEntity.list({entity_key:'orderrzzl',workflow_id:form.workflow.id})"-->
+                                <!--class="btn btn-default btn-rounded">-->
+                                <!--返回-->
+                                <!--</button>-->
+                                <button type="submit" ng-disabled="step1.$invalid"
+                                        class="btn btn-default btn-rounded" ng-click="steps.step2=true">下一步
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </tab>
+
+
+                <tab heading="2.图片上传" disabled="step1.$invalid" active="steps.step2"
+                     select="steps.percent=50">
+                    <form name="step2" class="form-horizontal form-validation">
+                        <!--<p class="m-b">图片上传</p>-->
+                        <progressbar value="steps.percent" class="progress-xs" type="success"></progressbar>
+
+                        <div class="form-group" ng-repeat="act in canActs">
+                            <label class="col-xs-2 control-label">{{ act.label }}</label>
+                            <div class="col-xs-10">
+                                <!--<span class="inline upload-photo-img m-r-xs m-t-xs"-->
+                                <!--ng-repeat="photo in uploadVal"-->
+                                <!--ng-click="uploadOnePhoto(photo[act.actCode])">-->
+                                <!--<img class="upload-img "-->
+                                <!--ng-if="photo.actCode=act.actCode?true:false"-->
+                                <!--ng-src="http://files.xiaojinpingtai.com/{{  photo[act.actCode].result.newFileName }}"-->
+                                <!--alt="">-->
+                                <!--</span>-->
+                                <span class="inline upload-photo-img m-r-xs m-t-xs"
+                                      ng-repeat="photo in act.actPhoto"
+                                      ng-click="uploadOnePhoto(photo)">
+                                                <img class="upload-img "
+                                                     ng-src="http://files.xiaojinpingtai.com/{{  photo.newFileName }}"
+                                                     alt="">
+                                </span>
+                                <span class="inline upload-photo m-t-xs" ng-click="uploadPhoto(act)">
+                                    <span class="block font-24">{{ act.label }}</span>
+                                    <i class="fa fa-cloud-upload fa-4x" aria-hidden="true"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="line line-dashed b-b line-lg pull-in "></div>
+
+
+                        <div class="form-group">
+                            <div class="col-xs-2"></div>
+                            <div class="col-xs-10">
+                                <button type="button" class="btn btn-default btn-rounded m-r-xs"
+                                        ng-click="steps.step1=true">上一步
+                                </button>
+                                <button type="button" class="btn btn-default btn-rounded"
+                                        ng-disabled="step2.$invalid" ng-click="orderrzzlSave()">
+                                    保存
+                                </button>
+                            </div>
+
+                        </div>
+                    </form>
+                </tab>
+            </tabset>
+
+
+            <div class="modal fade" id="orderrzzl_upload">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close"
+                                    ng-click="uploader.clearQueue();setUploadDone();"
+                                    data-dismiss="modal">
+                                <span>&times;</span>
+                            </button>
+                            <!--上传审核通过的文件-->
+                            上传文件
+                        </div>
+                        <div class="modal-body">
+                            <div class="hbox hbox-auto-xs hbox-auto-sm" nv-file-drop="" uploader="uploader"
+                                 filters="queueLimit, customFilter">
+                                <div class="col w-lg bg-light b-r bg-auto">
+                                    <div class="wrapper-md dker b-b">
+                                        <h4 class="m-n font-thin">选择文件</h4>
+                                    </div>
+                                    <div class="wrapper-md">
+                                        <div ng-show="uploader.isHTML5" class="m-b-md">
+                                            <!-- 3. nv-file-over uploader="link" over-class="className" -->
+                                            <div class="b-a b-2x b-dashed wrapper-lg bg-white text-center m-b"
+                                                 nv-file-over="" over-class="b-info" uploader="uploader">
+                                                拖动文件放到此处
+                                            </div>
+                                        </div>
+                                        <input id="audit_zip_file_input" class="w" type="file"
+                                               nv-file-select=""
+                                               multiple
+                                               uploader="uploader"/>
+                                    </div>
+                                </div>
+                                <div class="col bg-light bg-auto">
+                                    <div class="wrapper-md bg-light dk b-b">
+                                                    <span class="pull-right">文件数：
+                                                        <b class="badge bg-info">{{ uploader.queue.length }}</b>
+                                                    </span>
+                                        <h4 class="m-n font-thin text-danger ">文件上传</h4>
+                                    </div>
+                                    <div class="wrapper-md">
+                                        <table class="table bg-white-only b-a">
+                                            <thead>
+                                            <tr>
+                                                <th>文件名</th>
+                                                <th ng-show="uploader.isHTML5">大小</th>
+                                                <th>状态</th>
+                                                <th>操作</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr ng-repeat="item in uploader.queue">
+                                                <td>
+                                                    <div class="text-ellipsis w-sm">{{ item.file.name }}
+                                                    </div>
+                                                </td>
+                                                <td ng-show="uploader.isHTML5" nowrap>{{
+                                                    item.file.size/1024/1024|number:2
+                                                    }} MB
+                                                </td>
+                                                <td class="text-center">
+                                                                <span ng-show="item.isSuccess" class="text-success">
+                                                                    <i class="fa fa-check"></i>
+                                                                </span>
+                                                    <span ng-show="item.isCancel" class="text-warning">
+                                                                    <i class="fa fa-ban"></i>
+                                                                </span>
+                                                    <span ng-show="item.isError" class="text-danger">
+                                                                    <i class="fa fa-cancel"></i>
+                                                                </span>
+                                                </td>
+                                                <td nowrap>
+                                                    <button type="button" class="btn btn-default btn-xs"
+                                                            ng-click="item.upload()"
+                                                            ng-disabled="item.isReady || item.isUploading || item.isSuccess">
+                                                        上传
+                                                    </button>
+                                                    <button type="button" class="btn btn-default btn-xs"
+                                                            ng-click="item.remove();setUploadDone();">
+                                                        清除
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                        <div>
+                                            <div>
+                                                <p>进度</p>
+                                                <div class="progress bg-light dker" style="">
+                                                    <div class="progress-bar progress-bar-striped bg-info"
+                                                         role="progressbar"
+                                                         ng-style="{ 'width': uploader.progress + '%' }"></div>
+                                                </div>
+                                                <div class="m-t m-b font-bold h4 text-danger"
+                                                     ng-if="uploader.progress === 100 && !uploadDone">
+                                                    服务器正在处理中，请稍等。。。
+                                                </div>
+                                            </div>
+                                            <button type="button" class="btn btn-addon btn-success"
+                                                    ng-click="uploader.uploadAll()"
+                                                    ng-disabled="!uploader.getNotUploadedItems().length">
+                                                <i class="fa fa-arrow-circle-o-up"></i> 上传
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="orderrzzl_upload_one_photo" tabindex="-1" role="dialog">
+                <div class="modal-lg modal-dialog" role="document" style="width: 900px">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal"
+                                    aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                            <h4 class="modal-title">放大图片</h4>
+                        </div>
+                        <div class="modal-body" style="text-align: center">
+                            <img ng-src="http://files.xiaojinpingtai.com/{{ modalMaxPhoto.newFileName }}"
+                                 style="max-width: 750px;max-height: 650px;"
+                                 alt="">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger"
+                                    ng-click="photoChargeDelete(modalMaxPhoto)">
+                                删除
+                            </button>
+                            <button type="button" class="btn btn-primary"
+                                    ng-click="">
+                                退出
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+    </div>
+</div>
+<!-- /column -->
+</div>
+<!-- /hbox layout -->

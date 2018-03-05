@@ -1,0 +1,68 @@
+<script>
+    app.controller("ordermdbtProfileController",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "entity",
+            function ($rootScope, $scope, $http, entity) {
+
+                $scope.userList = {};
+
+                $scope.getLogList = function () {
+                    entity.getList('rest/ordermdbtLogs/search/latestNoticeUser?act_id=8').then(function (resResult) {
+                        if (resResult._embeddedItems) {
+                            angular.forEach(resResult._embeddedItems, function (val, key) {
+                                $scope.userList[val.id] = val
+                            })
+                        }
+
+                    });
+                };
+
+                $scope.getLogList();
+
+                $scope.getList = function () {
+                    $http.get('/linkman').success(function (resResult) {
+                        angular.forEach(resResult, function (val, key) {
+                            $scope.userList[val.id] = val
+                        })
+                    });
+                };
+
+                $scope.distributionSelect = "0";
+
+                $scope.distributionShow = function (val) {
+                    if (val === "0") {
+                        $scope.userList = {};
+                        $scope.getLogList();
+                    } else {
+                        $scope.userList = {};
+                        $scope.getList();
+                    }
+                };
+
+            }
+        ]
+    );
+</script>
+<div class="vbox bg-white" ng-controller="ordermdbtProfileController">
+    <div class="wrapper bg-white b-b">
+        <ul class="nav nav-pills nav-sm">
+            <li ui-sref-active="active">
+                <a ui-sref="workflowEntity.home.profile.info">主页</a>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="workflowEntity.home.profile.page({entity_key:'ordermdbt',view_type:'file'})">申请文件</a>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="workflowEntity.home.profile.page({entity_key:'ordermdbt',view_type:'log'})">操作记录</a>
+            </li>
+        </ul>
+    </div>
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner" ui-view=""></div>
+        </div>
+    </div>
+</div>

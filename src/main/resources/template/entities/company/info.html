@@ -1,0 +1,68 @@
+<div class="wrapper">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    公司详细信息
+                </div>
+                <table class="table table-striped m-b-none">
+                    <tbody>
+                    <tr>
+                        <td class="v-middle text-right w-sm"> 公司名称:</td>
+                        <td class="v-middle w-xl">{{ info.companyName }}</td>
+                        <td class="v-middle text-right w-sm">公司法人:</td>
+                        <td class="v-middle w-xl">{{ info.companyPersonName }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right w-sm"> 公司地址:</td>
+                        <td class="v-middle w-xl">{{ info.addressFullName }}</td>
+                        <td class="v-middle text-right w-sm">社会统一信用代码:</td>
+                        <td class="v-middle w-xl">{{ info.companyNumber }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right w-sm">  公司人数:</td>
+                        <td class="v-middle w-xl">{{ info.peopleAmount }}</td>
+                        <td class="v-middle text-right w-sm">创建时间:</td>
+                        <td class="v-middle w-xl">{{ info.createdAt | datetime }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="wrapper bg-white clearfix">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            公司成员
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover b-light">
+                <thead>
+                <tr>
+                    <th>姓名</th>
+                    <th>手机号</th>
+                    <th>公司角色</th>
+                    <th>创建时间</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="item in companyUsers">
+                    <td class="v-middle">
+                        {{ item.realname ? item.realname :info.companyPersonName }}
+                    </td>
+                    <td class="v-middle">
+                        {{ item.username }}
+                    </td>
+                    <td class="v-middle">
+                        {{ item.companyRole == 'manager' ? '法人' :'职员'}}
+                    </td>
+                    <td class="v-middle">
+                        {{ item.createdAt | datetime }}
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>注册</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <link rel="stylesheet" href="../css/weui.css">
+    <link rel="stylesheet" href="../css/weui2.css">
+    <link rel="stylesheet" href="../css/animate.min.css">
+    <link rel="stylesheet" href="../css/loading.css">
+    <style>
+        .weui_cells:before{
+            border-top: none;
+        }
+        .weui_cells:after{
+            border-bottom: none;
+        }
+        .astyle{
+            cursor: pointer;border-radius: 40px;width: 100%; height: 40px; background: #00b0ec; color: white;display: inline-block; line-height: 40px; text-align: center;
+        }
+        .astyle:active{
+            background: #ccc;
+            color: white;
+        }
+        .a2{
+            color: #f35626;
+            background-image: -webkit-linear-gradient(92deg,#f35626,#feab3a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            -webkit-animation: hue 60s infinite linear;
+        }
+    </style>
+
+</head>
+<body style="background: #fff">
+
+<div id="register">
+    <div style="width: 164px; margin: 0 auto;padding-top: 50px;">
+        <img src="../images/logo.png" >
+    </div>
+    <form id="form">
+        <div class="weui_cells weui_cells_form">
+            <div class="weui_cell">
+                <div class="weui_cell_hd"><label class="weui_label">手机号</label></div>
+                <div class="weui_cell_bd weui_cell_primary">
+                    <input id="mobile" class="weui_input" type="tel" maxlength="11" required pattern="^1(3|4|5|7|8)\d{9}$" placeholder="请输入手机号" emptyTips="请输入手机号" notMatchTips="请输入正确的手机号"/>
+                </div>
+            </div>
+            <div class="weui_cell weui_vcode">
+                <div class="weui_cell_hd"><label class="weui_label">验证码</label></div>
+                <div class="weui_cell_bd weui_cell_primary">
+                    <input id="vcode2" required class="weui_input" type="text" maxlength="6" placeholder="请输入验证码"/>
+                </div>
+                <div id="vCode" class="weui_cell_ft">
+                    <button id="vCodeText" href="javascript:;" class="weui-vcode-btn" style="background: #fff;border: none;border-left: 1px solid #e5e5e5;color: #0D0D0D;">获取验证码</button>
+                </div>
+            </div>
+            <div class="weui_cell">
+                <div class="weui_cell_hd"><label class="weui_label">密码</label></div>
+                <div class="weui_cell_bd weui_cell_primary">
+                    <input id="password" class="weui_input" type="password" maxlength="16" minlength="6" placeholder="请输入密码"  emptyTips="请输入密码"  notMatchTips="密码长度应在6-16位间" pattern=".{6,16}"  required />
+                </div>
+            </div>
+            <div class="weui_cell">
+                <div class="weui_cell_hd"><label class="weui_label">确认密码</label></div>
+                <div class="weui_cell_bd weui_cell_primary">
+                    <input id="password2" class="weui_input" type="password" maxlength="16" minlength="6" placeholder="请再次输入密码"  emptyTips="请再次输入密码"  required />
+                </div>
+            </div>
+            <div class="weui_cell"></div>
+        </div>
+    </form>
+    <div class="page-bd-15" style="margin-top: 20px;">
+        <a id="formSubmitBtn" class="astyle animated bounceIn">确定</a>
+        <p style="font-size: 16px;text-align: center;margin-top: 10px;"><span style="color: #8c8c8c;">已有账号?</span><span id="toLogin" style="color: #00b0ec;cursor: pointer;margin-left: 10px;">立即登录</span></p>
+    </div>
+</div>
+<div id="login" style="display: none">
+    <div style="background: #fff;width: calc(100% - 30px); height: 44px;padding: 0 15px;border-bottom: 1px solid #e6e6e6;" class="clearfix">
+        <div style="float: left" id="back">
+            <i class="icon icon-109 f-black" style="font-size: 25px; line-height: 44px;"></i>
+        </div>
+        <div style="float: left;width: calc(100% - 130px); padding: 0 50px; height: 44px;text-align: center;line-height: 44px;font-weight: bolder">
+            登录
+        </div>
+    </div>
+
+    <div style="width: 164px; margin: 0 auto;padding-top: 50px;">
+        <img src="../images/logo.png">
+    </div>
+
+    <form id="loginForm">
+        <div class="weui_cells weui_cells_form">
+            <div class="weui_cell">
+                <div class="weui_cell_hd"><label class="weui_label">手机号</label></div>
+                <div class="weui_cell_bd weui_cell_primary">
+                    <input id="loginMobile" class="weui_input" type="tel" maxlength="11" required placeholder="请输入手机号" emptyTips="请输入手机号" notMatchTips="请输入正确的手机号"/>
+                </div>
+            </div>
+            <div class="weui_cell">
+                <div class="weui_cell_hd"><label class="weui_label">密码</label></div>
+                <div class="weui_cell_bd weui_cell_primary">
+                    <input id="loginPassword" class="weui_input" type="password" maxlength="16" minlength="6" placeholder="请输入密码"  emptyTips="请输入密码"  notMatchTips="密码长度应在6-16位间" pattern=".{6,16}"  required />
+                </div>
+            </div>
+            <div class="weui_cell"></div>
+        </div>
+    </form>
+    <div class="page-bd-15" style="margin-top: 20px;">
+        <a id="loginFormSubmitBtn" class="astyle animated bounceIn">确定</a>
+    </div>
+</div>
+
+
+</body>
+<script src="../js/config.js"></script>
+<script src="../js/jquery-3.2.1.js"></script>
+<script src="../js/zepto.min.js"></script>
+<script src="../js/loading.js"></script>
+<script>
+if(window.location.search){
+    var href = window.location.href;
+    var href2 = href.split('?')[1];
+    var state_all = href2.split('&')[1];
+    var code_all = href2.split('&')[0];
+    window.state = state_all.split('=')[1];
+    window.code = code_all.split('=')[1];
+    console.log(window.state)
+    console.log(window.code)
+}
+
+function loading() {
+	$('body').loading({
+		loadingWidth:120,
+		title:'',
+		name:'test',
+		discription:'',
+		direction:'column',
+		type:'origin',
+		// originBg:'#71EA71',
+		originDivWidth:40,
+		originDivHeight:40,
+		originWidth:6,
+		originHeight:6,
+		smallLoading:false,
+		loadingMaskBg:'rgba(0,0,0,0.2)'
+	});
+
+}
+    //切换到登录
+    $('#toLogin').click(function () {
+        $('#register').hide();
+        $('#login').show();
+    });
+
+    //切换到注册
+    $('#back').click(function () {
+        $('#register').show();
+        $('#login').hide();
+    });
+
+    // 获取验证码倒计时
+    $('#vCode').click(function () {
+    	var mobile = $('#mobile').val();
+        var reg = /^1(3|4|5|7|8)\d{9}$/;
+        var r = mobile.match(reg);
+        if( r !== null){
+            $.ajax({
+                type: 'get',
+                url: '/smsCode' ,
+                data: {
+                    mobile:mobile
+                } ,
+                headers: {
+                    app_code:"WULIUQIANZHUANG",
+                    client:"wechat"
+                },
+                success: function (res) {
+                    $.alert(res.msg)
+                },error:function(res){
+
+                    $.alert(res.responseJSON.message)
+                },
+                dataType: 'json'
+            });
+            identifyingCode();
+        }else {
+            $.alert('请输入正确的手机号!')
+        }
+
+    });
+    var time=60;
+    function identifyingCode(){
+        if(time==0){
+            $(".weui-vcode-btn").html("获取验证码");
+            $(".weui-vcode-btn").removeAttr("disabled");
+            $(".weui-vcode-btn").css("color","#0D0D0D");
+            time=60;
+        }else{
+            $(".weui-vcode-btn").attr("disabled","disabled");
+            $(".weui-vcode-btn").html("重新获取("+time+")");
+            $(".weui-vcode-btn").css("color","#d9d9d9");
+            setTimeout(function(){
+                time=time-1;
+                identifyingCode();
+            },1000)
+        }
+    }
+
+    var $form = $("#form");
+    $form.form();
+
+    //注册
+    $("#formSubmitBtn").on("click", function(){
+        $form.validate(function(error){
+            if(error){
+
+            }else{
+            	loading();
+                var mobile = $('#mobile').val();
+                var vcode =$('#vcode2').val();
+                var password = $('#password').val();
+                var passwordAgain = $('#password2').val();
+                var data ={
+                    username:mobile,
+                    password:password,
+                    passwordAgain:passwordAgain,
+                   	smscode:vcode,
+                   	state:window.state,
+                   	code:window.code    
+                    
+                }
+
+                //var upData=JSON.stringify(data);
+                $.ajax({
+                    type: 'post',
+                    url: '/register' ,
+                    data: data ,
+                    headers: {
+                       
+                        app_code:"WULIUQIANZHUANG",
+                        client:"wechat"
+                    },
+                    success: function (res) {
+                    	removeLoading('test');
+                    	if(res.ActionStatus == 'FAIL'){
+                           	alert(res.ErrorInfo)
+                           }else{
+                        	   $.toast("注册成功");
+                        	   setTimeout(function () {
+                        		   var uri='http://'+window.config.location+'/wechat/wlqz/html/loan/loanApplication.html';
+                         			uri=encodeURIComponent(uri);
+                          			window.location.href='https://open.weixin.qq.com/connect/oauth2/authorize?appid='+window.config.appid+'&redirect_uri='+uri+'&response_type=code&scope=snsapi_base&state='+window.state+'#wechat_redirect';
+                                    
+                               },1500)
+
+                        	   
+                    	   }
+                 
+                    } ,
+                    error:function(res){
+                    	removeLoading('test');
+                    	var message = (res.responseJSON.message).split(':')[1]
+                    	$.alert(message)
+                    },
+                    dataType: 'json'
+                })
+            }
+        });
+
+    });
+
+    var $loginForm = $("#loginForm");
+        $loginForm.form();
+    //登录
+    $("#loginFormSubmitBtn").on("click", function(){
+        $loginForm.validate(function(error){
+            if(error){
+
+            }else{
+            
+                loading();
+                var mobile = $('#loginMobile').val();
+                var password = $('#loginPassword').val();
+                var data ={
+                    username:mobile,
+                    password:password,
+                    state:window.state,
+                    code:window.code
+
+                }
+
+                //var upData=JSON.stringify(data);
+                $.ajax({
+                    type: 'post',
+                    url: '/weblogin',
+                    data: data ,
+                    headers: {
+                        app_code:"WULIUQIANZHUANG",
+                        client:"wechat"
+                    },
+                    success: function (res) {
+                        removeLoading('test');
+                        if(res.ActionStatus == 'FAIL'){
+                            alert(res.ErrorInfo)
+                        }else{
+                            $.toast("登录成功");
+                            setTimeout(function () {
+                                var uri='http://'+window.config.location+'/wechat/wlqz/html/loan/loanApplication.html';
+                                uri=encodeURIComponent(uri);
+                                window.location.href='https://open.weixin.qq.com/connect/oauth2/authorize?appid='+window.config.appid+'&redirect_uri='+uri+'&response_type=code&scope=snsapi_base&state='+window.state+'#wechat_redirect';
+
+                            },1500)
+
+
+                        }
+
+                    } ,
+                    error:function(res){
+                    	 removeLoading('test');
+                    	 $.alert(res.responseJSON.message)
+                    },
+                    dataType: 'json'
+                })
+            }
+        });
+    });
+
+</script>
+
+</html>

@@ -1,0 +1,511 @@
+package com.liyang.service;
+
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import javax.annotation.PostConstruct;
+import javax.transaction.Transactional;
+
+import com.liyang.domain.capitalproduct.Capitalproduct;
+import com.liyang.domain.creditcard.Creditcard;
+import com.liyang.domain.creditcard.CreditcardRepository;
+import com.liyang.domain.creditrepayplan.Creditrepayplan;
+import com.liyang.domain.creditrepayplan.CreditrepayplanRepository;
+import com.liyang.domain.creditrepayplan.CreditrepayplanStateRepository;
+import com.liyang.domain.department.Departmenttype;
+import com.liyang.domain.department.DepartmenttypeRepository;
+import com.liyang.domain.loan.Loan;
+import com.liyang.domain.loan.LoanRepository;
+import com.liyang.domain.loan.LoanStateRepository;
+import com.liyang.domain.loan.Loanoverdue;
+import com.liyang.domain.loan.LoanoverdueRepository;
+import com.liyang.domain.ordercdd.Ordercdd;
+import com.liyang.domain.ordermdbt.Ordermdbt;
+import com.liyang.domain.ordermdbt.OrdermdbtRepository;
+import com.liyang.domain.product.Product;
+import com.liyang.util.CommonUtil;
+import com.liyang.util.DateUtil;
+import com.liyang.util.FailReturnObject;
+import com.liyang.util.ProductUtil;
+import com.liyang.util.ReturnObject;
+import com.liyang.util.WechatImageAsyncFetchEvent;
+import com.liyang.util.ReturnObject.Level;
+import com.timevale.tgtext.awt.geom.p;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+import com.liyang.domain.base.AbstractAuditorAct.ActGroup;
+import com.liyang.domain.creditrepayment.Creditrepayment;
+import com.liyang.domain.creditrepayment.CreditrepaymentAct;
+import com.liyang.domain.creditrepayment.CreditrepaymentActRepository;
+import com.liyang.domain.creditrepayment.CreditrepaymentFile;
+import com.liyang.domain.creditrepayment.CreditrepaymentLog;
+import com.liyang.domain.creditrepayment.CreditrepaymentLogRepository;
+import com.liyang.domain.creditrepayment.CreditrepaymentRepository;
+import com.liyang.domain.creditrepayment.CreditrepaymentState;
+import com.liyang.domain.creditrepayment.CreditrepaymentStateRepository;
+import com.liyang.domain.creditrepayment.CreditrepaymentWorkflow;
+import com.liyang.domain.creditrepayment.CreditrepaymentWorkflowRepository;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.jpa.query.expression.QueryExpSpecificationBuilder;
+import com.jpa.query.expression.generic.GenericQueryExpSpecification;
+import com.liyang.Enum.OrderTypeEnum;
+import com.liyang.aliyunsms.AliyunSmsService;
+import com.liyang.domain.base.ActRepository;
+import com.liyang.domain.base.AuditorEntityRepository;
+import com.liyang.domain.base.LogRepository;
+import com.liyang.domain.role.RoleRepository;
+import com.liyang.domain.user.User;
+
+@Service
+@Order(312)
+public class CreditrepaymentService extends
+		AbstractWorkflowService<Creditrepayment, CreditrepaymentWorkflow, CreditrepaymentAct, CreditrepaymentState, CreditrepaymentLog, CreditrepaymentFile> {
+	@Autowired
+	CreditrepaymentActRepository CreditrepaymentActRepository;
+
+	@Autowired
+	CreditrepaymentStateRepository CreditrepaymentStateRepository;
+
+	@Autowired
+	CreditrepaymentLogRepository CreditrepaymentLogRepository;
+
+	@Autowired
+	CreditrepaymentRepository CreditrepaymentRepository;
+	//
+	@Autowired
+	CreditrepaymentWorkflowRepository creditrepaymentWorkflowRepository;
+	@Autowired
+	RoleRepository roleRepository;
+	@Autowired
+	WlqzWechatPubService wechatPubService;
+	@Autowired
+	CreditrepayplanRepository creditrepayplanRepository;
+	@Autowired
+	CreditrepayplanStateRepository creditrepayplanStateRepository;
+	@Autowired
+	DepartmenttypeRepository departmenttypeRepository;
+	@Autowired
+	CreditcardRepository creditcardRepository;
+	@Autowired
+	LoanRepository loanRepository;
+	@Autowired
+	XinGePushService xinGePushService;
+	@Autowired
+	SmsService smsService;
+	@Autowired
+	LoanStateRepository LoanStateRepository;
+	@Autowired
+	LoanoverdueRepository loanoverdueRepository;
+	@Autowired
+	OrdermdbtRepository ordermdbtRepository;
+	@Autowired
+	AliyunSmsService aliyunSmsService;
+
+	@Override
+	@PostConstruct
+	public void sqlInit() {
+
+		long findAll = CreditrepaymentActRepository.count();
+		if (findAll == 0) {
+
+			CreditrepaymentAct save1 = CreditrepaymentActRepository
+					.save(new CreditrepaymentAct("创建", "create", 10, ActGroup.UPDATE));
+			CreditrepaymentAct save2 = CreditrepaymentActRepository
+					.save(new CreditrepaymentAct("读取", "read", 20, ActGroup.READ));
+			CreditrepaymentAct save3 = CreditrepaymentActRepository
+					.save(new CreditrepaymentAct("更新", "update", 30, ActGroup.UPDATE));
+			CreditrepaymentAct save4 = CreditrepaymentActRepository
+					.save(new CreditrepaymentAct("删除", "delete", 40, ActGroup.UPDATE));
+			CreditrepaymentAct save5 = CreditrepaymentActRepository
+					.save(new CreditrepaymentAct("自己的列表", "listOwn", 50, ActGroup.READ));
+			CreditrepaymentAct save6 = CreditrepaymentActRepository
+					.save(new CreditrepaymentAct("部门的列表", "listOwnDepartment", 60, ActGroup.READ));
+			CreditrepaymentAct save7 = CreditrepaymentActRepository
+					.save(new CreditrepaymentAct("部门和下属部门的列表", "listOwnDepartmentAndChildren", 70, ActGroup.READ));
+			CreditrepaymentAct save8 = CreditrepaymentActRepository
+					.save(new CreditrepaymentAct("通知其他人", "noticeOther", 80, ActGroup.NOTICE));
+			CreditrepaymentAct save9 = CreditrepaymentActRepository
+					.save(new CreditrepaymentAct("通知操作者", "noticeActUser", 90, ActGroup.NOTICE));
+			CreditrepaymentAct save10 = CreditrepaymentActRepository
+					.save(new CreditrepaymentAct("通知展示人", "noticeShowUser", 100, ActGroup.NOTICE));
+
+			CreditrepaymentState newState = new CreditrepaymentState("已创建", 0, "CREATED");
+			newState = CreditrepaymentStateRepository.save(newState);
+
+			CreditrepaymentState enableState = new CreditrepaymentState("有效", 100, "ENABLED");
+			enableState.setActs(Arrays.asList(save1, save2, save3, save4, save5, save6, save7).stream()
+					.collect(Collectors.toSet()));
+			CreditrepaymentStateRepository.save(enableState);
+			CreditrepaymentStateRepository.save(new CreditrepaymentState("无效", 200, "DISABLED"));
+			CreditrepaymentStateRepository.save(new CreditrepaymentState("已删除", 300, "DELETED"));
+
+		}
+
+	}
+
+	@Override
+	public LogRepository<CreditrepaymentLog> getLogRepository() {
+		// TODO Auto-generated method stub
+		return CreditrepaymentLogRepository;
+	}
+
+	@Override
+	public AuditorEntityRepository<Creditrepayment> getAuditorEntityRepository() {
+
+		return CreditrepaymentRepository;
+	}
+
+	@Override
+	@PostConstruct
+	public void injectLogRepository() {
+		new Creditrepayment().setLogRepository(CreditrepaymentLogRepository);
+
+	}
+
+	@Override
+	public CreditrepaymentLog getLogInstance() {
+		// TODO Auto-generated method stub
+		return new CreditrepaymentLog();
+	}
+
+	@Override
+	public ActRepository<CreditrepaymentAct> getActRepository() {
+		// TODO Auto-generated method stub
+		return CreditrepaymentActRepository;
+	}
+
+	@Override
+	@PostConstruct
+	public void injectEntityService() {
+		new Creditrepayment().setService(this);
+
+	}
+
+	@Override
+	public CreditrepaymentFile getFileLogInstance() {
+		// TODO Auto-generated method stub
+		return new CreditrepaymentFile();
+	}
+
+	public void save(Creditrepayment Creditrepayment) {
+		// wechatPubService.pushOpenAccMessage(toUser, url, templateId,
+		// childMap);
+		CreditrepaymentRepository.save(Creditrepayment);
+	}
+
+	@Transactional
+	public void doCreate(Creditrepayment creditrepayment) {
+		switch (creditrepayment.getRepaymentType()) {
+		case ORDERMDBT:
+			creditrepayment.setWorkflow(creditrepaymentWorkflowRepository.findOne(1));
+			creditrepayment.setOrderNo(ProductUtil.modify(creditrepayment.getCreditcard().getProduct().getLabel(),
+					OrderTypeEnum.REPAYMENT));
+			String planSN = creditrepayment.getPlanSn();
+			if (planSN == null) {
+				throw new FailReturnObject(1634, "请选择还款的期号", ReturnObject.Level.INFO);
+			}
+			Creditrepayplan creditrepayplan = creditrepayplanRepository.findByPlanSn(planSN);
+			if (creditrepayplan == null) {
+				throw new FailReturnObject(1842, "请输入正确的还款计划", ReturnObject.Level.INFO);
+			}
+			smsService.sendCommitMessage(creditrepayment.getOrderNo(), "还款", "面单白条");
+			
+			Ordermdbt ordermdbt = ordermdbtRepository.findByApplyMobile(creditrepayment.getCreditcard().getCreditcardIdentity());
+			if (ordermdbt == null) {
+				throw new FailReturnObject(1684, "查询面单白条订单出错", Level.WARNING);
+			}
+			if(ordermdbt.getServiceUser() != null){
+				if(ordermdbt.getServiceUser().getUsername() == null || !Pattern.matches("^1[\\d]{10}$", ordermdbt.getServiceUser().getUsername())){
+					throw new FailReturnObject(1971, "请输入正确的手机号", ReturnObject.Level.INFO);
+				}
+				Map<String, Object> param = new HashMap<String, Object>();
+				param.put("orderNo", creditrepayment.getOrderNo());
+				param.put("orderType", "还款");
+				param.put("label", "面单白条");
+				aliyunSmsService.sendMes(ordermdbt.getServiceUser().getUsername(), param, "SMS_119085953");
+			}
+			break;
+
+		default:
+			break;
+		}
+	}
+
+	public void doAdopt(Creditrepayment creditrepayment) {
+		switch (creditrepayment.getRepaymentType()) {
+		case ORDERMDBT:
+			creditrepayment.setState(CreditrepaymentStateRepository.findByStateCode("ENABLED"));
+			Creditrepayplan creditrepayplan = creditrepayment.getCreditrepayplan();
+			Creditcard creditcard = creditrepayment.getCreditcard();
+			Loan loan = creditrepayment.getLoan();
+
+			BigDecimal leftoverFees = creditrepayment.getPayAmount().subtract(creditrepayment.getPunishinterest());// 还过剩下的钱
+			if (leftoverFees.compareTo(BigDecimal.valueOf(0)) <= 0) {
+				Loanoverdue loanoverdue = loanoverdueRepository.findEnable(loan.getId());
+				if (loanoverdue != null) {
+					loanoverdue.setPenalSum(loanoverdue.getPenalSum().subtract(creditrepayment.getPayAmount()));
+					loanoverdueRepository.save(loanoverdue);
+				}
+				return;
+			}
+			loan.setRemainAmount(loan.getRemainAmount().subtract(leftoverFees));
+			if (loan.getRemainAmount().compareTo(BigDecimal.valueOf(0)) <= 0) {
+				loan.setState(LoanStateRepository.findByStateCode("PAYOF"));
+			}
+
+			if (creditrepayplan.getTerm() == 3) { // 还第三期
+
+				if (creditrepayplan.getLeftAmount().compareTo(creditrepayplan.getPrincipal()) <= 0) { // 本次还款全是本金
+					creditrepayplan.setLeftAmount(creditrepayplan.getLeftAmount().subtract(leftoverFees));// 还款计划剩余金额计算
+					creditcard.setCreditBalance(creditcard.getCreditBalance().add(leftoverFees));// 信用卡剩余额度计算
+					creditrepayment.setPrincipal(leftoverFees);
+					creditrepayment.setInterest(BigDecimal.valueOf(0));
+					if (creditrepayplan.getLeftAmount().compareTo(BigDecimal.valueOf(0)) <= 0) { // 若计划剩余为0，计划为已还清
+						creditrepayplan.setState(creditrepayplanStateRepository.findByStateCode("CLOSED"));
+					}
+
+				} else { // 本次还款可能包含本金，也可能全是利息
+					creditrepayplan.setLeftAmount(creditrepayplan.getLeftAmount().subtract(leftoverFees));
+					if (creditrepayplan.getLeftAmount().compareTo(creditrepayplan.getPrincipal()) < 0) { // 还款金额包含部分本金
+						BigDecimal payPrincipal = creditrepayplan.getPrincipal()
+								.subtract(creditrepayplan.getLeftAmount());
+						// 计算还款本金
+						creditcard.setCreditBalance(creditcard.getCreditBalance().add(payPrincipal));
+						creditrepayment.setPrincipal(payPrincipal);
+						creditrepayment.setInterest(leftoverFees.subtract(payPrincipal));
+						if (creditrepayplan.getLeftAmount().compareTo(BigDecimal.valueOf(0)) <= 0) { // 计划已还清
+							creditrepayplan.setState(creditrepayplanStateRepository.findByStateCode("CLOSED"));
+						}
+					} else {
+						// 本次还款全是利息
+						creditrepayment.setPrincipal(BigDecimal.valueOf(0));
+						creditrepayment.setInterest(leftoverFees);
+					}
+				}
+			} else { // 还前两期
+				creditrepayplan.setLeftAmount(creditrepayplan.getLeftAmount().subtract(leftoverFees));
+				creditrepayment.setPrincipal(BigDecimal.valueOf(0));
+				creditrepayment.setInterest(leftoverFees);
+				if (creditrepayplan.getLeftAmount().compareTo(BigDecimal.valueOf(0)) <= 0) {
+					creditrepayplan.setState(creditrepayplanStateRepository.findByStateCode("CLOSED"));
+				}
+			}
+
+			Loanoverdue loanoverdue = loanoverdueRepository.findEnable(loan.getId());
+			if (loanoverdue != null) {
+				loanoverdue.setPenalSum(loanoverdue.getPenalSum().subtract(creditrepayment.getPunishinterest()));
+				if (creditrepayplan.getIsOverdue() == 1) {
+					loanoverdue.setOverdueAmount(loanoverdue.getOverdueAmount().subtract(leftoverFees));
+					if (creditrepayplan.getLeftAmount().compareTo(BigDecimal.valueOf(0)) <= 0) {
+						creditrepayplan.setIsOverdue(0);
+					}
+				}
+				if (loanoverdue.getOverdueAmount().compareTo(BigDecimal.valueOf(0)) <= 0) {// 已结请
+					loanoverdue.setStatus(1);
+					loanoverdue.setFinishAt(new Date());
+					loanoverdue.setPenalSum(new BigDecimal(0));
+					loan.setOverdue(0);
+				}
+				loanoverdueRepository.save(loanoverdue);
+			}
+
+			loanRepository.save(loan);
+			CreditrepaymentRepository.save(creditrepayment);
+			creditcardRepository.save(creditcard);
+			creditrepayplanRepository.save(creditrepayplan);
+
+			wechatPubService.pushRepaymentMessage(creditrepayment.getCreatedBy(), creditrepayment.getDebtorName(), null,
+					creditrepayment.getPayAmount().setScale(2).toString(), "还款成功",
+					DateUtil.getStrByDate(creditrepayment.getDebtorActualRepaymentDate(), "yyyy-MM-dd HH:mm:ss"), null,
+					null);
+			String content = xinGePushService.getMDBTRepaymentPassMessage(creditrepayment);
+			xinGePushService.pushAppMessage(creditrepayment.getCreatedBy(),
+					creditrepayment.getCreditcard().getProduct(), "还款进度通知", content, 2);
+			break;
+		default:
+			break;
+		}
+	}
+
+	public void paymentOverdue() {
+
+	}
+
+	public void paymentPlan(Creditrepayment creditrepayment) {
+		System.out.println(creditrepayment.getState().getLabel());
+		Creditrepayplan creditrepayplan = creditrepayment.getCreditrepayplan();
+		BigDecimal realAmount = creditrepayment.getPayAmount();
+		BigDecimal leftoverFees = realAmount;// 还过剩下的钱
+		BigDecimal paid = new BigDecimal(0);// 已还的钱
+		BigDecimal leftAmount = creditrepayplan.getLeftAmount();
+		leftoverFees = leftoverFees.subtract(leftAmount);
+		int subResult = leftoverFees.compareTo(BigDecimal.valueOf(0));
+		// 如果实际还款金额比剩余应还金额多
+		if (subResult >= 0) {
+			paid = paid.add(creditrepayplan.getLeftAmount());
+			creditrepayplan.setLeftAmount(BigDecimal.valueOf(0));
+			creditrepayplan.setState(creditrepayplanStateRepository.findByStateCode("CLOSED"));
+		} else {
+			paid = paid.add(creditrepayplan.getLeftAmount().add(leftoverFees));
+			creditrepayplan.setLeftAmount(leftoverFees.abs());
+		}
+		creditrepayplanRepository.save(creditrepayplan);
+	}
+
+	public void doFailed(Creditrepayment creditrepayment) {
+		switch (creditrepayment.getRepaymentType()) {
+		case ORDERMDBT:
+			creditrepayment.setState(CreditrepaymentStateRepository.findByStateCode("DISABLED"));
+			wechatPubService.pushRepaymentMessage(creditrepayment.getCreatedBy(), creditrepayment.getDebtorName(), null,
+					creditrepayment.getPayAmount().setScale(2).toString(), "还款失败",
+					DateUtil.getStrByDate(creditrepayment.getDebtorActualRepaymentDate(), "yyyy-MM-dd HH:mm:ss"), null,
+					null);
+			String content = xinGePushService.getMDBTRepaymentFailMessage(creditrepayment);
+			xinGePushService.pushAppMessage(creditrepayment.getCreatedBy(),
+					creditrepayment.getCreditcard().getProduct(), "还款进度通知", content, 2);
+			break;
+
+		default:
+			break;
+		}
+
+	}
+
+	// 取消通过
+	public void sendBack(Creditrepayment creditrepayment) {
+		switch (creditrepayment.getRepaymentType()) {
+		case ORDERMDBT:
+
+			creditrepayment.setState(CreditrepaymentStateRepository.findByStateCode("ACCOUNTED"));
+			Creditrepayplan creditrepayplan = creditrepayment.getCreditrepayplan();
+			Creditcard creditcard = creditrepayment.getCreditcard();
+			// 判断还款计划期数
+			int term = creditrepayment.getCreditrepayplan().getTerm().intValue();
+			BigDecimal payAmount = creditrepayment.getPayAmount();
+			BigDecimal leftAmount = creditrepayplan.getLeftAmount();
+			BigDecimal principal = creditrepayplan.getPrincipal();
+			// 前两期还款
+			if (term < 3) {
+				// 前端限制了payAmount一定小于getLeftAmount
+				creditrepayplan.setLeftAmount(leftAmount.add(payAmount));
+				// 将状态由CLOSE改成ACCOUNTED
+				creditrepayplan.setState(creditrepayplanStateRepository.findByStateCode("ACCOUNTED"));
+			}
+			// 第三期还款
+			if (term == 3) {
+				if (payAmount.compareTo(principal) <= 0) {
+					// 还款全为本金
+					if (leftAmount.compareTo(principal) <= 0) {
+						creditrepayplan.setLeftAmount(leftAmount.add(payAmount)); // 还款计划剩余金额计算
+						creditcard.setCreditBalance(creditcard.getCreditBalance().subtract(payAmount)); // 信用卡剩余额度计算
+					} else {// 还款全为利息
+						creditrepayplan.setLeftAmount(leftAmount.add(payAmount)); // 还款计划剩余金额计算
+					}
+				}
+				// 还款为本金和利息
+				if (payAmount.compareTo(principal) > 0) {
+					creditrepayplan.setLeftAmount(creditrepayplan.getLeftAmount().add(payAmount)); // 还款计划剩余金额计算
+					creditcard.setCreditBalance(creditcard.getCreditBalance().subtract(principal)); // 信用卡剩余额度计算
+				}
+			}
+
+			break;
+
+		default:
+			break;
+		}
+
+	}
+
+	@Override
+	public CreditrepaymentLog fillmultiWechatImageToLog(Creditrepayment entity, CreditrepaymentLog log) {
+		// TODO Auto-generated method stub
+		String[] wechatFiles = entity.getWechatFiles();
+		for (String fileName : wechatFiles) {
+			CreditrepaymentFile fileLogInstance = getFileLogInstance();
+			fileLogInstance.setEntity(entity);
+			fileLogInstance.setAct(log.getAct());
+			if (entity.getSubcategory() != null) {
+				fileLogInstance.setSubcategory(entity.getSubcategory());
+			}
+			if (entity.getTopcategory() != null) {
+				fileLogInstance.setTopcategory(entity.getTopcategory());
+			}
+			if (CommonUtil.getCurrentUserDepartment() != null) {
+				fileLogInstance.setUploaderDepartmenttype(CommonUtil.getCurrentUserDepartment().getDepartmenttype());
+			}
+			fileLogInstance.setOriginalFileName(
+					String.format(IMAGE_URL_TEMPLATE, wechatGetService.getCacheTokenTotal(), fileName));
+			fileLogInstance.setUploadType("file");
+			fileLogInstance.setLog(log);
+			Departmenttype departmentType = departmenttypeRepository
+					.findByDepartmenttypeCode(Departmenttype.DepartmenttypeCode.DEBTOR);
+			fileLogInstance.setUploaderDepartmenttype(departmentType);
+			CreditrepaymentFile file = fileRepository.save(fileLogInstance);
+			applicationContext.publishEvent(new WechatImageAsyncFetchEvent(entity, file));
+		}
+		return log;
+	}
+
+	public Page<Creditrepayment> getRepaymentRecordBySearch(String realname, String telephone, Pageable pageable,
+			Integer productid, String stateCode, String orderNo) {
+		GenericQueryExpSpecification<Creditrepayment> queryExpression = new GenericQueryExpSpecification<Creditrepayment>();
+		queryExpression.add(QueryExpSpecificationBuilder.eq("creditcard.person.name", realname, true));
+		queryExpression.add(QueryExpSpecificationBuilder.eq("creditcard.person.telephone", telephone, true));
+		queryExpression.add(QueryExpSpecificationBuilder.eq("creditcard.product.id", productid, true));
+		queryExpression.add(QueryExpSpecificationBuilder.eq("state.stateCode", stateCode, true));
+		queryExpression.add(QueryExpSpecificationBuilder.eq("orderNo", orderNo, true));
+		Page<Creditrepayment> page = CreditrepaymentRepository.findAll(queryExpression, pageable);
+		return page;
+	}
+	
+    //得到近30天内，每隔3天的还款金额的集合
+	public List<String> getDaySumCreditrepaymentAmountSituation(){
+		int i= 0;
+		List<String> list = new ArrayList<String>();
+		while(i < 31 ){
+			String sum = getDaySumCreditrepaymentAmount(i);
+			list.add(sum);
+			i=i+3;
+		}
+        Collections.reverse(list); // 倒序排列 
+        System.out.println(list);
+		return list;
+	}
+	
+	//查询具体某一天的还款总额
+	public String getDaySumCreditrepaymentAmount(int days){
+		double sum = 0.00;
+		DecimalFormat df = new DecimalFormat("######0.00");
+		List<Creditrepayment> creditrepaymentlist = CreditrepaymentRepository.findByCreatedAt(days);
+		for(Creditrepayment creditrepayment : creditrepaymentlist){			
+			JSONObject information=JSON.parseObject(creditrepayment.getInformation());	
+			if(information != null){
+				//将包装类型转基本类型
+				double payAmount=Double.valueOf(information.get("payAmount").toString()).doubleValue();	
+				System.out.println(payAmount);
+				sum = sum + payAmount;
+			}
+		}
+		String result = df.format(sum);
+		//System.out.println(result);
+		return result;
+	}
+
+}

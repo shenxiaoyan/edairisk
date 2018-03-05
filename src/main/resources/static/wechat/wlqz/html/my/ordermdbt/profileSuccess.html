@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>我的申请</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <link rel="stylesheet" href="../../../css/weui.css">
+    <link rel="stylesheet" href="../../../css/weui2.css">
+    <link rel="stylesheet" href="../../../css/jquery.mloading.css">
+    <link rel="stylesheet" href="../../../css/animate.css">
+    <link rel="stylesheet" href="../../../css/global.css">
+    <link rel="stylesheet" href="../../../css/loading.css">
+    <style>
+        .weui_uploader_input_wrp {
+            margin: 0 6px;
+            float: none;
+            display: inline-block;
+            width: 65px;
+            height: 65px;
+            border: 1px #d9d9d9 dashed;
+        }
+        .weui_icon_success:before {
+            font-size: 16px;
+            color: #09bb07;
+        }
+        .weui_cells{
+            font-size: 16px;
+        }
+
+        .weui_tab_nav .weui_nav_red.bg_red {
+            border-color: #169BD5;!important;
+            color: #fff;
+            background: #169BD5;!important;
+        }
+        .weui_navbar_item{
+
+        }
+        .weui_navbar_item.tab-green{
+            background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
+            border-bottom: 3px solid #169BD5;
+            color: #169BD5;
+        }
+        .weui_tab_nav .weui_nav_red {
+            display: block;
+            -webkit-box-flex: 1;
+            -webkit-flex: 1;
+            flex: 1;
+            width: 100%;
+            height: 30px;
+            padding: 0;
+            font-size: 14px;
+            line-height: 31px;
+            text-align: center;
+            border: 1px solid #169BD5;
+            border-width: 1px 1px 1px 0;
+            color: #ef4f4f;
+            white-space: nowrap;
+            background: #fdfdfd;
+        }
+        .weui_tab_nav .weui_nav_red{
+            color: #169BD5;!important;
+        }
+        .weui_navbar{
+            background: #fff;
+        }
+        .btn{
+            width: 100%;
+            height: 40px;
+            background: #169BD5;
+            border-radius: 20px;
+            display: inline-block;
+            text-align: center;
+            line-height: 40px;
+            color: white;
+            font-size: 16px;
+        }
+        .btn:active{
+            background: #CCCCCC;
+            color: white;
+        }
+        .now_card{
+            display: block;
+            background: #fff;
+            margin-top: 15px;
+            border: 1px solid #e6e5e5;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        .now_card span{
+            margin-left: 5px;
+        }
+        .now_card > div{
+            padding: 10px 15px;
+        }
+        .now_card_title_whk{
+            padding: 0 12px;
+            background: #ffc425;
+            color: white;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-top: 1px;
+        }
+        .now_card_title_wjq{
+            padding: 0 12px;
+            background: #14c7a7;
+            color: white;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-top: 1px;
+        }
+        .now_card_title_yq{
+            padding: 0 12px;
+            background: #f96c70;
+            color: white;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-top: 1px;
+        }
+        .now_card_title_yjq{
+            padding: 0 12px;
+            background: #ccc;
+            color: white;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-top: 1px;
+        }
+        .now_card_content{
+            border-top: 1px solid #e6e5e5;
+            padding: 15px;
+        }
+        .margin-top-5{
+            margin-top: 5px;
+        }
+        .timeline-item-tail{
+            background: #169BD5;
+        }
+        .timeline-item-head{
+            background: #169BD5;
+            height: 15px;
+            left: -2px;
+            top: 0px;
+            width: 15px;
+            border: 3px solid #FFE599;
+        }
+        .time_success{
+            color:#0D0D0D;
+        }
+        .timeline-item-content > p{
+            color:#B2B2B2;
+        }
+        .timeline h4 {
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .timeline-item-content {
+            padding: 0 0 1.5rem 1.6rem;
+        }
+        .timeline-item-tail_huise{
+            background: #CCCCCC;
+        }
+        .bkBtn{
+            position: fixed;
+            bottom:0;
+            background:#169BD5;
+            text-align: center;
+            width: 100%;
+            height: 40px;
+            color:#fff;
+            line-height: 40px;
+            z-index: 100;
+            cursor:pointer;
+        }
+        .bkBtn:active{
+            background: #ccc;
+            color: white;
+        }
+        .imgBtn{
+            cursor: pointer;
+        }
+        .delBtn{
+            position: absolute;
+            top: -8px;
+            right: -2px;
+            font-size: 20px;
+            color: #E64340;
+            width:20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #fff;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div class="weui_msg" id="beidouAdopt">
+    <div class="weui_icon_area" style="margin-bottom: 0"><img src="../../../images/Choice@3x.png" style="width: 80px; height: 80px;"/></div>
+    <div class="weui_text_area">
+        <h2 class="weui_msg_title" style="color: #169BD5;">授信成功!</h2>
+        <p class="weui_msg_desc">请前往我的账户中申请借款吧！</p>
+
+        <a href="../../account/myLoanLogin.html" class="btn" style="margin-top: 30px;">我的账户</a>
+    </div>
+</div>
+</body>
+
+</html>

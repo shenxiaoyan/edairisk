@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+</head>
+<body>
+<div class="container-fluid" style="margin-top: 20px;">
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <form class="form-inline">
+                <div class="form-group">
+                    <label for="table_name">表名</label>
+                    <input type="text" class="form-control" id="table_name" placeholder="user">
+                </div>
+                &nbsp;
+                <div class="form-group">
+                    <label for="id">id</label>
+                    <input type="number" class="form-control" id="id" placeholder="1">
+                </div>
+                &nbsp;
+                <div class="form-group">
+                    <label for="password">密码</label>
+                    <input type="password" class="form-control" id="password" placeholder="当前登录人密码">
+                </div>
+                <button type="button" class="btn btn-default">确定</button>
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <p></p>
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    $(function () {
+        var button=$("button");
+        var p=$("p");
+        var pClass="bg-danger";
+        var url="deleteDataByForeignKey";
+        button.on("click",function () {
+            button.attr("disabled","disabled");
+
+            $.post(url,{tableName:$("#table_name").val(),id:$("#id").val(),password:$("#password").val()},function (rsp) {
+                button.removeAttr("disabled");
+                if(rsp.ErrorCode===0){
+                    pClass="bg-success";
+                }
+                setPText(p,pClass,rsp.ErrorInfo)
+            }).fail(function (obj) {
+                button.removeAttr("disabled");
+                var text =obj.responseJSON.message;
+                setPText(p,pClass,text)
+            });
+        });
+
+
+        function setPText(pLabel,pClass,text) {
+            p.attr("class",pClass);
+            p.text(text);
+        }
+    });
+</script>
+</html>

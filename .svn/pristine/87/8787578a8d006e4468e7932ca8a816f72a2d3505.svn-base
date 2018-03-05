@@ -1,0 +1,57 @@
+<div class="vbox bg-white" ng-controller="workflowEntityProfileController">
+    <div class="wrapper bg-white b-b clearfix">
+        <button class="pull-left btn btn-sm btn-primary btn-addon"
+                ui-sref="workflowEntity.list({entity_key:{{entity_key}}})">
+            <i class="fa fa-arrow-left"></i>
+            返回
+        </button>
+        <ul class="nav nav-pills nav-sm pull-right">
+            <li ui-sref-active="active">
+                <a ui-sref="workflowEntity.home.profile.info({})">主页</a>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="workflowEntity.home.profile.log({entity_key:{{entity_key}},view_type:'log'})">被操作记录</a>
+            </li>
+        </ul>
+    </div>
+    <div class="wrapper b-b b-light clearfix" ng-if="canActs.length > 0">
+        <button class="pull-left btn btn-sm btn-primary btn-addon m-r-sm"
+                ng-click="userExcute[act.actCode]()"
+                tooltip="{{act.help}}"
+                tooltip-placement="bottom"
+                ng-repeat="act in canActs">
+            <i class="fa fa-plus"></i> {{act.label}}
+        </button>
+        <div class="modal" id="adopt_user_modal">
+            <div class="modal-xs modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"
+                                aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                        <h4 class="modal-title">请选择该用户的角色</h4>
+                    </div>
+                    <div class="modal-body">
+                        <select class="form-control"
+                                ng-model="adoptRole"
+                                ng-change="userExcute.selectRole(adoptRole)"
+                                ng-options="role.label for role in allRoles">
+                        </select>
+                    </div>
+                    <div class="modal-footer text-center">
+                        <button type="button" class="btn btn-success w-lg"
+                                ng-click="userExcute.roleSelectedSave()">
+                            提交
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner" ui-view=""></div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,21 @@
+<div class="hbox hbox-auto-xs bg-light">
+    <div class="col lter w-md">
+        <div class="vbox">
+            <div class="b-b clearfix" style="padding: 19px 15px 0px 15px;">
+                <div class="pull-right">
+                    <ul class="nav nav-tabs" style="margin-bottom: -1px;">
+                          <li ui-sref-active="active"><a ui-sref="products.product.page({view_type:'dashboard'})">基本信息</a></li>
+                          <!--
+                            <li ui-sref-active="active"><a ui-sref="products.product.page({view_type:'fee'})" >关联费用</a></li>
+                            <li ui-sref-active="active"><a ui-sref="products.product.page({view_type:'investor_agent'})" >资方代理</a></li>
+                            <li ui-sref-active="active"><a ui-sref="products.product.page({view_type:'workflow'})">工作流配置</a></li>
+                          -->
+                    </ul>
+                </div>
+                <h4 class="pull-left  m-t-none">产品线名称</h4>
+            </div>
+            <div class="row-row bg-white"  ui-view>
+            </div>
+        </div>
+    </div>
+</div>

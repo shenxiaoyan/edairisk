@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <link rel="stylesheet" href="../../../css/weui.css">
+    <link rel="stylesheet" href="../../../css/weui2.css">
+    <link rel="stylesheet" href="../../../css/jquery.mloading.css">
+    <link rel="stylesheet" href="../../../css/animate.css">
+    <link rel="stylesheet" href="../../../css/global.css">
+    <link rel="stylesheet" href="../../../css/loading.css">
+    <title>公司资料</title>
+    <style>
+        .title > div {
+            width: 4px;
+            height:17px;
+            background: #169BD5;
+            margin-right: 10px;
+        }
+        .title > p {
+          margin-top: 0;
+        }
+        .adminCard{
+            background: #ffffff;
+            padding: 10px 0;
+            margin-top: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            box-shadow: 0 5px 24px 0 rgba(7,17,27,.2)
+        }
+        .adminCard  > div{
+            background: #E9E9E9;
+            padding: 5px 20px;
+        }
+        .adminCard  > div > p{
+           text-align: center;
+        }
+        p{
+            margin-top: 7px;
+        }
+        .danger{
+            color: red;
+            margin-top: 20px;
+        }
+        .enabled{
+            color: #169BD5;
+            margin-top: 20px;
+        }
+        .staffCard{
+            background: #ffffff;
+            padding: 10px 0;
+            border-radius: 5px;
+            font-size: 14px;
+            margin-top: 20px;
+        }
+        .staffCard > div {
+            padding: 0 15px;
+        }
+        .staffCard p{
+            margin-top: 10px;
+        }
+        .weui_cell:before{
+         border-top: none;
+        }
+        .slidelefts .weui_cell_bd{
+            padding: 0;
+        }
+        .weui_cell_bd weui_cell_primary animated{
+
+        }
+        .add{
+            text-align: center;
+            height: 40px;
+            line-height:40px;
+            border-radius:5px;
+            margin-top: 20px;
+            background: #169BD5;
+            color: #ffffff;
+        }
+        .add:active{
+            background: #CCCCCC;
+        }
+</style>
+</head>
+
+<body>
+<div id="accountNull" style="height: 100%;width: 100%;background: #fff;display:none;">
+    <div class="page-bd-15">
+        <div style="margin: 50px auto 30px;width: 111px;">
+            <img src="../../../images/null_con.png">
+        </div>
+        <p style="text-align: center;color: #666">只有面单白条产品才会创建公司</p>
+        <p style="text-align: center;color: #666">请先申请产品面单白条~</p>
+    </div>
+</div>
+    <div id="companyHave" class="page-bd-15" style="padding-top: 20px; display: none">
+
+        <div class="clearfix title">
+            <div class="left"></div>
+            <p class="left">公司基本资料</p>
+        </div>
+
+        <div class="adminCard">
+            <div>
+                <p class="clearfix">
+                    <p id="companyName"></p>
+                    <i id="changeCompany" class="right icon icon-67" style="color: #169BD5;line-height: 21px;margin-top: -18px;"></i>
+                </p>
+                <div class="clearfix">
+                    <p class="left">法人姓名:</p>
+                    <p id="companyPersonName" class="right"></p>
+                </div>
+                <div class="clearfix">
+                    <div class="left">
+                        <p>统一社会信用代码:</p>
+                        <p id="companyNumber"></p>
+                    </div>
+                    <div class="right">
+                        <p id="queryState"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="clearfix title" style="margin-top: 40px;">
+            <div class="left"></div>
+            <p class="left">网点员工</p>
+        </div>
+
+        <div id="employee">
+            <!--<div class="staffCard" data-userName="'+mobile+'"><div><div class="clearfix"><p class="left">员工姓名:</p><p class="right">'+realname+'</p></div><div class="clearfix"><p class="left">员工手机号:</p><p class="right">'+mobile+'</p></div></div></div>-->
+        </div>
+            <!--<div class="weui_cell slidelefts" style="margin-top: 20px; border-radius: 5px;"><div class="weui_cell_bd weui_cell_primary " style="border-radius: 4px"><div class="staffCard"><div><div class="clearfix"><p class="left">员工姓名:</p><p class="right">'+realname+'</p></div><div class="clearfix"><p class="left">员工手机号:</p><p class="right">'+mobile+'</p></div></div></div></div><div class="slideleft"><span class="bg-red f-white dels" style="border-radius: 5px; cursor: pointer">删除</span></div></div>-->
+
+        <div id="addemployee" class="add">增加员工</div>
+        <div id="showAllLoan" class="add">所有借款记录</div>
+    </div>
+</body>
+<script src="../../../js/config.js"></script>
+<script src="../../../js/jquery-3.2.1.js"></script>
+<script src="../../../js/zepto.min.js"></script>
+<script src="../../../js/jquery.mloading.js"></script>
+<script src="../../../js/loading.js"></script>
+<script>
+    function init() {
+        if(window.location.search){
+            var href = window.location.href;
+            var state = href.split('&')[1];
+            state = state.split('=')[1];
+            var code = href.split('?')[1];
+            code = code.split('&')[0];
+            code = code.split('=')[1];
+        }
+        $.ajax({
+            type: 'GET',
+            url: '/wechat/wlqz/callback' ,
+            //data: {'code':code} ,
+            headers: {
+                app_code:"WULIUQIANZHUANG",
+                client:"wechat"
+            },
+            success: function (res) {
+
+                if(res.message == 'error'){
+                    $.ajax({
+                        type: 'GET',
+                        url: '/wechatLogin' ,
+                        data: {'code':code,'state':state} ,
+                        headers: {
+                            app_code:"WULIUQIANZHUANG",
+                            client:"wechat"
+                        },
+                        success: function (res) {
+                            if(res.ActionStatus == 'FAIL'){
+                                //$('#accountNull').show();
+                                //用户没注册
+                                var uri='http://'+window.config.location+'/wechat/wlqz/html/login.html';
+                                uri=encodeURIComponent(uri);
+                                window.location.href='https://open.weixin.qq.com/connect/oauth2/authorize?appid='+window.config.appid+'&redirect_uri='+uri+'&response_type=code&scope=snsapi_base&state='+state+'#wechat_redirect';
+                            }else{
+                                window.userid=res.message;
+                                companyInfo(window.userid);
+                                isBoss(window.userid);
+                            }
+
+                        } ,
+                        dataType: 'json'
+                    })
+
+                }else{
+                    window.userid=res.message;
+                    companyInfo(window.userid);
+                    isBoss(window.userid);
+
+                }
+            } ,
+            dataType: 'json'
+        });
+    }
+
+    function companyInfo(userid) {
+        $.ajax({
+            type: 'get',
+            url: '/company/getcompanyinformation',
+            headers: {
+                app_code:"WULIUQIANZHUANG",
+                client:"wechat",
+            },
+            data:{
+                userid:userid
+            },
+            success: function (res) {
+                if(!res.data.company){
+                    $('#accountNull').show();
+                }else {
+                    $('#companyHave').show();
+                    var resCompany =res.data.company;
+                    $('#companyName').text(resCompany.companyName);
+                    $('#companyPersonName').text(resCompany.companyPersonName);
+                    $('#companyNumber').text(resCompany.companyNumber);
+
+                    console.log(resCompany.state)
+                    window.companyId=resCompany.id;
+                    window.state = resCompany.state;
+                    if(resCompany.state == "CREATED"){
+                        $('#queryState').text("正在审核中").addClass("danger")
+                        $('#changeCompany').show();
+                    }else{
+                        $('#queryState').text("已通过审核").addClass("enabled")
+                        $('#changeCompany').hide();
+                    }
+
+                    var employee = res.data.employee;
+
+                    $.each(employee,function (key,val) {
+                        var mobile = val.username;
+                        var realname =val.realname;
+                        var str ='<div class="staffCard" data-userName="'+mobile+'"><div><div class="clearfix"><p class="left">员工姓名:</p><p class="right">'+realname+'</p></div><div class="clearfix"><p class="left">员工手机号:</p><p class="right">'+mobile+'</p></div></div></div>'
+                        $('#employee').append(str)
+                    })
+                }
+
+
+            },error:function(res){
+                alert('该用户暂无所属公司')
+                console.log(res)
+            },
+            dataType: 'json'
+        });
+    }
+
+    //是否是老板
+
+    function isBoss(userid) {
+        $.ajax({
+            type: 'GET',
+            url: '/user/getCompanyRole?userid='+userid,
+            data: {} ,
+            headers: {
+                app_code:"WULIUQIANZHUANG",
+                client:"wechat"
+            },
+            success: function (res) {
+                console.log(res)
+                window.role = res.data;
+                //员工
+                if(res.data == 'employee'){
+                    $('#addemployee').hide();
+                    $('#changeCompany').hide();
+                    $('#showAllLoan').hide();
+                }
+            } ,
+            dataType: 'json'
+        })
+
+    }
+
+    //删除员工
+//    $(document).on("tap", ".dels", function() {
+//        $.confirm("您确定要删除吗?", "确认删除?", function() {
+//            $.toast("删除成功!");
+//        }, function() {
+//            //取消操作
+//        });
+//    });
+
+    $(document).on("tap", ".staffCard", function() {
+
+        var username = $(this)[0].dataset.username
+        console.log(window.role)
+        if(window.role == 'manager'){
+            console.log('jjjj')
+            $.actions({
+                title: "选择操作",
+                onClose: function() {
+                    console.log("close");
+                },
+                actions: [
+                    {
+                        text: "删除",
+                        className: 'bg-red f-white',
+                        onClick: function() {
+                            $.confirm("您确定要删除吗?", "确认删除?", function() {
+
+                                var data ={
+                                    username:username
+                                }
+
+                                $.ajax({
+                                    type: 'post',
+                                    url: '/company/removeemployee',
+                                    data: data ,
+                                    headers: {
+                                        app_code:"WULIUQIANZHUANG",
+                                        client:"wechat"
+                                    },
+                                    success: function (res) {
+                                        removeLoading('test');
+                                        $.toast("删除成功!");
+                                        window.location.href="companyLogin.html"
+
+                                    } ,
+                                    error:function(res){
+                                        removeLoading('test');
+                                        console.log(res)
+                                        $.alert(res.responseJSON.message)
+                                    },
+                                    dataType: 'json'
+                                })
+
+
+                            }, function() {
+                                //取消操作
+                            });
+                        }
+                    }
+                ]
+            });
+        }
+
+    });
+
+
+    //增加员工
+    $('#addemployee').click(function () {
+        console.log(state)
+        if(state == 'CREATED'){
+            $.alert('审核通过后才能添加成员')
+        }else {
+            window.location.href="addEmployee.html?userid="+window.userid;
+        }
+    })
+
+    //老板查看所有借款记录
+    $('#showAllLoan').click(function () {
+            window.location.href="showAllLoan.html?companyId="+window.companyId;
+    })
+
+    //修改公司名称
+    $('#changeCompany').click(function () {
+        window.location.href="changeCompany.html?companyId="+window.companyId;
+    })
+
+    init();
+</script>
+</html>

@@ -1,0 +1,161 @@
+<script>
+    app.controller("WelcomeCtrl",
+            [
+                "$rootScope",
+                "$scope",
+                "$http",
+                "FileUploader",
+                function ($rootScope, $scope, $http, FileUploader) {
+
+
+
+                    $scope.metrics = {};
+                    //以下是上传文件的动作详情参考前端框架示例 js/controllers/file-upload.js
+                    $scope.uploader = new FileUploader({
+                        url: '/fileUpload'
+                    });
+
+                    $scope.getMetrics = function () {
+                        $http.get('/metrics').success(function (resResult) {
+
+                            resResult.instance_uptime = resResult["instance.uptime"];
+                            resResult.heap_used = resResult["heap.used"];
+                            resResult.classes_loaded = resResult["classes.loaded"];
+                            resResult.threads_totalStarted = resResult["threads.totalStarted"];
+
+                            $scope.metrics = resResult;
+                        });
+                    }
+                    $scope.getMetrics();
+
+
+                    $scope.uploader.filters.push({
+                        name: 'customFilter',
+                        fn: function (item, options) {
+                            return this.queue.length < 1;
+                        }
+                    });
+
+                    $scope.uploader.onAfterAddingFile = function (fileItem) {
+
+                        if (fileItem.file.type !== "application/x-zip-compressed") {
+
+                            $rootScope.toasterError("警告！", "审核文件的格式需要为ZIP的压缩文件格式！");
+
+                            fileItem.remove();
+
+                        } else {
+                            fileItem.formData = [{fileType: "file"}]
+                        }
+
+                        $("#audit_zip_file_input").val("");
+
+                    };
+
+                    $scope.uploader.onErrorItem = function (fileItem, response, status, headers) {
+                        $rootScope.toasterError("上传失败！", fileItem.file.name + " 上传失败！");
+                    };
+
+                    $scope.uploader.onSuccessItem = function (fileItem, response, status, headers) {
+
+
+
+                    };
+
+                }
+            ]
+            )
+</script>
+<div class="hbox hbox-auto-xs hbox-auto-sm" ng-controller="WelcomeCtrl">
+    <!-- main -->
+    <div class="col">
+        <!-- main header -->
+        <div class="bg-light lter b-b wrapper-md">
+            <h1 class="m-n font-thin h3 text-black">小金</h1>
+            <small class="text-muted">小贷协作管理系统</small>
+        </div>
+        <!-- / main header -->
+
+
+
+
+
+
+        <div class="wrapper-md">
+            <!-- stats -->
+            <div class="row">
+                <div class="col-md-7">
+                    <div class="row row-sm text-center">
+                        <div class="col-xs-6">
+                            <div class="panel padder-v item">
+                                <div class="h1 text-info font-thin h1">{{metrics.uptime / 1000}}</div>
+                                <span class="text-muted text-xs">小金系统在线时间</span>
+                                <div class="top text-right w-full">
+                                    <i class="fa fa-caret-down text-warning m-r-sm"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-6">
+                            <a href class="block panel padder-v bg-primary item">
+                                <span class="text-white font-thin h1 block">{{metrics.heap_used}}</span>
+                                <span class="text-muted text-xs">计算量（次）</span>
+                                <span class="top text-right w-full">
+                                    <i class="fa fa-cloud-upload text-muted m-r-sm"></i>
+                                </span>
+                            </a>
+                        </div>
+                        <div class="col-xs-6">
+                            <a href class="block panel padder-v bg-info item">
+                                <span class="text-white font-thin h1 block">{{metrics.threads_totalStarted}}</span>
+                                <span class="text-muted text-xs">并行计算线程数</span>
+                                <span class="top">
+                                    <i class="fa fa-caret-up text-warning m-l-sm m-r-sm"></i>
+                                </span>
+                            </a>
+                        </div>
+                        <div class="col-xs-6">
+                            <div class="panel padder-v item">
+                                <div class="font-thin h1">{{metrics.classes_loaded}}</div>
+                                <span class="text-muted text-xs">处理事务量（次）</span>
+                                <div class="bottom">
+                                    <i class="fa fa-caret-up text-warning m-l-sm m-r-sm"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-5">
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            系统状态
+                        </div>
+                        <table class="table table-striped m-b-none">
+                            <thead>
+                                <tr>
+                                    <th>参数</th>
+                                    <th>数量</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="(key,value)  in metrics">
+                                    <td>{{key}}
+                                    </td>
+                                    <td>
+                                        {{value}}
+                                    </td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- / stats -->
+
+
+        </div>
+    </div>
+</div>

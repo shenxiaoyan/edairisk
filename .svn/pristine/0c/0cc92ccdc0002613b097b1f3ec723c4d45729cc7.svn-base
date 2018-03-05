@@ -1,0 +1,402 @@
+<script>
+    "use strict";
+    app.controller("mdbtoverduceListController",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "entity",
+            "$state",
+            function ($rootScope, $scope, $http, $stateParams, entity, $state) {
+
+                $scope.states = [
+                    {label:'未结清',stateCode:'0'},
+                    {label:'已结清',stateCode:'1'}
+                ];
+
+                $scope.state_code = $scope.states[0].stateCode;
+
+
+                $scope.searchForm= {
+                    name:'',
+                    phone:'',
+                    loanSn:'',
+                }
+
+                $scope.searchList = function(page) {
+                    //# % & 号键会注释掉后面的内容
+                    $scope.searchForm.name= $scope.searchForm.name.replace(/#/g,'').replace(/%/g,'').replace(/&/g,'').replace(/\^/g,'')
+                    $scope.searchForm.phone=$scope.searchForm.phone.replace(/#/g,'').replace(/%/g,'').replace(/&/g,'').replace(/\^/g,'')
+                    $scope.searchForm.loanSn=$scope.searchForm.loanSn.replace(/#/g,'').replace(/%/g,'').replace(/&/g,'').replace(/\^/g,'')
+
+                    $http({
+                        method: "GET",
+//                        url: "/quota/list?personName="+$scope.searchForm.personName+"&applyEnterpriseName=&applyMobile="+$scope.searchForm.applyMobile+"&quotaNumber="+$scope.searchForm.quotaNumber+"&stateCode=" + $scope.state_code+"&page="+page+"&size=20&sort=id,desc"
+                        url:"overdue/searchoverdue?name="+$scope.searchForm.name+"&phone="+$scope.searchForm.phone+"&status="+$scope.state_code+"&loanSn="+$scope.searchForm.loanSn+"&page="+page+"&size=10&sort=id,desc"
+                    }).success(function (resResult) {
+
+                        console.log(resResult)
+                        $scope.list = resResult.data.content;
+
+                        //搜索的返回格式和 rest/search不一样
+                        $scope.pageList = {
+                            size: resResult.data.size,
+                            total_elements: resResult.data.totalElements,
+                            current_page: resResult.data.number,
+                            num_page: resResult.data.totalPages,
+                            total_page: resResult.data.totalPages
+                        };
+
+                        if ($scope.list.length > 0) {
+                            $("#overdue_list_paginator").show();
+                            $rootScope.setPaginator("#overdue_list_paginator", $scope.pageList, $scope.searchList);
+                        }else{
+                            $("#overdue_list_paginator").hide();
+                        }
+
+                    });
+                }
+
+                //搜索按钮
+                $scope.searchFormBtn=function () {
+                    console.log( $scope.state_code)
+                    $scope.searchList(0)
+
+                }
+
+                //重置按钮
+                $scope.resetSearchFormBtn=function () {
+                    $scope.searchForm= {
+                        name:'',
+                        phone:'',
+                        loanSn:'',
+                    }
+                    $scope.searchList(0)
+                }
+
+//                entity.getList("/rest/orderwdsjshWorkflows/ " + $stateParams.workflow_id + "/states").then(function (resResult) {
+//                    $scope.states = resResult._embeddedItems;
+//                    if ($scope.states.length > 0) {
+//
+//                        $scope.states = $scope.states.sort(function (a, b) {
+//                            return a.sort - b.sort;
+//                        });
+//
+//
+//                        $scope.state_code = $scope.states[0].stateCode;
+//                        $scope.getList(0);
+//                    }
+//                });
+
+                $scope.pageList = {
+                    size: 0,
+                    total_elements: 0,
+                    current_page: 0,
+                    num_page: 1,
+                    total_page: 1
+                };
+
+                $scope.list = [];
+
+                /*默认读取列表*/
+
+                $scope.getList = function (page) {
+
+                    $scope.loading = true;
+
+                    $scope.list = [];
+
+                    var link = "overdue/searchoverdue?name="+$scope.searchForm.name+"&phone="+$scope.searchForm.phone+"&status="+$scope.state_code+"&loanSn="+$scope.searchForm.loanSn+"&page="+page+"&size=10&sort=id,desc"
+
+                    entity.getList(link).then(function (resResult) {
+
+                        $scope.loading = false;
+                        console.log(resResult)
+
+                        $scope.list = resResult.data.content;
+
+                        $scope.pageList = {
+                            size: resResult.data.size,
+                            total_elements: resResult.data.totalElements,
+                            current_page: resResult.data.number,
+                            num_page: resResult.data.totalPages,
+                            total_page: resResult.data.totalPages
+                        };
+
+                        if ($scope.list.length > 0) {
+                            $("#overdue_list_paginator").show();
+                            $rootScope.setPaginator("#overdue_list_paginator", $scope.pageList, $scope.getList);
+                        }else{
+                            $("#overdue_list_paginator").hide();
+                        }
+
+                    });
+                };
+
+                $scope.stateSelect = function ($event, stateCode) {
+                    if ($event.target.nodeName === "INPUT") {
+                        $scope.state_code = stateCode;
+                        $scope.searchForm= {
+                            name:'',
+                            phone:'',
+                            loanSn:'',
+                        }
+                        $scope.getList(0);
+                    }
+                };
+
+                $scope.getList(0);
+
+                $scope.toInfo=function (id,item) {
+                    console.log(item)
+                    $rootScope.mdbtItem=item;
+                    $state.go("auditEntity.home.profile.info", {entity_key: "mdbtoverdue",id:id}, {reload: true});
+                }
+
+                //改为结清状态
+                $scope.toOver=function (id) {
+                    swal({
+                        title: '确认结清?',
+                        type: "warning",
+                        showCancelButton: true,
+                        cancelButtonText: "退出",
+                        confirmButtonText: "同意",
+                        closeOnConfirm: true
+                    }, function () {
+                        var finishAt =getNowFormatDate();
+                        $http({
+                            method: "PATCH",
+                            url: "/rest/loanoverdues/" + id,
+                            data: {
+                                status:'1',
+                                finishAt:finishAt
+                            }
+                        }).success(function (resResult) {
+                            $rootScope.toasterSuccess("成功", "修改成功！");
+                            $state.go("auditEntity.list", {entity_key: "mdbtoverdue"}, {reload: true});
+
+                        });
+                    });
+                }
+
+
+
+                //获取当前时间 yyyy-MM-dd HH:MM:SS
+                function getNowFormatDate() {
+                    var date = new Date();
+                    var seperator1 = "-";
+                    var seperator2 = ":";
+                    var month = date.getMonth() + 1;
+                    var strDate = date.getDate();
+                    if (month >= 1 && month <= 9) {
+                        month = "0" + month;
+                    }
+                    if (strDate >= 0 && strDate <= 9) {
+                        strDate = "0" + strDate;
+                    }
+                    var currentdate = date.getFullYear() + seperator1 + month + seperator1 + strDate
+                        + " " + date.getHours() + seperator2 + date.getMinutes()
+                        + seperator2 + date.getSeconds();
+                    return currentdate;
+                }
+
+            }
+        ]
+    );
+</script>
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light" ng-controller="mdbtoverduceListController">
+    <!-- column -->
+    <div class="col w-md lter b-l">
+        <div class="vbox">
+            <div class="wrapper b-b clearfix">
+                <div class="inline pull-left">
+                    逾期状态：
+                </div>
+                <!--<div class="inline pull-left m-r">-->
+                <!--<label class="i-checks pull-left m-n" ng-click="stateSelect($event,'')">-->
+                <!--<input type="radio" name="state" checked><i></i>  全部-->
+                <!--</label>-->
+                <!--</div>-->
+                <div class="inline pull-left m-r" ng-repeat="state in states">
+                    <label class="i-checks pull-left m-n" ng-click="stateSelect($event,state.stateCode)">
+                        <input type="radio" value="{{state.stateCode}}" ng-model="state_code" name="state"><i></i> {{
+                        state.label }}
+                    </label>
+                </div>
+            </div>
+            <div class="wrapper b-b clearfix ">
+                <form class="form-inline" name="search_form">
+                    <div class="form-group m-r">
+                        <label for="">借款单号: </label>
+                        <input ng-model="searchForm.loanSn" class="form-control" type="text" pattern="^\s*[\da-zA-Z]+\s*$" name="loanSn">
+                        <span class="help-block text-danger"
+                              ng-show="search_form.loanSn.$dirty && search_form.loanSn.$invalid">
+                            <i class="fa fa-exclamation-circle text-danger"></i>订单编号只能输入数字或英文
+                        </span>
+                    </div>
+                    <div class="form-group m-r">
+                        <label for="">姓名: </label>
+                        <input ng-model="searchForm.name" class="form-control" type="text" pattern="^\s*[\u4e00-\u9fa5]+(·[\u4e00-\u9fa5]+)*\s*$" name="name">
+                        <span class="help-block text-danger"
+                              ng-show="search_form.name.$dirty && search_form.name.$invalid">
+                            <i class="fa fa-exclamation-circle text-danger"></i>不符合姓名格式
+                        </span>
+                    </div>
+                    <div class="form-group m-r">
+                        <label for="">手机号: </label>
+                        <input ng-model="searchForm.phone" class="form-control" type="tel" pattern="^\s*\d+\s*$" name="phone">
+                        <span class="help-block text-danger"
+                              ng-show="search_form.phone.$dirty && search_form.phone.$invalid">
+                            <i class="fa fa-exclamation-circle text-danger"></i>手机号必须为数字
+                        </span>
+                    </div>
+                    <button class="btn btn-primary m-r" ng-click="searchFormBtn()" ng-disabled="search_form.$invalid">
+                        <i class="fa fa-search"></i>查询
+                    </button>
+                    <button class="btn btn-default m-r" ng-click="resetSearchFormBtn()">
+                        <i class="fa fa-refresh"></i>重置
+                    </button>
+                </form>
+            </div>
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner">
+                        <div class="wrapper">
+                            <div class="panel panel-default">
+                                <div class="panel-heading" ng-if="!loading && list.length > 0">
+                                    查询结果
+                                </div>
+                                <div ng-if="loading"
+                                     style="position: fixed;top: 50%;right: 50%;margin-left: -15px;margin-top: -15px;">
+                                    <div class="sk-spinner sk-spinner-cube-grid">
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                    </div>
+                                    <div class="text-center m-t">加载中请稍后</div>
+                                </div>
+                                <div class="panel-heading" ng-if="!loading && list.length < 1">
+                                    暂无数据！
+                                </div>
+                                <div ng-if="!loading && list.length > 0">
+                                    <table class="table table-hover b-t b-light">
+                                        <thead>
+                                        <tr>
+                                            <th>操作</th>
+                                            <th>借款单号</th>
+                                            <th>姓名</th>
+                                            <th>手机号</th>
+                                            <th>本金(元)</th>
+                                            <th>逾期金额(元)</th>
+                                            <th>逾期天数</th>
+                                            <th>逾期罚金(元)</th>
+                                            <th>逾期累加金额(元)</th>
+                                            <th>逾期时间</th>
+                                            <th ng-if="state_code == 1">结清时间</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr ng-repeat="item in list">
+                                            <!--<td class="v-middle clearfix">-->
+                                                <!--<button ng-click="toInfo(item.overdueId,item)" class="pull-left btn btn-sm btn-info m-r">详情</button>-->
+                                                <!--<button ng-if="state_code == 0" ng-click="toOver(item.overdueId)" class="pull-left btn btn-sm btn-primary m-r">结清</button>-->
+                                            <!--</td>-->
+                                            <td class="v-middle">
+                                                <div class="btn-group dropdown">
+                                                    <button class="btn btn-success btn-xs" data-toggle="dropdown">操作 <span class="caret"></span></button>
+                                                    <ul class="dropdown-menu">
+                                                        <li ng-click="toInfo(item.overdueId,item)" >
+                                                            <a>详情</a>
+                                                        </li>
+                                                        <!--<li ng-if="state_code == 0" ng-click="toOver(item.overdueId)">-->
+                                                            <!--<a>结清</a>-->
+                                                        <!--</li>-->
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.orderNo }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.name }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.phone }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.principal }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.overdueAmount }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.overdueDays }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.penalSum }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.historyAmount }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.createAt |datetime }}
+                                            </td>
+                                            <td ng-if="state_code == 1" class="v-middle" ng-class="{true: 'color_black', false: 'color_red'}[!(item.finishAt == null)]">
+                                                {{ item.finishAt ? (item.finishAt |datetime) : '尚未结清' }}
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="wrapper b-t b-light clearfix">
+                <ul id="overdue_list_paginator" style="margin:2px 0;float: right;"></ul>
+                <small class="m-l-md pull-right text-muted inline m-t-sm m-b-sm m-r">共 {{pageList.total_elements}} 条，本页共 {{ list.length }}
+                    条
+                </small>
+            </div>
+        </div>
+    </div>
+    <!-- /column -->
+</div>
+<!-- /hbox layout -->
+
+<div class="modal fade" id="quota_failed" tabindex="-1" role="dialog">
+    <div class="modal-xs modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"
+                        aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title">请填写未通过理由</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group clearfix">
+                    <label class="col-lg-2 text-right">理由</label>
+                    <div class="col-lg-10">
+                                <textarea class="form-control" ng-model="failedVla" cols="9" style="height: 250px">
+                                </textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer text-center">
+                <button id="model_fail" type="button" class="btn btn-success w-lg">
+                    提交
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

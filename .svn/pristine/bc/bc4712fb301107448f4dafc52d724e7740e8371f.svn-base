@@ -1,0 +1,172 @@
+<script>
+    /*
+     * 创建人：刘雅倩
+     * 创建时间：2017/08/16
+     * 公司看到的终端数量
+     *
+     * */
+    "use strict";
+    app.controller("groupTerminalCtrl", [
+        "$scope",
+        function($scope) {
+            //测试用的
+
+            $scope.branchList = [
+                {
+                    name: "公司",
+                    login: "560000",
+                    fee: "5120000"
+                }
+            ];
+
+            $scope.brandChart = echarts.init(document.getElementById('branch_dashboard_chart'));
+
+            $scope.option = {
+            	    backgroundColor: '#2c343c',
+
+            	    title: {
+            	        text: '各公司终端数量',
+            	        left: 'center',
+            	        top: 20,
+            	        textStyle: {
+            	            color: '#ccc'
+            	        }
+            	    },
+
+            	    tooltip : {
+            	        trigger: 'item',
+            	        formatter: "{a} <br/>{b} : {c} ({d}%)"
+            	    },
+
+            	    visualMap: {
+            	        show: false,
+            	        min: 80,
+            	        max: 600,
+            	        inRange: {
+            	            colorLightness: [0, 1]
+            	        }
+            	    },
+            	    series : [
+            	        {
+            	            name:'数量',
+            	            type:'pie',
+            	            radius : '55%',
+            	            center: ['50%', '50%'],
+            	            data:[
+            	                {value:335, name:'手机'},
+            	                {value:310, name:'电脑'},
+            	                {value:274, name:'ipad'},
+            	                {value:235, name:'广告'},
+            	                {value:400, name:'引擎'}
+            	            ].sort(function (a, b) { return a.value - b.value; }),
+            	            roseType: 'radius',
+            	            label: {
+            	                normal: {
+            	                    textStyle: {
+            	                        color: 'rgba(255, 255, 255, 0.3)'
+            	                    }
+            	                }
+            	            },
+            	            labelLine: {
+            	                normal: {
+            	                    lineStyle: {
+            	                        color: 'rgba(255, 255, 255, 0.3)'
+            	                    },
+            	                    smooth: 0.2,
+            	                    length: 10,
+            	                    length2: 20
+            	                }
+            	            },
+            	            itemStyle: {
+            	                normal: {
+            	                    color: '#c23531',
+            	                    shadowBlur: 200,
+            	                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+            	                }
+            	            },
+
+            	            animationType: 'scale',
+            	            animationEasing: 'elasticOut',
+            	            animationDelay: function (idx) {
+            	                return Math.random() * 200;
+            	            }
+            	        }
+            	    ]
+            	};
+
+            $scope.brandChart.setOption($scope.option);
+
+            //窗口大小改变时重新绘制图表
+            $(window).resize(function() {
+                $scope.brandChart.resize();
+            });
+        }
+    ]);
+</script>
+
+<div class="hbox hbox-auto-xs lter" ng-controller="groupTerminalCtrl">
+    <!-- column -->
+    <div class="col">
+        <div class="vbox">
+            <div class="bg-light lter b-b clearfix" style="padding: 14.5px 20px;">
+                <select class="pull-left m-r-sm input-sm form-control w-sm inline v-middle" ng-options="branch.name for branch in branchList" ng-model="branch">
+                    <option value=""> --请选择公司-- </option>
+                </select>
+
+                <div class="pull-right">
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-default" ng-click="changeView()">今天</button>
+                        <button class="btn btn-sm btn-default" ng-click="changeView()">昨天</button>
+                        <button class="btn btn-sm btn-default" ng-click="changeView()">前天</button>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-default" ng-click="changeView('agendaDay')">本周</button>
+                        <button class="btn btn-sm btn-default" ng-click="changeView('agendaWeek')">上周</button>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-default" ng-click="changeView('month')">本月</button>
+                        <button class="btn btn-sm btn-default" ng-click="changeView('month')">上月</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner wrapper-md">
+                        <div style="padding-top: 0;">
+                            <div class="panel wrapper">
+                                <div id="branch_dashboard_chart" style="height:400px;"></div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="table-responsive">
+                                <table class="table table-striped b-t b-light">
+                                    <thead>
+	                                    <tr>
+	                                        <th>公司</th>
+	                                        <th>手机</th>
+	                                        <th>电脑</th>
+	                                        <th>ipad</th>
+      	                                    <th>引擎</th>
+      	                                    <th>广告</th>
+	                                    </tr>
+                                    </thead>
+                                    <tbody>
+	                                    <tr ng-repeat="list in branchList">
+	                                        <td><span class="pull-left waybill_item_number"><a>{{ list.name}}</a></span></td>
+	                                        <td class="report_amount"><span class="text-ellipsis">{{ list.login }}</span></td>
+	                                        <td class="report_amount"><span class="text-ellipsis">{{ list.login }}</span></td>
+	                                        <td class="report_amount"><span class="text-ellipsis">{{ list.fee }}</span></td>
+	                                        <td class="report_amount"><span class="text-ellipsis">{{ list.fee }}</span></td>
+	                                        <td class="report_amount"><span class="text-ellipsis">{{ list.fee }}</span></td>
+	                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

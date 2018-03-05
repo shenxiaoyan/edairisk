@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <link rel="stylesheet" href="../../../css/weui.css">
+    <link rel="stylesheet" href="../../../css/weui2.css">
+    <link rel="stylesheet" href="../../../css/jquery.mloading.css">
+    <link rel="stylesheet" href="../../../css/animate.css">
+    <link rel="stylesheet" href="../../../css/global.css">
+    <link rel="stylesheet" href="../../../css/loading.css">
+    <title>增加员工</title>
+    <style>
+        .add{
+            text-align: center;
+            height: 40px;
+            line-height:40px;
+            border-radius:20px;
+            margin-top: 20px;
+            background: #169BD5;
+            color: #ffffff;
+        }
+        .add:active{
+            background: #CCCCCC;
+        }
+    </style>
+</head>
+<body>
+<form id="form">
+    <div class="weui_cells weui_cells_form">
+        <div class="weui_cell">
+            <div class="weui_cell_hd"><label class="weui_label">员工姓名</label></div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <input id="name" class="weui_input" type="tel" maxlength="11" required  placeholder="请输入员工姓名" emptyTips="请输入员工姓名" notMatchTips="请输入正确的员工姓名"/>
+            </div>
+        </div>
+        <div class="weui_cell">
+            <div class="weui_cell_hd"><label class="weui_label">手机号</label></div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <input id="mobile" class="weui_input" type="tel" maxlength="11" required pattern="^1(3|4|5|7|8)\d{9}$" placeholder="请输入手机号" emptyTips="请输入手机号" notMatchTips="请输入正确的手机号"/>
+            </div>
+        </div>
+        <div class="weui_cell weui_vcode">
+            <div class="weui_cell_hd"><label class="weui_label">验证码</label></div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <input id="vcode2" required class="weui_input" type="text" maxlength="6" placeholder="请输入验证码"/>
+            </div>
+            <div id="vCode" class="weui_cell_ft">
+                <button id="vCodeText" href="javascript:;" class="weui-vcode-btn" style="background: #fff;border: none;border-left: 1px solid #e5e5e5;color: #0D0D0D;">获取验证码</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<div class="page-bd-15" style="margin-top: 50px;">
+    <div id="formSubmitBtn" class="add">增加员工</div>
+</div>
+
+</body>
+<script src="../../../js/config.js"></script>
+<script src="../../../js/jquery-3.2.1.js"></script>
+<script src="../../../js/zepto.min.js"></script>
+<script src="../../../js/loading.js"></script>
+<script>
+    if(window.location.search){
+        var href = window.location.href;
+         window.userid = href.split('=')[1];
+    }
+
+    function loading() {
+        $('body').loading({
+            loadingWidth:120,
+            title:'',
+            name:'test',
+            discription:'',
+            direction:'column',
+            type:'origin',
+            // originBg:'#71EA71',
+            originDivWidth:40,
+            originDivHeight:40,
+            originWidth:6,
+            originHeight:6,
+            smallLoading:false,
+            loadingMaskBg:'rgba(0,0,0,0.2)'
+        });
+
+    }
+
+    // 获取验证码倒计时
+    $('#vCode').click(function () {
+        var mobile = $('#mobile').val();
+        var reg = /^1(3|4|5|7|8)\d{9}$/;
+        var r = mobile.match(reg);
+        if( r !== null){
+            $.ajax({
+                type: 'get',
+                url: '/smsCode' ,
+                data: {
+                    mobile:mobile
+                } ,
+                headers: {
+                    app_code:"WULIUQIANZHUANG",
+                    client:"wechat"
+                },
+                success: function (res) {
+                    $.alert(res.msg)
+                },error:function(res){
+                    $.alert(res.responseJSON.message)
+                },
+                dataType: 'json'
+            });
+            identifyingCode();
+        }else {
+            $.alert('请输入正确的手机号!')
+        }
+
+    });
+    var time=60;
+    function identifyingCode(){
+        if(time==0){
+            $(".weui-vcode-btn").html("获取验证码");
+            $(".weui-vcode-btn").removeAttr("disabled");
+            $(".weui-vcode-btn").css("color","#0D0D0D");
+            time=60;
+        }else{
+            $(".weui-vcode-btn").attr("disabled","disabled");
+            $(".weui-vcode-btn").html("重新获取("+time+")");
+            $(".weui-vcode-btn").css("color","#d9d9d9");
+            setTimeout(function(){
+                time=time-1;
+                identifyingCode();
+            },1000)
+        }
+    }
+
+    var $form = $("#form");
+    $form.form();
+
+    $("#formSubmitBtn").on("click", function(){
+        $form.validate(function(error){
+            if(error){
+
+            }else{
+                loading();
+                var name = $('#name').val();
+                var mobile = $('#mobile').val();
+                var vcode =$('#vcode2').val();
+                var data ={
+                    username:mobile,
+                    realname:name,
+                    smscode:vcode,
+                    userid:window.userid
+                }
+
+                //var upData=JSON.stringify(data);
+                $.ajax({
+                    type: 'post',
+                    url: '/company/addemployee' ,
+                    data: data ,
+                    headers: {
+
+                        app_code:"WULIUQIANZHUANG",
+                        client:"wechat"
+                    },
+                    success: function (res) {
+                        removeLoading('test');
+                        if(res.ActionStatus == 'FAIL'){
+                            $.alert(res.ErrorInfo)
+                        }else {
+                            window.location.href="companyLogin.html"
+                        }
+
+
+                    } ,
+                    error:function(res){
+                        removeLoading('test');
+                        console.log(res)
+                        $.alert(res.responseJSON.message)
+                    },
+                    dataType: 'json'
+                })
+            }
+        });
+
+    });
+</script>
+</html>

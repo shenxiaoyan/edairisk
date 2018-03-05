@@ -1,0 +1,562 @@
+<script>
+    "use strict";
+    app.controller("mdbtcreditrepaymentListController",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "entity",
+            '$state',
+            function ($rootScope, $scope, $http, $stateParams, entity, $state) {
+
+                $scope.states = [];
+                $scope.products =[];
+                $scope.changePunishId=null;
+                $scope.punishinterest=null;
+                $scope.searchForm={
+                    realname:'',
+                    telephone:'',
+                    productid:'4',
+                    orderNo:''
+                };
+
+                console.log($stateParams.workflow_id)
+                entity.getList("/rest/creditrepaymentWorkflows/"+ $stateParams.workflow_id +"/states").then(function (resResult) {
+                    $scope.states = resResult._embeddedItems;
+                    //$scope.states.push({stateCode:'',sort:0,label:'全部'});
+                    if ($scope.states.length > 0) {
+
+                        $scope.states = $scope.states.sort(function (a, b) {
+                            return a.sort - b.sort;
+                        });
+
+                        $scope.state_code = $scope.states[0].stateCode;
+                        $scope.getList(0);
+                    }
+                });
+
+
+//                //全部读出来
+//                entity.getList("/rest/products?page=0&size=1000").then(function (resResult) {
+//                    $scope.products = resResult._embeddedItems;
+//                    console.log($scope.products)
+//                });
+
+
+                $scope.searchList = function(page) {
+                    //# % & 号键会注释掉后面的内容
+                    $scope.searchForm.realname= $scope.searchForm.realname.replace(/[#%&\^\\]/g,'')
+                    $scope.searchForm.telephone=$scope.searchForm.telephone.replace(/[#%&\^\\]/g,'')
+                    $scope.searchForm.orderNo=$scope.searchForm.orderNo.replace(/[#%&\^\\]/g,'')
+                    $http({
+                        method: "GET",
+                        url: "/repayment/searchrepaymentrecord?orderNo="+$scope.searchForm.orderNo+"&stateCode="+$scope.state_code+"&realname="+$scope.searchForm.realname+"&telephone="+$scope.searchForm.telephone+"&productid="+$scope.searchForm.productid+"&page="+page+"&size=10&sort=id,desc"
+                    }).success(function (resResult) {
+
+                        console.log(resResult)
+                        $scope.list = resResult.data.content;
+
+//                        angular.forEach($scope.list,function (val,key) {
+//                            if(val.information){
+//                                val.sn=JSON.parse(val.information).id
+//                                val.mobile=JSON.parse(val.information).mobile
+//                                val.payAmount=JSON.parse(val.information).payAmount
+//                                val.payDate=$scope.formatDate((JSON.parse(val.information).payDate).substring(0,8))
+//                                val.payPlans=(JSON.parse(val.information).payPlans).pop()
+//                                val.personName = val.name
+//                                val.product = val.label
+//                            }
+//                        })
+
+                        //搜索的返回格式和 rest/search不一样
+                        $scope.pageList = {
+                            size: resResult.data.size,
+                            total_elements: resResult.data.totalElements,
+                            current_page: resResult.data.number,
+                            num_page: resResult.data.totalPages,
+                            total_page: resResult.data.totalPages
+                        };
+
+                        if ($scope.list.length > 0) {
+                            $("#mdbtcreditrepayment_list_paginator").show();
+                            $rootScope.setPaginator("#mdbtcreditrepayment_list_paginator", $scope.pageList, $scope.searchList);
+                        }else{
+                            $("#mdbtcreditrepayment_list_paginator").hide();
+                        }
+
+                    });
+                }
+
+                //搜索按钮
+                $scope.searchFormBtn=function () {
+                    console.log( $scope.state_code)
+                    $scope.searchList(0)
+
+                }
+
+                //重置按钮
+                $scope.resetSearchFormBtn=function () {
+                    $scope.searchForm={
+                        realname:'',
+                        telephone:'',
+                        productid:'4',
+                        orderNo:''
+                    };
+                    $scope.searchList(0)
+                }
+
+
+
+                $scope.pageList = {
+                    size: 0,
+                    total_elements: 0,
+                    current_page: 0,
+                    num_page: 1,
+                    total_page: 1
+                };
+
+                $scope.list = [];
+
+
+                $scope.getList = function (page) {
+                    $scope.loading = true;
+                    $scope.list = [];
+
+                    //var link = "/rest/creditrepayments/listOwnDepartmentAndChildren?size=20&page=" + page;
+
+                    //if($scope.state_code){
+                    //var link = "/rest/creditrepayments?sort=id,desc&stateCode=" + $scope.state_code + "&size=20&page=" + page;
+                    var link = "/repayment/searchrepaymentrecord?stateCode="+$scope.state_code+"&realname="+$scope.searchForm.realname+"&telephone="+$scope.searchForm.telephone+"&productid="+$scope.searchForm.productid+"&page="+page+"&size=10&sort=id,desc"
+                    //var link = "/rest/creditrepayments/search/listOwnDepartmentAndChildren?sort=id,desc&stateCode=" + $scope.state_code + "&size=20&page=" + page;
+                    //}
+
+                    if($scope.searchForm.productid == 4){
+                        $scope.mdbtTabel=true;
+                    }else {
+                        $scope.mdbtTabel=false;
+                    }
+                    if($scope.state_code == 'CREATED'){
+                        $scope.mdbtBtn=true;
+                    }else {
+                        $scope.mdbtBtn=false;
+                    }
+
+                    entity.getList(link).then(function (resResult) {
+                        $scope.loading = false;
+                        $scope.list = resResult.data.content;
+
+//                        angular.forEach($scope.list,function (val,key) {
+//                            //val.sn=JSON.parse(val.information).id
+//                            //val.mobile=JSON.parse(val.information).mobile
+//                            //val.payAmount=JSON.parse(val.information).payAmount
+//                            //val.payDate=$scope.formatDate((JSON.parse(val.information).payDate).substring(0,8))
+//                            //val.payPlans=(JSON.parse(val.information).payPlans).pop()
+//                            //val.personName = val.name
+//                            //val.product = val.label
+//                        })
+
+                        //搜索的返回格式和 rest/search不一样
+                        $scope.pageList = {
+                            size: resResult.data.size,
+                            total_elements: resResult.data.totalElements,
+                            current_page: resResult.data.number,
+                            num_page: resResult.data.totalPages,
+                            total_page: resResult.data.totalPages
+                        };
+
+                        if ($scope.list.length > 0) {
+                            $rootScope.setPaginator("#mdbtcreditrepayment_list_paginator", $scope.pageList, $scope.getList);
+                        }
+
+                    });
+                };
+
+                $scope.stateSelect = function ($event, stateCode) {
+                    if ($event.target.nodeName === "INPUT") {
+                        $scope.state_code = stateCode;
+                        $scope.searchForm= {
+                            realname:'',
+                            telephone:'',
+                            productid:'4',
+                            orderNo:''
+                        }
+                        $scope.getList(0);
+                    }
+                };
+
+
+                $scope.repaymentForm = {};
+
+                $scope.repaymentBtn = function () {
+                    $("#save_model").modal("show");
+                };
+
+
+                $scope.savaRepayment = function () {
+
+                    $http.post("rest/creditrepayplan", $scope.repaymentForm).success(function (resResult) {
+
+                    });
+
+                    $("#save_model").modal("hide");
+                }
+                $scope.formatDate = function (date) {
+                    return date.substring(0,4)+'-'+date.substring(4,6)+'-'+date.substring(6,8);
+                };
+
+                $scope.fn={
+                    'adopt':function (id) {
+                        swal({
+                            title: "是否确定还款",
+                            type: "warning",
+                            showCancelButton: true,
+                            cancelButtonText: "退出",
+                            confirmButtonText: "同意",
+                            closeOnConfirm: true
+                        }, function () {
+                            var html = '<div style="position: fixed;top: calc(50% - 50px);;right: calc(50% - 50px); width: 100px; height: 100px" class="sk-spinner sk-spinner-cube-grid" id="loadAction">' +
+                                '<div class="sk-cube"></div>' +
+                                '<div class="sk-cube"></div>' +
+                                '<div class="sk-cube"></div>' +
+                                '<div class="sk-cube"></div>' +
+                                '<div class="sk-cube"></div>' +
+                                '<div class="sk-cube"></div>' +
+                                '<div class="sk-cube"></div>' +
+                                '<div class="sk-cube"></div>' +
+                                '<div class="sk-cube"></div>' +
+                                '<div>加载中请稍后...</div>'
+                            '</div>';
+
+                            $("body").append(html);
+
+
+                            $http({
+                                method: "patch",
+                                url: "/rest/creditrepayments/"+id,
+                                data: {
+                                    act:'adopt'
+                                }
+                            }).success(function (resResult) {
+                                console.log(resResult);
+                                $("#loadAction").remove();
+                                $rootScope.toasterSuccess("注意",'确认还款成功！');
+                                $state.go("workflowEntity.list", {entity_key: "mdbtcreditrepayment"}, {reload: true});
+                            }).error(function (res) {
+                                $("#loadAction").remove();
+                            });
+                        });
+                    },
+                    'failed':function (id) {
+                        swal({
+                            title: "是否确定未通过",
+                            type: "warning",
+                            showCancelButton: true,
+                            cancelButtonText: "退出",
+                            confirmButtonText: "同意",
+                            closeOnConfirm: true
+                        }, function () {
+                            $http({
+                                method: "patch",
+                                url: "/rest/creditrepayments/"+id,
+                                data: {
+                                    act:'failed'
+                                }
+                            }).success(function (resResult) {
+                                console.log(resResult);
+                                $rootScope.toasterSuccess("注意",'确认还款未通过操作成功！');
+                                $state.go("workflowEntity.list", {entity_key: "mdbtcreditrepayment"}, {reload: true});
+                            });
+                        });
+                    },
+                    'openFile':function(id){
+                        $scope.id=id;
+                        entity.getList("/rest/creditrepayments/" +id+"/files").then(function (resResult) {
+                                console.log(resResult)
+
+                                $scope.creditrepaymentFiles = resResult._embeddedItems;
+                                $scope.imgSrc=[];
+                                if($scope.creditrepaymentFiles.length){
+                                    angular.forEach($scope.creditrepaymentFiles,function(data){
+                                        $scope.imgSrc.push("http://files.xiaojinpingtai.com/"+data.newFileName);
+
+                                    })
+                                    //console.log($scope.imgSrc)
+                                    $("#file_open").modal("show");
+                                }else{
+                                    $rootScope.toasterWarning("还没有上传凭证！");
+                                }
+                            }
+                        );
+                    },
+                    'changePunish':function (id,punishinterest) {
+                        $scope.changePunishId=id
+                        $scope.punishinterest=punishinterest;
+                        $("#changePunishModal").modal("show");
+                    },
+                    'modifyPunishSave':function (punishinterest) {
+                        $http({
+                            method: "patch",
+                            url: "/rest/creditrepayments/"+$scope.changePunishId,
+                            data: {
+                                punishinterest:punishinterest
+                            }
+                        }).success(function (resResult) {
+                            console.log(resResult);
+                            $("#changePunishModal").modal("hide");
+                            $rootScope.toasterSuccess("注意",'修改罚息操作成功！');
+                            $state.go("workflowEntity.list", {entity_key: "mdbtcreditrepayment"}, {reload: true});
+                        });
+                    }
+                }
+            }
+        ]
+    );
+</script>
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light" ng-controller="mdbtcreditrepaymentListController">
+    <!-- column -->
+    <div class="col w-md lter b-l">
+        <div class="vbox">
+            <!--<div class="wrapper b-b b-light clearfix">-->
+            <!--<div class="pull-left m-r w inline">-->
+            <!--<label class="sr-only" for=""></label>-->
+            <!--<input type="text" class="form-control" id="">-->
+            <!--</div>-->
+            <!--<div class="pull-left m-r w inline">-->
+            <!--<label class="sr-only" for=""></label>-->
+            <!--<input type="text" class="form-control" id="">-->
+            <!--</div>-->
+            <!--<div class="pull-left m-r w inline">-->
+            <!--<label class="sr-only" for=""></label>-->
+            <!--<input type="text" class="form-control" id="">-->
+            <!--</div>-->
+            <!--<div class="pull-left m-r inline">-->
+            <!--<button class="btn btn-primary btn-addon">-->
+            <!--<i class="fa fa-search"></i>-->
+            <!--查询-->
+            <!--</button>-->
+            <!--</div>-->
+            <!--</div>-->
+
+            <div class="wrapper b-b  clearfix">
+
+                <div class="inline pull-left">
+                    面单白条还款列表状态：
+                    <!--<span translate="creditrepayment.self.label"></span>状态：-->
+                </div>
+                <!--<div class="inline pull-left m-r">-->
+                <!--<label class="i-checks pull-left m-n" ng-click="stateSelect($event,'')">-->
+                <!--<input type="radio" name="state" checked><i></i>  全部-->
+                <!--</label>-->
+                <!--</div>-->
+
+                <div class="inline pull-left m-r" ng-repeat="state in states">
+                    <label class="i-checks pull-left m-n" ng-click="stateSelect($event,state.stateCode)">
+                        <input type="radio" value="{{state.stateCode}}" ng-model="state_code" name="state"><i></i> {{
+                        state.label }}
+                    </label>
+                </div>
+                <!--<button class="pull-right btn btn-success" ng-click="repaymentBtn()">还款</button>-->
+            </div>
+
+            <div class="wrapper b-b clearfix ">
+                <form class="form-inline" name="search_form">
+                    <div class="form-group m-r">
+                        <label for="">还款单号: </label>
+                        <input ng-model="searchForm.orderNo" class="form-control" type="text" pattern="^\s*[\da-zA-Z]+\s*$" name="orderNo">
+                        <span class="help-block text-danger"
+                              ng-show="search_form.orderNo.$dirty && search_form.orderNo.$invalid">
+                            <i class="fa fa-exclamation-circle text-danger"></i>订单编号只能输入数字或英文
+                        </span>
+                    </div>
+                    <div class="form-group m-r">
+                        <label for="">法人姓名: </label>
+                        <input ng-model="searchForm.realname" class="form-control" type="text" pattern="^\s*[\u4e00-\u9fa5]+(·[\u4e00-\u9fa5]+)*\s*$" name="realname">
+                        <span class="help-block text-danger"
+                              ng-show="search_form.realname.$dirty && search_form.realname.$invalid">
+                            <i class="fa fa-exclamation-circle text-danger"></i>不符合姓名格式
+                        </span>
+                    </div>
+                    <div class="form-group m-r">
+                        <label for="">手机号: </label>
+                        <input ng-model="searchForm.telephone" class="form-control" type="tel" pattern="^\s*\d+\s*$" name="telephone">
+                        <span class="help-block text-danger"
+                              ng-show="search_form.telephone.$dirty && search_form.telephone.$invalid">
+                            <i class="fa fa-exclamation-circle text-danger"></i>手机号必须为数字
+                        </span>
+                    </div>
+                    <button class="btn btn-primary m-r" ng-click="searchFormBtn()"  ng-disabled="search_form.$invalid">
+                        <i class="fa fa-search"></i>查询
+                    </button>
+                    <button class="btn btn-default m-r" ng-click="resetSearchFormBtn()">
+                        <i class="fa fa-refresh"></i>重置
+                    </button>
+                </form>
+            </div>
+
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner">
+                        <div class="wrapper">
+                            <div class="panel panel-default">
+                                <div class="panel-heading" ng-if="!loading && list.length > 0">
+                                    查询结果
+                                </div>
+                                <div ng-if="loading"
+                                     style="position: fixed;top: 50%;right: 50%;margin-left: -15px;margin-top: -15px;">
+                                    <div class="sk-spinner sk-spinner-cube-grid">
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                    </div>
+                                    <div class="text-center m-t">加载中请稍后</div>
+                                </div>
+                                <div class="panel-heading" ng-if="!loading && list.length < 1">
+                                    暂无数据！
+                                </div>
+                                <div ng-if="!loading && list.length > 0">
+                                    <table class="table table-hover b-light">
+                                        <thead>
+                                        <tr>
+                                            <th>操作</th>
+                                            <th>还款单号</th>
+                                            <th>法人姓名</th>
+                                            <th>手机号</th>
+                                            <!--<th ng-if="state_code===''">状态</th>-->
+                                            <!--<th>申请日期</th>-->
+                                            <th>应还金额(元)</th>
+                                            <th>罚息(元)</th>
+                                            <th>实际到账金额(元)</th>
+                                            <th>操作人</th>
+                                            <th>计划还款日期</th>
+                                            <th>实际还款日期</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr ng-repeat="item in list">
+                                            <td class="v-middle">
+                                                <div class="btn-group dropdown">
+                                                    <button class="btn btn-success btn-xs" data-toggle="dropdown">操作 <span class="caret"></span></button>
+                                                    <ul class="dropdown-menu">
+                                                        <li>
+                                                            <a  ui-sref="workflowEntity.home.profile.info({id:item.id})" >详情</a>
+                                                        </li>
+                                                        <li ng-click="fn.openFile(item.id)">
+                                                            <a>查看凭证</a>
+                                                        </li>
+                                                        <li ng-if="state_code==='CREATED'" ng-click="fn.changePunish(item.id,item.punishinterest)">
+                                                            <a>修改罚息</a>
+                                                        </li>
+                                                        <li ng-if="state_code==='CREATED'" class="divider"></li>
+                                                        <li ng-if="state_code==='CREATED'"  ng-click="fn.adopt(item.id)">
+                                                            <a>确认还款</a>
+                                                        </li>
+                                                        <li ng-if="state_code==='CREATED'"  ng-click="fn.failed(item.id)">
+                                                            <a >未通过</a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+
+                                            <td class="v-middle">
+                                                {{ item.orderNo }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.name }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.phoneString }}
+                                            </td>
+
+                                            <!--<td class="v-middle">-->
+                                                <!--{{ item.stateLabel }}-->
+                                            <!--</td>-->
+                                            <td class="v-middle">
+                                                {{ item.fees }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.punishinterest }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.realPayAmount }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.repaymentName}}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.planDate | datetime}}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.realDate | datetime }}
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="wrapper b-t b-light clearfix">
+                <ul id="mdbtcreditrepayment_list_paginator" style="margin:2px 0;float: right;"></ul>
+                <small class="m-l-md pull-right text-muted inline m-t-sm m-b-sm m-r">共 {{pageList.total_elements}} 条，本页共 {{ list.length }}
+                    条
+                </small>
+            </div>
+            <div class="modal fade" id="file_open">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content" style="float:left">
+                        <ul style="list-style: none;padding:0px;margin-bottom:0px;">
+                            <li ng-repeat="src in imgSrc"><img class="img-responsive" ng-src="{{src}}"></li>
+                        </ul>
+
+                    </div>
+                </div>
+            </div><!--查看凭证的模态框-->
+            <div class="modal fade" id="changePunishModal" tabindex="-1" role="dialog">
+                <div class="modal-xs modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal"
+                                    aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                            <h4 class="modal-title">请输入修改罚息</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group clearfix">
+                                <label class="col-lg-4 control-label text-right">当前罚息：</label>
+                                <div class="col-lg-8">
+                                    <span>{{ punishinterest }}</span>
+                                </div>
+                            </div>
+                            <div class="form-group clearfix">
+                                <label class="col-lg-4 control-label text-right">罚息：</label>
+                                <div class="col-lg-8">
+                                    <input type="text" class="form-control" ng-model="changePunishModal">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer text-center">
+                            <button type="button" class="btn btn-success w-lg"
+                                    ng-click="fn.modifyPunishSave(changePunishModal)">
+                                提交
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /column -->
+</div>
+<!-- /hbox layout -->
+

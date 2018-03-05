@@ -1,0 +1,272 @@
+<script>
+    "use strict";
+    app.controller("userListController",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "entity",
+            function ($rootScope, $scope, $http, $stateParams, entity) {
+
+                $scope.states = [];
+
+                $scope.searchForm={
+                    nickname:'',
+                    username:''
+                };
+
+                $scope.searchList = function(page) {
+                    $scope.searchForm.nickname= $scope.searchForm.nickname.replace(/#/g,'').replace(/%/g,'').replace(/&/g,'')
+                    $scope.searchForm.username=$scope.searchForm.username.replace(/#/g,'').replace(/%/g,'').replace(/&/g,'')
+                    $http({
+                        method: "GET",
+                        url: "/user/list?state.stateCode="+$scope.state_code+"&nickname="+$scope.searchForm.nickname+"&username="+$scope.searchForm.username+"&page="+page+"&size=10&sort=id,desc"
+                    }).success(function (resResult) {
+
+                        console.log(resResult)
+                        $scope.list = resResult.data.content;
+
+                        //搜索的返回格式和 rest/search不一样
+                        $scope.pageList = {
+                            size: resResult.data.size,
+                            total_elements: resResult.data.totalElements,
+                            current_page: resResult.data.number,
+                            num_page: resResult.data.totalPages,
+                            total_page: resResult.data.totalPages
+                        };
+
+                        if ($scope.list.length > 0) {
+                            $rootScope.setPaginator("#user_list_paginator", $scope.pageList, $scope.searchList);
+                        }
+
+                    });
+                }
+
+                //搜索按钮
+                $scope.searchFormBtn=function () {
+                    console.log( $scope.state_code)
+                    $scope.searchList(0)
+
+                }
+
+                //重置按钮
+                $scope.resetSearchFormBtn=function () {
+                    $scope.searchForm= {
+                        nickname:'',
+                        username:''
+                    }
+                    $scope.searchList(0)
+                }
+
+                entity.getList("/rest/userWorkflows/ " + $stateParams.workflow_id + "/states").then(function (resResult) {
+                    $scope.states = resResult._embeddedItems;
+                    if ($scope.states.length > 0) {
+
+                        $scope.states = $scope.states.sort(function (a, b) {
+                            return a.sort - b.sort;
+                        });
+
+                        //默认有效了，每次都点很烦
+                        $scope.state_code = $scope.states[2].stateCode;
+                        $scope.getList(0);
+                    }
+                });
+
+                //初始化分页参数
+                $scope.pageList = {
+                    size: 0,
+                    total_elements: 0,
+                    current_page: 0,
+                    num_page: 1,
+                    total_page: 1
+                };
+
+                $scope.list = [];
+
+                /*
+                 * 获取实体列表
+                 * @author  金杭
+                 * @param   {number}  页码
+                 * @return  无
+                 * */
+
+                $scope.getList = function (page) {
+
+                    $scope.loading = true;
+
+                    $scope.list = [];
+
+                    //全部筛选
+                    //var link = "/rest/users/search/listStateOwnDepartmentAndChildren?size=20&page=" + page;
+
+                    //有状态时的筛选路由
+                    //if($scope.state_code){
+                    //var link = "/rest/users/search/findAllByRole?role_code=USER&sort=id,desc&size=20&stateCode=" + $scope.state_code + "&page=" + page;
+                    // url: "/user/list?state.stateCode="+$scope.state_code+"&page="+page+"&size=20&sort=id,desc"
+                    //var link = "/rest/users/search/findAllByRoleAndState?role_code=USER&sort=id,desc&size=20&stateCode=" + $scope.state_code + "&page=" + page;
+                    //}
+                    var link="/user/list?state.stateCode="+$scope.state_code+"&page="+page+"&size=10&sort=id,desc"+"&nickname="+$scope.searchForm.nickname+"&username="+$scope.searchForm.username;
+
+                    entity.getList(link, ["state", "department", "role","person"]).then(function (resResult) {
+
+                        $scope.loading = false;
+
+                        $scope.list = resResult.data.content;
+                        //console.log(resResult._embeddedItems)
+
+                        //设置分页参数
+                        $scope.pageList = {
+                            size: resResult.data.size,
+                            total_elements: resResult.data.totalElements,
+                            current_page: resResult.data.number,
+                            num_page: resResult.data.totalPages,
+                            total_page: resResult.data.totalPages
+                        };
+
+                        //生成翻页插件
+                        if ($scope.list.length > 0) {
+                            $("#user_list_paginator").show();
+                            $rootScope.setPaginator("#user_list_paginator", $scope.pageList, $scope.getList);
+                        }else{
+                            $("#user_list_paginator").hide();
+                        }
+
+                    });
+                };
+
+                //状态筛选
+                $scope.stateSelect = function ($event, stateCode) {
+                    if ($event.target.nodeName === "INPUT") {
+                        $scope.state_code = stateCode;
+                        $scope.getList(0);
+                    }
+                };
+
+            }
+        ]
+    );
+</script>
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light" ng-controller="userListController">
+    <!-- column -->
+    <div class="col w-md lter b-l">
+        <div class="vbox">
+            <div class="wrapper b-b clearfix">
+                <div class="inline pull-left">
+                    前端<span translate="user.self.label"></span>状态：
+                </div>
+                <!--<div class="inline pull-left m-r">-->
+                <!--<label class="i-checks pull-left m-n" ng-click="stateSelect($event,'')">-->
+                <!--<input type="radio" name="state" checked><i></i>  全部-->
+                <!--</label>-->
+                <!--</div>-->
+                <div class="inline pull-left m-r" ng-repeat="state in states">
+                    <label class="i-checks pull-left m-n" ng-click="stateSelect($event,state.stateCode)">
+                        <input type="radio" value="{{state.stateCode}}" ng-model="state_code" name="state"><i></i> {{
+                        state.label }}
+                    </label>
+                </div>
+            </div>
+            <div class="wrapper b-b clearfix ">
+                <form class="form-inline">
+                    <div class="form-group m-r">
+                        <label for="">昵称: </label>
+                        <input ng-model="searchForm.nickname" class="form-control" type="text">
+                    </div>
+                    <div class="form-group m-r">
+                        <label for="">手机号: </label>
+                        <input ng-model="searchForm.username" class="form-control" type="tel">
+                    </div>
+                    <button class="btn btn-primary m-r" ng-click="searchFormBtn()">
+                        <i class="fa fa-search"></i>查询
+                    </button>
+                    <button class="btn btn-default m-r" ng-click="resetSearchFormBtn()">
+                        <i class="fa fa-refresh"></i>重置
+                    </button>
+                </form>
+            </div>
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner">
+                        <div class="wrapper">
+                            <div class="panel panel-default">
+                                <div class="panel-heading" ng-if="!loading && list.length > 0">
+                                    查询结果
+                                </div>
+                                <div ng-if="loading"
+                                     style="position: fixed;top: 50%;right: 50%;margin-left: -15px;margin-top: -15px;">
+                                    <div class="sk-spinner sk-spinner-cube-grid">
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                    </div>
+                                    <div class="text-center m-t">加载中请稍后</div>
+                                </div>
+                                <div class="panel-heading" ng-if="!loading && list.length < 1">
+                                    暂无数据！
+                                </div>
+                                <div class="table-responsive" ng-if="!loading && list.length > 0">
+                                    <table class="table table-hover b-light" ng-if="list.length > 0">
+                                        <thead>
+                                        <tr>
+                                            <th>操作</th>
+                                            <th style="width: 50px;">头像</th>
+                                            <th>昵称</th>
+                                            <th>手机号</th>
+                                            <!--<th>所属部门</th>-->
+                                            <th>创建时间</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr ng-repeat="item in list">
+                                            <td class="v-middle clearfix">
+                                                <button ui-sref="workflowEntity.home.profile.info({id:item.id})"
+                                                        class="pull-left btn btn-xs btn-success m-r">详情
+                                                </button>
+                                                <!--<button ui-sref="workflowEntity.form({id:item.id})"-->
+                                                <!--class="pull-left btn btn-sm btn-danger m-r">编辑-->
+                                                <!--</button>-->
+                                            </td>
+
+                                            <td class="v-middle">
+                                                <span class="pull-left thumb avatar m-r" style="height: 50px;">
+                                                    <img style="height: 50px;width: 50px;" ng-src="{{ item.headimgurl == null ?  'img/avatar_null.jpg' : item.headimgurl}}">
+                                                </span>
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.nickname == null ? '暂无设置昵称' : item.nickname}}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.username }}
+                                            </td>
+                                            <!--<td class="v-middle">-->
+                                                <!--{{ item.department.id?item.department.label?item.department.label:"名称未知":"未选择"}}-->
+                                            <!--</td>-->
+                                            <td class="v-middle">
+                                                {{ (item.createdAt)?(item.createdAt | datetime):''}}
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="wrapper b-t b-light clearfix">
+                <ul id="user_list_paginator" style="margin:2px 0;float: right;"></ul>
+                <small class="m-l-md pull-right text-muted inline m-t-sm m-b-sm m-r">共 {{pageList.total_elements}} 条，本页共 {{ list.length }} 条</small>
+            </div>
+        </div>
+    </div>
+    <!-- /column -->
+</div>
+<!-- /hbox layout -->

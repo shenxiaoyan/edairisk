@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <link rel="stylesheet" href="../../../css/weui.css">
+    <link rel="stylesheet" href="../../../css/weui2.css">
+    <link rel="stylesheet" href="../../../css/jquery.mloading.css">
+    <link rel="stylesheet" href="../../../css/animate.css">
+    <link rel="stylesheet" href="../../../css/global.css">
+    <link rel="stylesheet" href="../../../css/loading.css">
+    <title>修改公司资料</title>
+    <style>
+        .btn{
+            width: 100%;
+            height: 40px;
+            background: #169BD5;
+            border-radius: 20px;
+            display: inline-block;
+            text-align: center;
+            line-height: 40px;
+            color: white;
+            font-size: 16px;
+        }
+        .btn:active{
+            background: #CCCCCC;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<form id="form">
+    <div class="weui_cells weui_cells_form">
+        <div class="weui_cell">
+            <div class="weui_cell_hd"><label class="weui_label">公司名称</label></div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <input id="companyName" class="weui_input" type="text" required  placeholder="输入公司名称">
+            </div>
+            <div class="weui_cell_ft">
+                <i class="weui_icon_warn"></i>
+            </div>
+        </div>
+        <div class="weui_cell">
+            <div class="weui_cell_hd"><label class="weui_label" style="width: 150px;">社会统一信用代码</label></div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <input id="companyNumber" class="weui_input" type="text" required  placeholder="请输入社会统一信用代码">
+            </div>
+            <div class="weui_cell_ft">
+                <i class="weui_icon_warn"></i>
+            </div>
+        </div>
+        <div class="weui_cell">
+            <div class="weui_cell_hd"><label class="weui_label">公司法人</label></div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <input id="companyPersonName" class="weui_input" type="text"  placeholder="请输入公司法人">
+            </div>
+            <div class="weui_cell_ft">
+                <i class="weui_icon_warn"></i>
+            </div>
+        </div>
+        <div class="weui_cell">
+            <div class="weui_cell_hd"><label class="weui_label">公司地址</label></div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <input id="companyFull" readonly class="weui_input" type="text"  placeholder="请输入公司地址">
+            </div>
+            <div class="weui_cell_ft">
+                <i class="weui_icon_warn"></i>
+            </div>
+        </div>
+        <div class="weui_cell">
+            <div class="weui_cell_hd"><label class="weui_label">详细地址</label></div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <input id="companyAddress" class="weui_input" type="text"  placeholder="请输入公司地址">
+            </div>
+            <div class="weui_cell_ft">
+                <i class="weui_icon_warn"></i>
+            </div>
+        </div>
+    </div>
+</form>
+
+<a id="appBtn" class="btn" style="margin-top: 20px;">下一步</a>
+</body>
+<script src="../../../js/config.js"></script>
+<script src="../../../js/jquery-3.2.1.js"></script>
+<script src="../../../js/zepto.min.js"></script>
+<script src="../../../js/picker.js"></script>
+<script src="../../../js/picker-city.js"></script>
+<script src="../../../js/jquery.mloading.js"></script>
+<script src="../../../js/loading.js"></script>
+<script>
+    function loading() {
+        $('body').loading({
+            loadingWidth:120,
+            title:'',
+            name:'test',
+            discription:'',
+            direction:'column',
+            type:'origin',
+            // originBg:'#71EA71',
+            originDivWidth:40,
+            originDivHeight:40,
+            originWidth:6,
+            originHeight:6,
+            smallLoading:false,
+            loadingMaskBg:'rgba(0,0,0,0.2)'
+        });
+
+    }
+    if(window.location.search){
+        var href = window.location.href;
+        var companyId = href.split('companyId')[1];
+        companyId = companyId.split('=')[1];
+    }
+
+    $.ajax({
+        type: 'get',
+        url: '/rest/companies/'+companyId,
+        headers: {
+            app_code:"WULIUQIANZHUANG",
+            client:"wechat",
+        },
+        data:{},
+        success: function (res) {
+            $('#companyName').val(res.companyName)
+            $('#companyNumber').val(res.companyNumber)
+            $('#companyPersonName').val(res.companyPersonName)
+            var companyFull = res.companyProvince+' '+res.companyCity+' '+res.companyDistrict;
+            $('#companyFull').val(companyFull)
+            $('#companyAddress').val(res.companyAddress)
+
+        },error:function(res){
+            removeLoading('test');
+            alert(res.responseJSON.message)
+            console.log(res)
+        },
+        dataType: 'json'
+    });
+
+    $("#companyFull").cityPicker({
+        title: "选择公司地址",
+    });
+
+    var $form = $("#form");
+    $form.form();
+    $('#appBtn').click(function () {
+
+        $form.validate(function(error) {
+            if (error) {
+
+            } else {
+
+                loading();
+                var companyName =$('#companyName').val();
+                var companyPersonName =$('#companyPersonName').val();
+                var companyNumber = $('#companyNumber').val();
+                var companyFull = $('#companyFull').val().split(' ');
+                var companyAddress = $('#companyAddress').val();
+
+                var data = {
+                    companyProvince:companyFull[0],
+                    companyCity:companyFull[1],
+                    companyDistrict:companyFull[2],
+                    companyAddress:companyAddress,
+                    companyName:companyName,
+                    companyPersonName:companyPersonName,
+                    companyNumber:companyNumber,
+                    id:companyId
+                };
+                $.ajax({
+                    type: 'get',
+                    url: '/company/changecompanyinfo',
+                    headers: {
+                        app_code:"WULIUQIANZHUANG",
+                        client:"wechat",
+                    },
+                    data:data,
+                    success: function (res) {
+                        removeLoading('test');
+                        if(res.ActionStatus == "FAIL"){
+                            $.alert(res.ErrorInfo)
+                        }else {
+                            window.location.href="companyLogin.html";
+                        }
+
+
+                    },error:function(res){
+                        removeLoading('test');
+                        alert(res.responseJSON.message)
+                        console.log(res)
+                    },
+                    dataType: 'json'
+                });
+
+            }
+        })
+    })
+</script>
+</html>

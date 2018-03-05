@@ -1,0 +1,445 @@
+<script>
+    "use strict";
+    app.controller("managerListController",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "entity",
+            "$state",
+            function ($rootScope, $scope, $http, $stateParams, entity , $state) {
+
+                $scope.states = [];
+
+                entity.getList("/rest/userWorkflows/ " + $stateParams.workflow_id + "/states").then(function (resResult) {
+                    $scope.states = resResult._embeddedItems;
+                    if ($scope.states.length > 0) {
+
+                        $scope.states = $scope.states.sort(function (a, b) {
+                            return a.sort - b.sort;
+                        });
+
+                        $scope.state_code = $scope.states[2].stateCode;
+                        $scope.getList(0);
+                    }
+                });
+
+                //初始化分页参数
+                $scope.pageList = {
+                    size: 0,
+                    total_elements: 0,
+                    current_page: 0,
+                    num_page: 1,
+                    total_page: 1
+                };
+
+                $scope.list = [];
+
+                /*
+                 * 获取实体列表
+                 * @author  金杭
+                 * @param   {number}  页码
+                 * @return  无
+                 * */
+
+                $scope.getList = function (page) {
+
+                    $scope.loading = true;
+
+                    $scope.list = [];
+
+                    //全部筛选
+                    //var link = "/rest/users/search/listStateOwnDepartmentAndChildren?size=20&page=" + page;
+
+                    //有状态时的筛选路由
+                    //if($scope.state_code){
+                    var link = "/user/backgroundlist?rolecode=USER&sort=id,desc&size=20&stateCode=" + $scope.state_code + "&page=" + page;
+                    //}
+
+                    entity.getList(link, ["state", "department", "role"]).then(function (resResult) {
+
+                        $scope.loading = false;
+
+                        $scope.list = resResult.data.content;
+
+                        //设置分页参数
+                        $scope.pageList = {
+                            size: resResult.data.size,
+                            total_elements: resResult.data.totalElements,
+                            current_page: resResult.data.number,
+                            num_page: resResult.data.totalPages,
+                            total_page: resResult.data.totalPages
+                        };
+
+                        //生成翻页插件
+                        if ($scope.list.length > 0) {
+                            $("#manager_list_paginator").show();
+                            $rootScope.setPaginator("#manager_list_paginator", $scope.pageList, $scope.getList);
+                        }else{
+                            $("#manager_list_paginator").hide();
+                        }
+
+                    });
+                };
+
+                //状态筛选
+                $scope.stateSelect = function ($event, stateCode) {
+                    if ($event.target.nodeName === "INPUT") {
+                        $scope.state_code = stateCode;
+                        $scope.getList(0);
+                    }
+                };
+
+                $scope.roles       = [];
+                $scope.departments = [];
+
+                $scope.role          = null;
+                $scope.addDepartment = null;
+                $scope.addState      = null;
+
+                //获取部门和角色列表
+                entity.getList("rest/roles?size=10000").then(function (response) {
+                    $scope.roles = response._embeddedItems;
+                });
+
+                entity.getList("rest/departments").then(function (response) {
+                    $scope.departments = response._embeddedItems;
+                });
+
+                $scope.addSubmit = function () {
+
+                    if (!(/^1[34578]\d{9}$/.test($scope.addPhone))) {
+                        $rootScope.toasterError("失败！", "手机号格式错误！");
+                    }
+                    else if (!$scope.addName) {
+                        $rootScope.toasterError("失败！", "请输入真实姓名！");
+                    }
+                    else if (!$scope.addDepartment) {
+                        $rootScope.toasterError("失败！", "请选择部门！");
+                    }
+                    else if (!$scope.addRole) {
+                        $rootScope.toasterError("失败！", "请选择角色！");
+                    }
+                    else {
+                        $http({
+                            method: 'POST',
+                            url: '/rest/users',
+                            data: {
+                                act: "create",
+                                username: String($scope.addPhone),
+                                nickname: $scope.addName,
+                                department: $scope.addDepartment ? $scope.addDepartment._links.self.href : null,
+                                role: $scope.addRole ? $scope.addRole._links.self.href : null,
+                                state: $scope.addState ? $scope.addState._links.self.href : null,
+                                workflow: "rest/userWorkflows/" + $stateParams.workflow_id
+                            }
+                        }).success(function (response) {
+                            $rootScope.toasterSuccess("成功！", "操作成功！");
+                        });
+                    }
+                };
+
+                $scope.fn={
+                    'setSms':function (id) {
+                        swal({
+                            title: "是否设为后台消息接收者",
+                            type: "warning",
+                            showCancelButton: true,
+                            cancelButtonText: "退出",
+                            confirmButtonText: "同意",
+                            closeOnConfirm: true
+                        }, function () {
+                            $http({
+                                method: "patch",
+                                url: "/rest/users/"+id,
+                                data: {
+                                    smsNoticer:'1'
+                                }
+                            }).success(function (resResult) {
+                                console.log(resResult);
+                                $rootScope.toasterSuccess("注意",'设为后台消息接收者成功！');
+                                $state.go("workflowEntity.list", {entity_key: "manager"}, {reload: true});
+                            });
+                        });
+                    },
+                    'cancelSms':function (id) {
+                        swal({
+                            title: "是否取消后台消息接收者",
+                            type: "warning",
+                            showCancelButton: true,
+                            cancelButtonText: "退出",
+                            confirmButtonText: "同意",
+                            closeOnConfirm: true
+                        }, function () {
+                            $http({
+                                method: "patch",
+                                url: "/rest/users/"+id,
+                                data: {
+                                    smsNoticer:'0'
+                                }
+                            }).success(function (resResult) {
+                                console.log(resResult);
+                                $rootScope.toasterSuccess("注意",'取消后台消息接收者成功！');
+                                $state.go("workflowEntity.list", {entity_key: "manager"}, {reload: true});
+                            });
+                        });
+                    }
+                }
+
+            }
+        ]
+    );
+</script>
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light" ng-controller="managerListController">
+    <!-- column -->
+    <div class="col w-md lter b-l">
+        <div class="vbox">
+            <div class="wrapper b-b b-light clearfix">
+                <!--<div class="pull-left m-r w inline">-->
+                <!--<label class="sr-only" for=""></label>-->
+                <!--<input type="text" class="form-control" id="">-->
+                <!--</div>-->
+                <!--<div class="pull-left m-r w inline">-->
+                <!--<label class="sr-only" for=""></label>-->
+                <!--<input type="text" class="form-control" id="">-->
+                <!--</div>-->
+                <!--<div class="pull-left m-r w inline">-->
+                <!--<label class="sr-only" for=""></label>-->
+                <!--<input type="text" class="form-control" id="">-->
+                <!--</div>-->
+                <!--<div class="pull-left m-r inline">-->
+                <!--<button class="btn btn-primary btn-addon">-->
+                <!--<i class="fa fa-search"></i>-->
+                <!--查询-->
+                <!--</button>-->
+                <!--</div>-->
+                <div class="pull-left m-r inline">
+                    <button class="btn btn-danger btn-addon" data-toggle="modal" data-target="#addUser">
+                        <i class="fa fa-user-plus"></i>
+                        新建
+                    </button>
+                </div>
+                <div class="modal fade" id="addUser" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal">
+                                    <span>&times;</span>
+                                </button>
+                                <h4 class="modal-title" id="createDepartModal">新增后台用户</h4>
+                            </div>
+                            <div class="modal-body">
+                                <form name="manager_form">
+                                    <div class="form-group">
+                                        <label><span class="text-danger">*</span>电话号码</label>
+                                        <input type="text"
+                                               class="form-control"
+                                               name="mobile"
+                                               autocomplete="off"
+                                               required
+                                               ng-model="addPhone"
+                                               pattern="^(?:13\d|14\d|15\d|17\d|18\d)-?\d{5}(\d{3}|\*{3})$">
+                                        <span class="help-block text-danger"
+                                              ng-show="manager_form.mobile.$dirty && manager_form.mobile.$invalid">
+                                            <i class="fa fa-exclamation-circle text-danger"></i>&ensp;请输入正确的手机号，且必填
+                                        </span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label><span class="text-danger">*</span>真实姓名</label>
+                                        <input type="text"
+                                               class="form-control"
+                                               name="name"
+                                               autocomplete="off"
+                                               required
+                                               ng-model="addName"
+                                               pattern="">
+                                        <span class="help-block text-danger"
+                                              ng-show="manager_form.name.$dirty && manager_form.name.$invalid">
+                                            <i class="fa fa-exclamation-circle text-danger"></i>&ensp;姓名为必填
+                                        </span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label><span class="text-danger">*</span>选择部门</label>
+                                        <select type="text"
+                                                class="form-control"
+                                                autocomplete="off"
+                                                name="department"
+                                                ng-options="department.label for department in departments"
+                                                ng-model="addDepartment"
+                                                required></select>
+                                        <span class="help-block text-danger"
+                                              ng-show="manager_form.department.$dirty && manager_form.department.$invalid">
+                                            <i class="fa fa-exclamation-circle text-danger"></i>&ensp;部门为必填
+                                        </span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label><span class="text-danger">*</span>选择角色</label>
+                                        <select type="text"
+                                                class="form-control"
+                                                autocomplete="off"
+                                                name="role"
+                                                ng-options="role.label for role in roles"
+                                                ng-model="addRole"
+                                                required></select>
+                                        <span class="help-block text-danger"
+                                              ng-show="manager_form.role.$dirty && manager_form.role.$invalid">
+                                            <i class="fa fa-exclamation-circle text-danger"></i>&ensp;角色为必填
+                                        </span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label><span class="text-danger">*</span>选择状态</label>
+                                        <select type="text"
+                                                class="form-control"
+                                                autocomplete="off"
+                                                name="state"
+                                                ng-options="state.label for state in states"
+                                                ng-model="addState"
+                                                required></select>
+                                        <span class="help-block text-danger"
+                                              ng-show="manager_form.state.$dirty && manager_form.state.$invalid">
+                                            <i class="fa fa-exclamation-circle text-danger"></i>&ensp;状态为必填
+                                        </span>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                                <button type="button"
+                                        class="btn btn-primary"
+                                        data-dismiss="modal"
+                                        ng-disabled="manager_form.$invalid"
+                                        ng-click="addSubmit()">确定
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="wrapper b-b b-light clearfix">
+                <div class="inline pull-left">
+                    后台<span translate="user.self.label"></span>状态：
+                </div>
+                <!--<div class="inline pull-left m-r">-->
+                <!--<label class="i-checks pull-left m-n" ng-click="stateSelect($event,'')">-->
+                <!--<input type="radio" name="state" checked><i></i>  全部-->
+                <!--</label>-->
+                <!--</div>-->
+                <div class="inline pull-left m-r" ng-repeat="state in states">
+                    <label class="i-checks pull-left m-n" ng-click="stateSelect($event,state.stateCode)">
+                        <input type="radio" value="{{state.stateCode}}" ng-model="state_code" name="state"><i></i> {{
+                        state.label }}
+                    </label>
+                </div>
+            </div>
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner"  style="overflow: scroll;">
+                        <div class="wrapper">
+                            <div class="panel panel-default">
+                                <div class="panel-heading" ng-if="!loading && list.length > 0">
+                                    查询结果
+                                </div>
+                                <div ng-if="loading"
+                                     style="position: fixed;top: 50%;right: 50%;margin-left: -15px;margin-top: -15px;">
+                                    <div class="sk-spinner sk-spinner-cube-grid">
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                    </div>
+                                    <div class="text-center m-t">加载中请稍后</div>
+                                </div>
+                                <div class="panel-heading" ng-if="!loading && list.length < 1">
+                                    暂无数据！
+                                </div>
+                                <div ng-if="!loading && list.length > 0">
+                                    <table class="table table-hover b-light">
+                                        <thead>
+                                        <tr>
+                                            <th>操作</th>
+                                            <th style="width: 50px;">头像</th>
+                                            <th>姓名</th>
+                                            <th>手机号</th>
+                                            <th>用户角色</th>
+                                            <th>状态</th>
+                                            <th>后台消息接收者</th>
+                                            <th>创建时间</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr ng-repeat="item in list">
+                                            <td class="v-middle">
+                                                <div class="btn-group dropdown">
+                                                    <button class="btn btn-success btn-xs" data-toggle="dropdown">操作 <span class="caret"></span></button>
+                                                    <ul class="dropdown-menu">
+                                                        <li><a ui-sref="workflowEntity.home.profile.info({id:item.id})">详情</a>
+                                                        </li>
+                                                        <li><a ui-sref="workflowEntity.form({id:item.id})">编辑</a>
+                                                        </li>
+                                                        <li ng-if="!item.smsNoticer" ng-click="fn.setSms(item.id)"><a>设为接收者</a>
+                                                        </li>
+                                                        <li ng-if="item.smsNoticer" ng-click="fn.cancelSms(item.id)"><a>取消接收者</a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                            <!--<td class="v-middle clearfix">-->
+                                                <!--<button ui-sref="workflowEntity.home.profile.info({id:item.id})"-->
+                                                        <!--class="pull-left btn btn-sm btn-info m-r">详情-->
+                                                <!--</button>-->
+                                                <!--<button ui-sref="workflowEntity.form({id:item.id})"-->
+                                                        <!--class="pull-left btn btn-sm btn-primary m-r">编辑-->
+                                                <!--</button>-->
+                                                <!--<button ng-if="!item.smsNoticer" class="pull-left btn btn-sm btn-success m-r" ng-click="fn.setSms(item.id)">设为接收者-->
+                                                <!--</button>-->
+                                                <!--<button ng-if="item.smsNoticer" class="pull-left btn btn-sm btn-danger m-r" ng-click="fn.cancelSms(item.id)">设为接收者-->
+                                                <!--</button>-->
+                                            <!--</td>-->
+                                            <td class="v-middle">
+                                                <span class="pull-left thumb avatar m-r">
+                                                    <img ng-src="{{ item.headimgurl }}">
+                                                </span>
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.nickname }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.username }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.roleName?item.roleName:"名称未知" }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.stateLabel?item.stateLabel:"状态名称未知" }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.smsNoticer ? '是': '否' }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.createdAt | datetime }}
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="wrapper b-t b-light clearfix">
+                <ul id="manager_list_paginator" style="margin:2px 0;float: right;"></ul>
+                <small class="m-l-md pull-right text-muted inline m-t-sm m-b-sm m-r">本页共 {{ list.length }} 条</small>
+            </div>
+        </div>
+    </div>
+    <!-- /column -->
+</div>
+<!-- /hbox layout -->

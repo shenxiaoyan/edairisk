@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>提现申请</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <link rel="stylesheet" href="../../../css/weui.css">
+    <link rel="stylesheet" href="../../../css/weui2.css">
+    <style>
+        .btn{
+            width: 100%;
+            height: 40px;
+            background: #169BD5;
+            border-radius: 20px;
+            display: inline-block;
+            text-align: center;
+            line-height: 40px;
+            color: white;
+            font-size: 16px;
+        }
+        .btn:active{
+            background: #CCCCCC;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<div style="margin: 0; padding: 8px 15px"  class="weui_cells_title">提现申请</div>
+<div class="weui_cells" style="margin-top: 0">
+    <div class="weui_cell weui_vcode">
+        <div class="weui_cell_hd"><label class="weui_label">提现金额</label></div>
+        <div class="weui_cell_bd weui_cell_primary">
+            <input id="money" oninput="change()" class="weui_input" type="number" placeholder="请输入提现金额"/>
+        </div>
+        <div class="weui_cell_ft">
+            <a href="javascript:;" style="padding: 0 1.6em 0 1.7em;color:#000;" class="weui-vcode-btn">元</a>
+        </div>
+    </div>
+    <div class="weui_cell">
+        <div class="weui_cell_bd weui_cell_primary">
+            <p>借款时间</p>
+        </div>
+        <div class="weui_cell_ft" id="nowDate"></div>
+    </div>
+    <div class="weui_cell">
+        <div class="weui_cell_bd weui_cell_primary">
+            <p>还款时间</p>
+        </div>
+        <div class="weui_cell_ft" id="preDate"></div>
+    </div>
+    <div class="weui_cell">
+        <div class="weui_cell_bd weui_cell_primary">
+            <p>日息</p>
+        </div>
+        <div id="Dailyinterest" class="weui_cell_ft"></div>
+    </div>
+</div>
+<div style="margin-top: 20px;" class="page-bd-15">
+    <a id="applyBtn" class="btn">立即申请</a>
+</div>
+</body>
+<script src="../../../js/jquery-3.2.1.js"></script>
+<script src="../../../js/zepto.min.js"></script>
+<script src="../../../js/config.js"></script>
+<script>
+    var d = new Date();
+    var vYear = d.getFullYear();
+    var vMon = d.getMonth() + 1;
+    var vDay = d.getDate();
+    var preMon=d.getMonth() + 4;
+    if(preMon > 12){
+        preMon = preMon -12
+    }
+    var s=vYear+"/"+(vMon<10 ? "0" + vMon : vMon)+"/"+(vDay<10 ? "0"+ vDay : vDay);
+    var p=vYear+"/"+(preMon<10 ? "0" + preMon : preMon)+"/"+(vDay<10 ? "0"+ vDay : vDay);
+    $('#nowDate').text(s);
+    $('#preDate').text(p);
+
+    function change() {
+        var con = $('#money').val() * 0.000417;
+        $('#Dailyinterest').text(con);
+    }
+    $('#applyBtn').click(function () {
+    	var mobile = window.location.search;
+    	mobile = mobile.split('?')[1];
+        if(!$('#money').val()){
+        	 $.alert('申请金额不能为空!')
+           
+        }else if($('#money').val() > 1000000){
+        	$.alert('单次提现不超过100万!')
+        }else{
+        	var money =$('#money').val();
+        	var toUrl=window.config.link+"/bdjf/html5/borrowByFollow.html?mobile="+mobile+"&zcCode=1004&loanAmount="+money+"&ptproductId="+window.config.ptproductId+"&zcName="+window.config.zcName+"&bankType=2";
+            window.location.href=toUrl;
+        }
+    })
+
+</script>
+</html>

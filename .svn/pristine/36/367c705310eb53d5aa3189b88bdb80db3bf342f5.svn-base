@@ -1,0 +1,227 @@
+<script>
+    "use strict";
+    app.controller("orderwdsjshListController",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "entity",
+            function ($rootScope, $scope, $http, $stateParams, entity) {
+
+                $scope.states = [];
+
+                entity.getList("/rest/ordercddWorkflows/ " + $stateParams.workflow_id + "/states").then(function (resResult) {
+                    $scope.states = resResult._embeddedItems;
+                    if ($scope.states.length > 0) {
+
+                        $scope.states = $scope.states.sort(function (a, b) {
+                            return a.sort - b.sort;
+                        });
+
+                        $scope.state_code = $scope.states[0].stateCode;
+                        $scope.getList(0);
+                    }
+                });
+
+                $scope.pageList = {
+                    size: 0,
+                    total_elements: 0,
+                    current_page: 0,
+                    num_page: 1,
+                    total_page: 1
+                };
+
+                $scope.list = [];
+
+
+                $scope.getList = function (page) {
+
+                    $scope.loading = true;
+
+                    $scope.list = [];
+
+                    //var link = "/rest/orderwdsjshes/search/listOwnDepartmentAndChildren?sort=lastModifiedAt,desc&size=20&page=" + page;
+
+                    //if($scope.state_code){
+                    var link = "/rest/orderwdsjshes/search/findAllByIsDistribution?sort=id,desc&stateCode=" + $scope.state_code + "&size=20&page=" + page;
+                    //link = "/rest/orderwdsjshes/search/getByStateCode?stateCode=" + $scope.state_code + "&size=20&page=" + page;
+                    //}
+
+                    entity.getList(link).then(function (resResult) {
+
+                        $scope.loading = false;
+
+                        $scope.list = resResult._embeddedItems;
+
+                        $scope.pageList = {
+                            size: resResult.page.size,
+                            total_elements: resResult.page.totalElements,
+                            current_page: resResult.page.number,
+                            num_page: resResult.page.totalPages,
+                            total_page: resResult.page.totalPages
+                        };
+
+                        if ($scope.list.length > 0) {
+                            $rootScope.setPaginator("#orderwdsjsh_list_paginator", $scope.pageList, $scope.getList);
+                        }
+
+                    });
+                };
+
+                $scope.stateSelect = function ($event, stateCode) {
+                    if ($event.target.nodeName === "INPUT") {
+                        $scope.state_code = stateCode;
+                        $scope.getList(0);
+                    }
+                };
+
+            }
+        ]
+    );
+</script>
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light" ng-controller="orderwdsjshListController">
+    <!-- column -->
+    <div class="col w-md lter b-l">
+        <div class="vbox">
+            <!--<div class="wrapper b-b b-light clearfix">-->
+            <!--<div class="pull-left m-r w inline">-->
+            <!--<label class="sr-only" for=""></label>-->
+            <!--<input type="text" class="form-control" id="">-->
+            <!--</div>-->
+            <!--<div class="pull-left m-r w inline">-->
+            <!--<label class="sr-only" for=""></label>-->
+            <!--<input type="text" class="form-control" id="">-->
+            <!--</div>-->
+            <!--<div class="pull-left m-r w inline">-->
+            <!--<label class="sr-only" for=""></label>-->
+            <!--<input type="text" class="form-control" id="">-->
+            <!--</div>-->
+            <!--<div class="pull-left m-r inline">-->
+            <!--<button class="btn btn-primary btn-addon">-->
+            <!--<i class="fa fa-search"></i>-->
+            <!--查询-->
+            <!--</button>-->
+            <!--</div>-->
+            <!--</div>-->
+            <div class="wrapper b-b b-light clearfix">
+                <div class="inline pull-left">
+                    <span translate="orderwdsjsh.self.label"></span>状态：
+                </div>
+                <!--<div class="inline pull-left m-r">-->
+                <!--<label class="i-checks pull-left m-n" ng-click="stateSelect($event,'')">-->
+                <!--<input type="radio" name="state" checked><i></i>  全部-->
+                <!--</label>-->
+                <!--</div>-->
+                <div class="inline pull-left m-r" ng-repeat="state in states">
+                    <label class="i-checks pull-left m-n" ng-click="stateSelect($event,state.stateCode)">
+                        <input type="radio" value="{{state.stateCode}}" ng-model="state_code" name="state"><i></i> {{
+                        state.label }}
+                    </label>
+                </div>
+            </div>
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner">
+                        <div class="wrapper">
+                            <div class="panel panel-default">
+                                <div class="panel-heading" ng-if="!loading && list.length > 0">
+                                    查询结果
+                                </div>
+                                <div ng-if="loading"
+                                     style="position: fixed;top: 50%;right: 50%;margin-left: -15px;margin-top: -15px;">
+                                    <div class="sk-spinner sk-spinner-cube-grid">
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                    </div>
+                                    <div class="text-center m-t">加载中请稍后</div>
+                                </div>
+                                <div class="panel-heading" ng-if="!loading && list.length < 1">
+                                    暂无数据！
+                                </div>
+                                <!--<div class="wrapper" ng-if="list.length > 0">-->
+                                <!--<div class="w">-->
+                                <!--<select class="form-control" ng-model="linkmanVal"-->
+                                <!--ng-options="y.nickname for (x,y) in linkmanList" ng-change="distributionPeopleSelect(linkmanVal)">-->
+                                <!--<option value="">&#45;&#45;未选择业务员&#45;&#45;</option>-->
+                                <!--</select>-->
+                                <!--</div>-->
+                                <!--</div>-->
+                                <div class="table-responsive" ng-if="!loading && list.length > 0">
+                                    <table class="table table-hover b-light">
+                                        <thead>
+                                        <tr>
+                                            <th>操作</th>
+                                            <th>序号</th>
+                                            <th>姓名</th>
+                                            <th>身份证</th>
+                                            <th>地址</th>
+                                            <th>是否分配</th>
+                                            <th>业务员</th>
+                                            <th>创建时间</th>
+                                            <th>最后修改时间</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr ng-repeat="item in list">
+                                            <td class="v-middle clearfix">
+                                                <button ui-sref="workflowEntity.home.profile.info({id:item.id})"
+                                                        class="pull-left btn btn-xs btn-success m-r">详情
+                                                </button>
+                                                <button ui-sref="workflowEntity.form({id:item.id})"
+                                                        class="pull-left btn btn-xs btn-success m-r">编辑
+                                                </button>
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.id }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.realName }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.applyIdentityNo }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.applyEnterpriseAddress }}
+                                            </td>
+                                            <td class="v-middle"
+                                                ng-class="{true: 'text-success', false: 'text-danger'}[item.isDistribution]">
+                                                {{ item.isDistribution?"是":"未分配" }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.serviceName }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.createdAt | datetime}}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.lastModifiedAt | datetime}}
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="wrapper b-t b-light clearfix">
+                <ul id="orderwdsjsh_list_paginator" style="margin:2px 0;float: right;"></ul>
+                <small class="m-l-md pull-right text-muted inline m-t-sm m-b-sm m-r">本页共 {{ list.length }}
+                    条
+                </small>
+            </div>
+        </div>
+    </div>
+    <!-- /column -->
+</div>
+<!-- /hbox layout -->

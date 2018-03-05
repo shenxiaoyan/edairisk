@@ -1,0 +1,89 @@
+package com.liyang.domain.orderwdsjsh;
+
+
+import javax.persistence.criteria.Order;
+
+import org.aspectj.weaver.ast.Or;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.data.rest.core.annotation.RestResource;
+
+import com.jpa.query.expression.generic.SpecificationQueryRepository;
+import com.liyang.domain.base.WorkflowEntityRepository;
+import com.liyang.domain.ordermdbt.Ordermdbt;
+import com.liyang.domain.person.Person;
+import com.liyang.domain.user.User;
+
+import java.util.List;
+
+//@RepositoryRestResource(excerptProjection = UserProjection.class)
+public interface OrderwdsjshRepository extends WorkflowEntityRepository<Orderwdsjsh>,SpecificationQueryRepository<Orderwdsjsh>{
+    @Query("select m from Orderwdsjsh m JOIN m.state s where s.stateCode = :stateCode")
+    public Page<Orderwdsjsh> getByStateCode(@Param("stateCode") String stateCode, Pageable pageable);
+
+    @Query("select o from Orderwdsjsh o  inner join o.state state where o.applyMobile=?1 and state.stateCode=?2")
+    public Orderwdsjsh getByTelephoneAndStatCode(String telephone, String stateCode);
+
+    //@Query("select o from Orderwdsjsh o inner join o.createBy user where user.id=?1")
+    @RestResource(exported = false)
+    public Page<Orderwdsjsh> getByUser(Integer uid, Pageable pageable);
+
+    //查找用户
+    //@Query("select u from User u inner join Orderwdsjsh o where o.createBy.id=")
+    //public User getUserByOrderwdsjsh()
+    @Query("select o from Orderwdsjsh o where o.applyMobile=?1")
+    @RestResource(exported = false)
+    public Orderwdsjsh getByMobile(String mobile);
+
+    //查询没有分配的
+    @Query("select o from Orderwdsjsh o inner join o.state s where s.stateCode=:stateCode and o.isDistribution=0")
+    public Page<Orderwdsjsh> findAllByIsDistribution(@Param("stateCode") String stateCode, Pageable pageable);
+
+    @Query("select o from Orderwdsjsh o inner join o.state s where s.stateCode=:stateCode")
+    public Page<Orderwdsjsh> listOwnByStateCode(@Param("stateCode") @Value("ENABLED") String stateCode, Pageable pageable);
+    //select m from #{#entityName} m JOIN m.state s where s.stateCode = :stateCode
+    //业务员费配到自己下的业务      这个可以改成业务人员登陆的id
+//		@Query("select o from Orderwdsjsh o inner join o.state s where s.stateCode=:stateCode and o.isDistribution=1 and o.createdBy in  (select u.id from User u where u.serviceUserId=?#{principal.id})")
+//		public Page<Orderwdsjsh> getOrderwdsjshByServiceUserId(@Param("stateCode")String stateCode, Pageable pageable);
+
+    @Query("select o from Orderwdsjsh o inner join o.state s where s.stateCode=:stateCode and o.isDistribution=1 and o.serviceUser.id= ?#{principal.id}")
+    public Page<Orderwdsjsh> getOrderwdsjshByServiceUserId(@Param("stateCode") String stateCode, Pageable pageable);
+
+    //		@Query("select o from Orderwdsjsh o where o.serviceUserId=:userid and o.state.stateCode=:stateCode")
+//		public Page<Orderwdsjsh> getOrderwdsjshByStateCodeAndUser(@Param("stateCode")String stateCode,@Param("userid")String userid, Pageable pageable);
+    @Query("select o from Orderwdsjsh o where o.serviceUser.id=:userid and o.state.stateCode=:stateCode")
+    public Page<Orderwdsjsh> getOrderwdsjshByStateCodeAndUser(@Param("stateCode") String stateCode, @Param("userid") Integer userid, Pageable pageable);
+
+    //根据申请人手机号查询 
+    public Orderwdsjsh findByApplyMobile(String telephone);
+
+    //根据申请人身份证号查询
+    public Orderwdsjsh findByApplyIdentityNo(String identityNo);
+
+    @RestResource(exported = false)
+    Orderwdsjsh findFirstByCreatedBy(User user);
+
+    @Query("select o from Orderwdsjsh o  where o.createdBy.id=:userid ")
+    public List<Orderwdsjsh> findByCreateBy( @Param("userid") Integer userid);
+    
+    @Query(" select o from Orderwdsjsh o  where o.user.id=:userid and o.state.stateCode=:stateCode")
+    public Orderwdsjsh findByApplyUserAndState(@Param("userid") Integer userid,@Param("stateCode") String stateCode);
+    
+    @Query("select o from Orderwdsjsh o  inner join o.product pd where o.applyMobile=?1 and pd.id=?2")
+    public Orderwdsjsh getByApplyIdentityNoAndProductid(String applyMobile, Integer productid);
+    
+    @Query("select o from Orderwdsjsh o where o.person.id=:personId ")
+    public Orderwdsjsh findByPersonId(@Param("personId") Integer personId);
+    
+    @Query("select count(*) from Orderwdsjsh")
+    public int getOrderwdsjshAmount();
+    
+    @Query("select count(*) from Orderwdsjsh o where o.state.stateCode = 'DENIED'")
+    public Integer getOderwdsjshDeniedSum();
+    
+    @Query(" select o from Orderwdsjsh o  where o.applyIdentityNo=:applyIdentityNo and o.state.stateCode not in ('DISABLED')")
+    public Orderwdsjsh findByApplyIdentityNoAndState(@Param("applyIdentityNo") String applyIdentityNo);
+}

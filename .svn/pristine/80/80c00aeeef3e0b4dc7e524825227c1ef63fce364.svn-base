@@ -1,0 +1,183 @@
+<script>
+    /*
+     * 创建人：刘雅倩
+     * 创建时间：2017/08/16
+     * 集团看到的员工数量
+     *
+     * */
+    "use strict";
+    app.controller("groupEmployeeCtrl", [
+        "$scope",
+        function($scope) {
+            //测试用的
+
+            $scope.branchList = [
+                {
+                    name: "公司",
+                    login: "560000",
+                    fee: "5120000"
+                }
+            ];
+
+            $scope.brandChart = echarts.init(document.getElementById('branch_dashboard_chart'));
+
+            $scope.option = {
+            	    backgroundColor: '#2c343c',
+
+            	    title: {
+            	        text: '员工数量',
+            	        left: 'center',
+            	        top: 20,
+            	        textStyle: {
+            	            color: '#ccc'
+            	        }
+            	    },
+
+            	    tooltip : {
+            	        trigger: 'item',
+            	        formatter: "{a} <br/>{b} : {c} ({d}%)"
+            	    },
+                    toolbox: {
+                        show : true,
+                        feature : {
+                                    dataZoom: {
+                                        yAxisIndex: 'none'
+                                    },
+                            dataView : {show: true, readOnly: false},
+                            magicType : {show: true, type: ['line', 'bar']},
+                            restore : {show: true},
+                            saveAsImage : {show: true}
+                        }
+                    },
+            	    visualMap: {
+            	        show: false,
+            	        min: 80,
+            	        max: 600,
+            	        inRange: {
+            	            colorLightness: [0, 1]
+            	        }
+            	    },
+            	    series : [
+            	        {
+            	            name:'员工数量',
+            	            type:'pie',
+            	            radius : '55%',
+            	            center: ['50%', '50%'],
+            	            data:[
+            	                {value:435, name:'总数量'},
+            	                {value:350, name:'在职'},
+            	                {value:274, name:'审核中'},
+            	                {value:235, name:'已离职'},
+            	                {value:300, name:'被禁用'}
+            	            ].sort(function (a, b) { return a.value - b.value; }),
+            	            roseType: 'radius',
+            	            label: {
+            	                normal: {
+            	                    textStyle: {
+            	                        color: 'rgba(255, 255, 255, 0.3)'
+            	                    }
+            	                }
+            	            },
+            	            labelLine: {
+            	                normal: {
+            	                    lineStyle: {
+            	                        color: 'rgba(255, 255, 255, 0.3)'
+            	                    },
+            	                    smooth: 0.2,
+            	                    length: 10,
+            	                    length2: 20
+            	                }
+            	            },
+            	            itemStyle: {
+            	                normal: {
+            	                    color: '#c23531',
+            	                    shadowBlur: 200,
+            	                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+            	                }
+            	            },
+
+            	            animationType: 'scale',
+            	            animationEasing: 'elasticOut',
+            	            animationDelay: function (idx) {
+            	                return Math.random() * 200;
+            	            }
+            	        }
+            	    ]
+            	};
+
+            $scope.brandChart.setOption($scope.option);
+
+            //窗口大小改变时重新绘制图表
+            $(window).resize(function() {
+                $scope.brandChart.resize();
+            });
+        }
+    ]);
+</script>
+
+<div class="hbox hbox-auto-xs lter" ng-controller="groupEmployeeCtrl">
+    <!-- column -->
+    <div class="col">
+        <div class="vbox">
+            <div class="bg-light lter b-b clearfix" style="padding: 14.5px 20px;">
+                <select class="pull-left m-r-sm input-sm form-control w-sm inline v-middle" ng-options="branch.name for branch in branchList" ng-model="branch">
+                    <option value=""> --请选择公司-- </option>
+                </select>
+
+                <div class="pull-right">
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-default" ng-click="changeView()">今天</button>
+                        <button class="btn btn-sm btn-default" ng-click="changeView()">昨天</button>
+                        <button class="btn btn-sm btn-default" ng-click="changeView()">前天</button>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-default" ng-click="changeView('agendaDay')">本周</button>
+                        <button class="btn btn-sm btn-default" ng-click="changeView('agendaWeek')">上周</button>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-default" ng-click="changeView('month')">本月</button>
+                        <button class="btn btn-sm btn-default" ng-click="changeView('month')">上月</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner wrapper-md">
+                        <div style="padding-top: 0;">
+                            <div class="panel wrapper">
+                                <div id="branch_dashboard_chart" style="height:400px;"></div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="table-responsive">
+                                <table class="table table-striped b-t b-light">
+                                    <thead>
+	                                    <tr>
+	                                        <th>公司</th>
+	                                        <th>员工数量</th>
+	                                        <th>在职</th>
+	                                        <th>审核中</th>
+	                                        <th>已离职</th>
+	                                        <th>被禁用</th>
+	                                    </tr>
+                                    </thead>
+                                    <tbody>
+	                                    <tr ng-repeat="list in branchList">
+	                                        <td><span class="pull-left waybill_item_number"><a>{{ list.name}}</a></span></td>
+	                                        <td class="report_amount"><span class="text-ellipsis">{{ list.login }}</span></td>
+	                                        <td class="report_amount"><span class="text-ellipsis">{{ list.login }}</span></td>
+	                                        <td class="report_amount"><span class="text-ellipsis">{{ list.fee }}</span></td>
+	                                        <td class="report_amount"><span class="text-ellipsis">{{ list.fee }}</span></td>
+	                                        <td class="report_amount"><span class="text-ellipsis">{{ list.fee }}</span></td>
+	                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,211 @@
+<div class="wrapper-md">
+    <div class="row">
+        <div class="col-xs-12 col-sm-10">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    申请信息
+                </div>
+                <form name="info_form">
+                    <table class="table table-striped m-b-none">
+                        <tbody>
+                        <tr>
+                            <td class="v-middle text-right w-sm">姓名：</td>
+                            <td class="v-middle w-xl">
+                                <input type="text" ng-model="profile.realName" class="form-control" pattern="^\s*[\u4E00-\u9FA5]+\s*$" name="realName" required>
+                                <span class="help-block text-danger"
+                                      ng-show="info_form.realName.$dirty && info_form.realName.$invalid && !info_form.realName.$error.required">
+                                    <i class="fa fa-exclamation-circle text-danger"></i>姓名必须为中文
+                                </span>
+                                <span class="help-block text-danger"
+                                      ng-show="info_form.realName.$dirty && info_form.realName.$error.required">
+                                    <i class="fa fa-exclamation-circle text-danger"></i>姓名为必填
+                                </span>
+                            </td>
+                            <td class="v-middle text-right w-sm">手机号码：</td>
+                            <td class="v-middle w-xl">
+                                <input type="text" ng-model="profile.applyMobile" class="form-control" pattern="^\s*\d+\s*$" name="applyMobile" required>
+                                <span class="help-block text-danger"
+                                      ng-show="info_form.applyMobile.$dirty && info_form.applyMobile.$invalid && !info_form.applyMobile.$error.required">
+                                    <i class="fa fa-exclamation-circle text-danger"></i>手机号必须为数字
+                                </span>
+                                <span class="help-block text-danger"
+                                      ng-show="info_form.applyMobile.$dirty && info_form.applyMobile.$error.required">
+                                    <i class="fa fa-exclamation-circle text-danger"></i>手机号为必填
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="v-middle text-right w-sm">身份证号：</td>
+                            <td class="v-middle w-xl">
+                                <input type="text" ng-model="profile.applyIdentityNo" disabled class="form-control">
+                            </td>
+                            <td class="v-middle text-right w-sm">办公地址：</td>
+                            <td class="v-middle w-xl">
+                                <input type="text" ng-model="profile.applyEnterpriseAddress" placeholder="办公区域地址" class="form-control" pattern="^\s*[\u4E00-\u9FA5a-zA-Z\d]+\s*$" name="applyEnterpriseAddress" required>
+                                <span class="help-block text-danger"
+                                      ng-show="info_form.applyEnterpriseAddress.$dirty && info_form.applyEnterpriseAddress.$invalid && !info_form.applyEnterpriseAddress.$error.required">
+                                    <i class="fa fa-exclamation-circle text-danger"></i>格式错误
+                                </span>
+                                <span class="help-block text-danger"
+                                      ng-show="info_form.applyEnterpriseAddress.$dirty && info_form.applyEnterpriseAddress.$error.required">
+                                    <i class="fa fa-exclamation-circle text-danger"></i>办公地址为必填
+                            </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="v-middle text-right w-sm">申请额度(元)：</td>
+                            <td class="v-middle w-xl">
+                                <input type="text" ng-model="profile.applyAmount" disabled class="form-control">
+                            </td>
+                            <td class="v-middle text-right w-sm">借款期限：</td>
+                            <td class="v-middle w-xl">
+                                <input type="text" ng-model="profile.applyPeriodNumber" disabled class="form-control">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="v-middle text-right">日平均收件量：</td>
+                            <td class="v-middle">
+                                <input type="text" ng-model="profile.applyDayPatchExpress" class="form-control" pattern="^\s*\d+\s*$" name="applyDayPatchExpress" required>
+                                <span class="help-block text-danger"
+                                      ng-show="info_form.applyDayPatchExpress.$dirty && info_form.applyDayPatchExpress.$invalid && !info_form.applyDayPatchExpress.$error.required">
+                                    <i class="fa fa-exclamation-circle text-danger"></i>日平均收件量必须为数字
+                                </span>
+                                <span class="help-block text-danger"
+                                      ng-show="info_form.applyDayPatchExpress.$dirty && info_form.applyDayPatchExpress.$error.required">
+                                    <i class="fa fa-exclamation-circle text-danger"></i>日平均收件量为必填
+                                </span>
+                            </td>
+                            <td class="v-middle text-right">日平均派件量：</td>
+                            <td class="v-middle">
+                                <input type="text" ng-model="profile.applyDayPickExpress" class="form-control" pattern="^\s*\d+\s*$" name="applyDayPickExpress" required>
+                                <span class="help-block text-danger"
+                                      ng-show="info_form.applyDayPickExpress.$dirty && info_form.applyDayPickExpress.$invalid && !info_form.applyDayPickExpress.$error.required">
+                                    <i class="fa fa-exclamation-circle text-danger"></i>日平派收件量必须为数字
+                                </span>
+                                <span class="help-block text-danger"
+                                      ng-show="info_form.applyDayPickExpress.$dirty && info_form.applyDayPickExpress.$error.required">
+                                    <i class="fa fa-exclamation-circle text-danger"></i>日平派收件量为必填
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="v-middle text-right">快递网点名称：</td>
+                            <td class="v-middle">
+                                <input type="text" ng-model="profile.applyEnterpriseName" class="form-control" pattern="^\s*[\u4E00-\u9FA5a-zA-Z\d]+\s*$" name="applyEnterpriseName" required>
+                                <span class="help-block text-danger"
+                                      ng-show="info_form.applyEnterpriseName.$dirty && info_form.applyEnterpriseName.$invalid && !info_form.applyEnterpriseName.$error.required">
+                                    <i class="fa fa-exclamation-circle text-danger"></i>格式错误
+                                </span>
+                                <span class="help-block text-danger"
+                                      ng-show="info_form.applyEnterpriseName.$dirty && info_form.applyEnterpriseName.$error.required">
+                                    <i class="fa fa-exclamation-circle text-danger"></i>快递网点名称为必填
+                                </span>
+                            </td>
+                            <td class="v-middle text-right">经营区域：</td>
+                            <td class="v-middle">
+                                <input type="text" ng-model="profile.applyEnterpriseProvince" placeholder="省"
+                                       class="m-l-xs inline w-xs form-control" pattern="^\s*[\u4E00-\u9FA5]+\s*$" name="applyEnterpriseProvince" required>
+                                <span class="help-block text-danger"
+                                      ng-show="info_form.applyEnterpriseProvince.$dirty && info_form.applyEnterpriseProvince.$invalid && !info_form.applyEnterpriseProvince.$error.required">
+                                    <i class="fa fa-exclamation-circle text-danger"></i>省名必须为中文
+                                </span>
+                                <span class="help-block text-danger"
+                                      ng-show="info_form.applyEnterpriseProvince.$dirty && info_form.applyEnterpriseProvince.$error.required">
+                                    <i class="fa fa-exclamation-circle text-danger"></i>省名为必填
+                                </span>
+                                <input type="text" ng-model="profile.applyEnterpriseCity" placeholder="市"
+                                       class="m-l-xs inline w-xs form-control" pattern="^\s*[\u4E00-\u9FA5]+\s*$" name="applyEnterpriseCity" required>
+                                <span class="help-block text-danger"
+                                      ng-show="info_form.applyEnterpriseCity.$dirty && info_form.applyEnterpriseCity.$invalid && !info_form.applyEnterpriseCity.$error.required">
+                                    <i class="fa fa-exclamation-circle text-danger"></i>市名必须为中文
+                                </span>
+                                <span class="help-block text-danger"
+                                      ng-show="info_form.applyEnterpriseCity.$dirty && info_form.applyEnterpriseCity.$error.required">
+                                    <i class="fa fa-exclamation-circle text-danger"></i>市名为必填
+                                </span>
+                                <input type="text" ng-model="profile.applyEnterpriseDistrict" placeholder="区"
+                                       style="width: 45%" class="m-l-xs inline w-xs form-control" pattern="^\s*[\u4E00-\u9FA5]+\s*$" name="applyEnterpriseDistrict" required>
+                                <span class="help-block text-danger"
+                                      ng-show="info_form.applyEnterpriseDistrict.$dirty && info_form.applyEnterpriseDistrict.$invalid && !info_form.applyEnterpriseDistrict.$error.required">
+                                    <i class="fa fa-exclamation-circle text-danger"></i>区名必须为中文
+                                </span>
+                                <span class="help-block text-danger"
+                                      ng-show="info_form.applyEnterpriseDistrict.$dirty && info_form.applyEnterpriseDistrict.$error.required">
+                                    <i class="fa fa-exclamation-circle text-danger"></i>区名为必填
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="v-middle text-right">代理品牌：</td>
+                            <td class="v-middle">
+                                <input type="text" ng-model="profile.agentBrand" class="form-control" pattern="^\s*[\u4E00-\u9FA5a-zA-Z\d]+\s*$" name="agentBrand" required>
+                                <span class="help-block text-danger"
+                                      ng-show="info_form.agentBrand.$dirty && info_form.agentBrand.$invalid && !info_form.agentBrand.$error.required">
+                                    <i class="fa fa-exclamation-circle text-danger"></i>格式错误
+                                </span>
+                                <span class="help-block text-danger"
+                                      ng-show="info_form.agentBrand.$dirty && info_form.agentBrand.$error.required">
+                                    <i class="fa fa-exclamation-circle text-danger"></i>代理品牌为必填
+                                </span>
+                            </td>
+                            <td class="v-middle text-right"></td>
+                            <td class="v-middle">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="v-middle text-right"></td>
+                            <td class="v-middle">
+                            </td>
+                            <td class="v-middle text-right"></td>
+                            <td class="v-middle">
+                                <button class="btn btn-default" ui-sref-opts='{reload: true}' ui-sref="workflowEntity.home.profile.info({id:profile.id,entity_key:'orderwdsjsh'})">
+                                    返回
+                                </button>
+                                <button class="btn btn-primary" ng-disabled="info_form.$invalid" ng-click="orderwdsjshExcute.updateSave()">
+                                    保存
+                                </button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </form>
+            </div>
+            <div class="clearfix m-b-md" ng-if="accountShow">
+                <!--<div class="pull-left m-r" style="width: 410px;">-->
+                    <!--<div class="wrapper-md bg-white" style="border: 1px solid #E7EBED;">-->
+                        <!--<div class="bg-info text-center"-->
+                             <!--style="width: 80px;height: 50px; line-height: 50px;border-radius: 5px;">-->
+                            <!--<span class="text-white font-bold">小金银行</span>-->
+                        <!--</div>-->
+                        <!--<div class="m-t-md m-b-md text-muted font-thin h4">-->
+                            <!--1234 4321 3214 3241-->
+                        <!--</div>-->
+                        <!--<div class="clearfix">-->
+                            <!--<div class="pull-left clearfix">-->
+                                <!--<span class="pull-left font-bold">过期时间：</span>-->
+                                <!--<span class="pull-left">20/09</span>-->
+                            <!--</div>-->
+                            <!--<div class="pull-right clearfix">-->
+                                <!--<span class="pull-left font-bold">持卡人：</span>-->
+                                <!--<span class="pull-left">力饼</span>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+                <div class="pull-left w-xl">
+                    <button class="btn btn-sm btn-success btn-addon"
+                            ui-sref="workflowEntity.home.profile.info({entity_key:'account',state_code:accountList.state_code,id:accountList.id})">
+                        <i class="fa fa-credit-card"></i> 账户详情
+                    </button>
+                    <div class="line line-dashed b-b"></div>
+                    <div>创建时间：{{ accountList.createdAt | datetime }}</div>
+                    <div class="line line-dashed b-b"></div>
+                    <div>提示：{{ accountList.notice }}</div>
+                    <div class="line line-dashed b-b"></div>
+                    <div>账号：{{ accountList.account }}</div>
+                    <div class="line line-dashed b-b m-b-n"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,283 @@
+<script>
+    "use strict";
+    app.controller("userHomeController",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$state",
+            "$stateParams",
+            "entity",
+            function ($rootScope, $scope, $http, $state, $stateParams, entity) {
+
+                //获取实体id
+                $scope.id = $stateParams.id;
+
+                $scope.profile     = {};
+                $scope.canActs     = [];
+                $scope.canFileActs = [];
+
+
+                /*
+                *获取实体详情
+                * @author  沈卫
+                * */
+
+                $scope.listInfo={
+                    product:'随借随还',   //产品名称
+                    sjshShow:true,      //sjsh是否隐藏显示 ng-if
+                    xydShow:false,      //xyd是否隐藏显示 ng-if
+                    rzzlShow:false,     //rzzl是否隐藏显示 ng-if
+                    isHaveLoan:false,    //是否有借款信息 ng-if
+                    isHaveCreditRepayments:false,
+                    sjshTabShow:true
+                }
+                // ng-option 选择数组
+                $scope.selectLists=[
+                    {name:'随借随还'},
+                    {name:'网点信用贷'},
+                    {name:'融资租赁'},
+                ];
+
+                $scope.selectActive=$scope.selectLists[0];
+
+                //tab切换
+                $scope.sjshLoanTab=function () {
+                    $scope.listInfo.sjshTabShow=true;
+                }
+                $scope.sjshRepayTab=function () {
+                    $scope.listInfo.sjshTabShow=false;
+                }
+
+                $scope.formatDate = function (date) {
+                    return date.substring(0,4)+'-'+date.substring(4,6)+'-'+date.substring(6,8);
+                };
+
+
+                entity.getDetail("/rest/orderwdsjshes/search/findByCreateBy?userid="+$scope.id,['person']).then(function (resResult) {
+                    //结果为数组
+                    $scope.profile.sjshList = resResult._embeddedItems;
+
+                    if($scope.profile.sjshList.length > 0){
+                        //person不为空
+                        if( !$.isEmptyObject(resResult._embeddedItems[0].person) ){
+                            $scope.personName=resResult._embeddedItems[0].person.name
+                            getInfo($scope.profile.sjshList[0].person.id)
+                        }
+                    }
+
+
+
+                });
+
+                //根据personID 获取信用卡,再通过信用卡获取借款，还款信息
+                function getInfo(personId) {
+                    entity.getDetail("/rest/persons/"+personId+"/creditcards",['loans','creditrepayments','product']).then(function (resResult) {
+                        //结果为数组
+                        if( resResult._embeddedItems.length > 0 ){
+                            console.log(resResult._embeddedItems)
+
+                            //遍历随借随还的信用卡
+                            angular.forEach(resResult._embeddedItems,function (val,key) {
+                                if(val.product.label == '网点随借随还'){
+                                    $scope.infoList = val;
+                                }
+                            })
+
+                            console.log($scope.infoList)
+
+                            //如果有借款信息
+                            if(!$.isEmptyObject($scope.infoList.loans) && $scope.infoList.loans._embeddedItems.length > 0){
+                                $scope.listInfo.isHaveLoan=true;
+
+                                angular.forEach($scope.infoList.loans._embeddedItems,function (val,key) {
+                                    val.informationJson = JSON.parse(val.information)
+                                    val.informationJson.loanStartDate =$scope.formatDate(val.informationJson.loanStartDate);
+                                    val.informationJson.loanEndDate =$scope.formatDate(val.informationJson.loanEndDate);
+                                })
+                                console.log($scope.infoList.loans)
+                            }
+
+                            //如果有还款信息
+                            if(!$.isEmptyObject($scope.infoList.creditrepayments) && $scope.infoList.creditrepayments._embeddedItems.length > 0){
+                                $scope.listInfo.isHaveCreditRepayments=true;
+
+                                angular.forEach($scope.infoList.creditrepayments._embeddedItems,function (val,key) {
+                                    val.informationJson = JSON.parse(val.information)
+                                    val.informationJson.payDate=$scope.formatDate(val.informationJson.payDate)
+                                    console.log(val.informationJson.payDate)
+                                    val.payPlans = (JSON.parse(val.information).payPlans).pop();
+                                })
+                                console.log($scope.infoList.creditrepayments)
+                            }
+                        }
+
+                    });
+                }
+
+                //SECLECT 改变时的onChange事件
+                $scope.changeSelect=function (val) {
+                    $scope.listInfo.product=val.name;
+
+                    if(val.name === '随借随还'){
+
+
+
+                        entity.getDetail("/rest/orderwdsjshes/search/findByCreateBy?userid="+$scope.id,['person']).then(function (resResult) {
+                            $scope.listInfo={
+                                sjshShow:true,
+                                xydShow:false,
+                                rzzlShow:false
+                            }
+
+                            //切换回来TAB没有样式
+                            $scope.listInfo.sjshTabShow=true;
+
+                            //结果为数组
+                            $scope.profile.sjshList = resResult._embeddedItems;
+
+                            if($scope.profile.sjshList.length > 0){
+                                //person不为空
+                                if( !$.isEmptyObject(resResult._embeddedItems[0].person) ){
+                                    $scope.personName=resResult._embeddedItems[0].person.name
+                                    getInfo($scope.profile.sjshList[0].person.id)
+                                }
+                            }
+
+
+                        });
+                    }else if(val.name === '网点信用贷'){
+                        $scope.listInfo={
+                            sjshShow:false,
+                            xydShow:true,
+                            rzzlShow:false
+                        }
+                        //获取信用贷实体详情
+                        entity.getDetail("/rest/orderwdxyds/search/findByCreateBy?userid="+$scope.id).then(function (resResult) {
+                            //结果为数组
+                            $scope.profile.xydList = resResult._embeddedItems;
+
+                        });
+                    }else if(val.name === '融资租赁'){
+                        $scope.listInfo={
+                            sjshShow:false,
+                            xydShow:false,
+                            rzzlShow:true
+                        }
+                        //获取融资租赁实体详情
+                        entity.getDetail("/rest/orderrzzls/search/findByCreateBy?userid="+$scope.id).then(function (resResult) {
+                            //结果为数组
+                            $scope.profile.rzzlList = resResult._embeddedItems;
+
+                        });
+                    }
+                }
+
+
+//                //获取实体详情
+//                entity.getDetail("/rest/users/" + $scope.id, ["createdBy", "state", "createdByDepartment", "lastModifiedBy", "department", "role", "workflow"]).then(function (resResult) {
+//
+//                    $scope.profile = resResult;
+//
+//                    //对状态按钮进行分组
+//                    angular.forEach($scope.profile.currentUserCanActList, function (val, key) {
+//                        if (val.actGroup === "UPDATE") {
+//                            $scope.canActs.push(val);
+//                        }
+//                    });
+//
+//                    $scope.state_code = $scope.profile.state.stateCode;
+//
+//                    entity.getDetail($scope.profile.department._links.departmenttype.href, ["roles"]).then(function (typeResResult) {
+//                        //获取部门类型的角色
+//                        $scope.allRoles  = typeResResult.roles._embeddedItems;
+//                        $scope.adoptRole = entity.getSelectedMyOwn($scope.allRoles, $scope.profile.role);
+//                    });
+//
+//
+//                });
+
+
+
+
+
+
+
+                /*
+                 * 用户所有操作的方法集合，其中每一个方法对应实体的一个行为，也有自定义方法
+                 * @author  李斌
+                 * */
+                $scope.userExcute = {
+                    "patch": function (options) {
+                        swal({
+                            title: options.title,
+                            type: options.type,
+                            text: options.text,
+                            showCancelButton: true,
+                            cancelButtonText: "退出",
+                            confirmButtonText: "同意",
+                            closeOnConfirm: true
+                        }, function () {
+                            $http({
+                                method: "PATCH",
+                                url: options.url,
+                                data: options.data
+                            }).success(function (resResult) {
+
+                                if (options.modal) {
+                                    $("#" + options.modal + "_user_modal").modal("hide");
+                                }
+
+                                $rootScope.toasterSuccess("成功！", "操作成功！");
+
+                                $state.go("workflowEntity.list", {
+                                    entity_key: "user",
+                                    workflow_id: $scope.profile.workflow.id
+                                }, {reload: true});
+
+                            });
+                        });
+                    },
+                    "adopt": function () {
+                        $("#adopt_user_modal").modal("show");
+                    },
+                    "roleSelectedSave": function () {
+                        if ($scope.adoptRole !== null) {
+                            $scope.userExcute.patch({
+                                title: "请确认！",
+                                text: "确定给该用户分配" + $scope.adoptRole.label + "角色嘛？",
+                                type: "warning",
+                                modal: "adopt",
+                                url: $scope.profile._links.self.href,
+                                data: {
+                                    act: "adopt",
+                                    role: $scope.adoptRole._links.self.href
+                                }
+                            })
+                        }
+                    },
+                    "selectRole": function (role) {
+                        //自定义的方法在实体行为不存在这个
+                        $scope.adoptRole = role;
+                    },
+                    "update": function () {
+                        $state.go("workflowEntity.home.profile.form", {
+                            id: $scope.id,
+                            entity_key: "user"
+                        }, {reload: false});
+                    }
+                };
+
+            }
+        ]
+    );
+</script>
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light" ng-controller="userHomeController">
+    <!-- column -->
+    <div class="col w-md lter b-l">
+        <div class="h-full" ui-view></div>
+    </div>
+    <!-- /column -->
+</div>
+<!-- /hbox layout -->

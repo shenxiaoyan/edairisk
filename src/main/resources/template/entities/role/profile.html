@@ -1,0 +1,30 @@
+<div class="vbox bg-white">
+    <div class="bg-white b-b clearfix" style="padding:19px 20px">
+        <button class="pull-left btn btn-sm btn-primary btn-addon" ui-sref="auditEntity.list({entity_key:'role'})">
+            <i class="fa fa-arrow-left"></i>
+            返回
+        </button>
+        <ul class="nav nav-pills nav-sm pull-right">
+            <li ui-sref-active="active">
+                <a ui-sref="auditEntity.home.profile.info">主页</a>
+            </li>
+            <!--<li ui-sref-active="active">-->
+            <!--<a ui-sref="auditEntity.home.profile.log({entity_key:'capitalproduct'})">操作记录</a>-->
+            <!--</li>-->
+        </ul>
+    </div>
+    <div class="wrapper b-b b-light clearfix" ng-if="canActs.length > 0">
+        <button ng-class="act.btnClass"
+                ng-click="roleExcute[act.actCode]()"
+                tooltip="{{act.help}}"
+                tooltip-placement="bottom"
+                ng-repeat="act in canActs">
+            <i ng-class="act.iconClass"></i> {{act.label}}
+        </button>
+    </div>
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner" ui-view=""></div>
+        </div>
+    </div>
+</div>

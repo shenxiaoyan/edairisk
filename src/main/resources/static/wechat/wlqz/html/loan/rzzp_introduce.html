@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>快递分拣设备融资租赁</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <link rel="stylesheet" href="../../css/weui.css">
+    <link rel="stylesheet" href="../../css/weui2.css">
+    <style>
+        .btn{
+            width: 100%;
+            height: 40px;
+            background: #ffbd00;
+            display: inline-block;
+            text-align: center;
+            line-height: 40px;
+            color: white;
+            font-size: 16px;
+            position: fixed;
+            bottom: 0px;
+            left: 0;
+        }
+        .btn:active{
+            background: #CCCCCC;
+            color: white;
+        }
+    </style>
+</head>
+<body style="background: #fff; font-size: 14px;">
+<div>
+    <img style="width: auto; height: auto;display:block;max-width: 100%;max-height: 100%;" src="../../images/rzzp_bg.png">
+</div>
+<div style="background: #fff;padding: 20px 15px;">
+    <h3 style="margin-bottom: 20px;">产品介绍</h3>
+    <div>
+        <p style="margin-top: 10px;" class="clearfix">
+            <span style="width:48px;float:left;color:#666; padding-right:20px;background: url('../../images/icon_1.png') no-repeat left center; background-size:13px 13px; padding-left: 20px;">借款人</span>
+            <span style="float: left; width:calc(100% - 95px)">有营业执照的全国快递加盟商</span>
+        </p>
+        <p style="margin-top: 10px;">
+            <span style="color:#666; padding-right:20px;background: url('../../images/icon_1.png') no-repeat left center; background-size:13px 13px; padding-left: 20px;">额&nbsp;&nbsp;&nbsp;&nbsp;度</span>
+            <span>高至5000万</span>
+        </p>
+        <p style="margin-top: 10px;" class="clearfix">
+            <span style="width:48px;float:left;color:#666; padding-right:20px;background: url('../../images/icon_1.png') no-repeat left center; background-size:13px 13px; padding-left: 20px;">期&nbsp;&nbsp;&nbsp;&nbsp;限</span>
+            <span style="float: left; width:calc(100% - 95px)">等额本息24期、36期</span>
+        </p>
+    </div>
+</div>
+<div style="padding: 5px;border-top:1px solid #EBEBEB; background: #fafafa;  border-bottom: 1px solid #EBEBEB;"></div>
+<div style="background: #fff;padding: 20px 15px; margin-top: 10px;">
+    <h3 style="margin-bottom: 20px;">申请条件</h3>
+    <div>
+        <p>
+            <span style="color:#666; padding-right:20px;background: url('../../images/icon_1.png') no-repeat left center; background-size:13px 13px; padding-left: 20px;">经营期限</span>
+            <span style="margin-left: 7px;">1年及以上</span>
+        </p>
+        <p style="margin-top: 10px;" class="clearfix">
+            <span style="width:70px;float:left;color:#666; padding-right:20px;background: url('../../images/icon_1.png') no-repeat left center; background-size:13px 13px; padding-left: 20px;">资格要求</span>
+            <span style="float: left; width:calc(100% - 115px)">申请企业无严重不良记录，且无贷款纠纷</span>
+        </p>
+        <p style="margin-top: 10px;" class="clearfix">
+            <span style="width:70px;float:left;color:#666; padding-right:20px;background: url('../../images/icon_1.png') no-repeat left center; background-size:13px 13px; padding-left: 20px;">借款要求</span>
+            <span style="float: left; width:calc(100% - 115px)">日均票件量10000票及以上</span>
+        </p>
+    </div>
+</div>
+<div style="padding: 0 15px;">
+    <h3>申请流程</h3>
+    <div class="weui-flex" style="margin-top: 10px;">
+        <div class="weui-flex-item"><div class="placeholder" style="background: #e6e6e6; color: #0D0D0D;font-size: 12px;border-radius: 25px;">线上申请</div></div>
+        <div class="weui-flex-item"><div class="placeholder" style="background: #e6e6e6; color: #0D0D0D;font-size: 12px;border-radius: 25px;">上传资料</div></div>
+        <div class="weui-flex-item"><div class="placeholder" style="background: #e6e6e6; color: #0D0D0D;font-size: 12px;border-radius: 25px;">风控审核</div></div>
+        <div class="weui-flex-item"><div class="placeholder" style="background: #e6e6e6; color: #0D0D0D;font-size: 12px;border-radius: 25px;">签约放款</div></div>
+    </div>
+</div>
+<div class="page-bd-15" style="margin: 20px 0 0 0;padding-bottom:20px">
+    <a class="btn" onclick="fn()">立即申请</a>
+</div>
+</body>
+<script src="../../js/config.js"></script>
+<script src="../../js/jquery-3.2.1.js"></script>
+<script>
+    function fn(){
+        var item ={productType:'融资租赁'};
+        item = JSON.stringify(item)
+        localStorage.setItem('productType',item);
+        $.ajax({
+            type: 'GET',
+            url: '/wechat/wlqz/state' ,
+            data: {} ,
+            headers: {
+                app_code:"WULIUQIANZHUANG",
+                client:"wechat"
+            },
+            success:function (res) {
+                var state=res;
+                console.log(state)
+                var uri='http://'+window.config.location+'/wechat/wlqz/html/loan/loanApplication.html';
+                uri=encodeURIComponent(uri);
+                window.location.href='https://open.weixin.qq.com/connect/oauth2/authorize?appid='+window.config.appid+'&redirect_uri='+uri+'&response_type=code&scope=snsapi_base&state='+state+'#wechat_redirect';
+            } ,
+            dataType: 'text'
+        })
+    }
+</script>
+</html>

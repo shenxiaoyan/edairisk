@@ -1,0 +1,406 @@
+<script>
+    "use strict";
+    app.controller("personFormController",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "$state",
+            "entity",
+            function ($rootScope, $scope, $http, $stateParams, $state, entity) {
+
+                $scope.allStates   = null;//所有状态
+                $scope.state       = null;//默认或关联的状态
+                $scope.workflow_id = $stateParams.workflow_id;
+
+                //时间控件开始
+                //控制点击日历图表弹出选择框
+                $scope.open = function ($event) {
+                    $event.preventDefault();
+                    $event.stopPropagation();
+                    $scope.opened = true;
+                };
+
+                //时间控件属性设置 参考http://www.cnblogs.com/pilixiami/p/5611346.html
+                $scope.dateOptions = {
+                    formatYear: "yy",
+                    startingDay: 1,
+                    class: "datepicker"
+                };
+                //时间控件结束
+
+                if ($stateParams.id) {
+
+                    //存储id便于跳转回详情页
+                    $scope.id = $stateParams.id;
+
+                    //load数据
+                    entity.getDetail("rest/persons/" + $stateParams.id, ["state", "workflow"]).then(function (resResult) {
+
+                        $scope.form = resResult;
+
+                        //获取所有部门状态
+                        entity.getList("rest/personStates").then(function (statesResResult) {
+                            $scope.allStates = statesResResult._embeddedItems;
+                            //获取关联的部门状态
+                            $scope.state     = entity.getSelectedMyOwn($scope.allStates, $scope.form.state);
+                        });
+
+                    });
+
+                }
+
+                /*
+                 * 保存自然人
+                 * @author  金杭
+                 * @param   无
+                 * @return  无
+                 * */
+                $scope.savePerson = function () {
+
+                    $scope.form.state    = $scope.state ? $scope.state._links.self.href : null;
+                    $scope.form.workflow = "/rest/personWorkflows/" + $stateParams.workflow_id;
+
+                    //修改时的请求
+                    if ($scope.form._links) {
+
+                        //加入行为code
+                        $scope.form.act = "update";
+
+                        $http({
+                            method: "PATCH",
+                            url: $scope.form._links.self.href,
+                            data: $scope.form
+                        }).success(function (resResult) {
+                            $state.go("workflowEntity.home.profile.info", {
+                                id: resResult.id,
+                                entity_key: "person"
+                            }, {reload: true});
+                            $rootScope.toasterSuccess("修改成功！", "自然人信息修改成功！");
+                        });
+
+                    }
+
+                };
+
+            }
+        ]
+    )
+</script>
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs" ng-controller="personFormController">
+    <!-- column -->
+    <div class="col">
+        <div class="vbox">
+            <div class="wrapper b-b" ng-if="!form._links">
+                <div class="font-thin h4">
+                    <span translate="person.self.label"></span>新建
+                </div>
+            </div>
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner">
+                        <div class="wrapper">
+                            <form name="person_form" class="form-horizontal">
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">
+                                        <span class="text-danger">*</span>
+                                        <span translate="person.name.label"></span>
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="name"
+                                               ng-model="form.name"
+                                               required>
+                                        <span class="help-block text-danger"
+                                              ng-show="person_form.name.$dirty && person_form.name.$invalid">
+                                            <i class="fa fa-exclamation-circle text-danger"></i>&ensp;姓名为必填
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label" translate="person.alias.label"></label>
+                                    <div class="col-sm-8">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="alias"
+                                               ng-model="form.alias">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">
+                                        <span class="text-danger">*</span>
+                                        <span translate="person.telephone.label"></span>
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="telephone"
+                                               ng-model="form.telephone"
+                                               required
+                                               pattern="^(^([0\+]\d{2,3})\d{3,4}\-\d{3,8}$)|(^([0\+]\d{2,3})\d{3,4}\d{3,8}$)|(^([0\+]\d{2,3}){0,1}13\d{9}$)|(^\d{3,4}\d{3,8}$)|(^\d{3,4}\-\d{3,8}$)$">
+                                        <span class="help-block text-danger"
+                                              ng-show="person_form.telephone.$dirty && person_form.telephone.$invalid">
+                                            <i class="fa fa-exclamation-circle text-danger"></i>&ensp;请填写正确格式的手机号码或固定电话，此项必填
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"
+                                           translate="person.maritalStatus.self.label"></label>
+                                    <div class="col-xs-10 m-t-xs">
+                                        <label class="i-checks m-r-sm">
+                                            <input type="radio" value="UNMARRIED" name="personMarital"
+                                                   ng-model="form.maritalStatus">
+                                            <i></i>
+                                            未婚
+                                        </label>
+                                        <label class="i-checks m-r-sm">
+                                            <input type="radio" value="MARRIED" name="personMarital"
+                                                   ng-model="form.maritalStatus">
+                                            <i></i>
+                                            已婚
+                                        </label>
+                                        <label class="i-checks m-r-sm">
+                                            <input type="radio" value="WIDOWED" name="personMarital"
+                                                   ng-model="form.maritalStatus">
+                                            <i></i>
+                                            丧偶
+                                        </label>
+                                        <label class="i-checks m-r-sm">
+                                            <input type="radio" value="DIVORCE" name="personMarital"
+                                                   ng-model="form.maritalStatus">
+                                            <i></i>
+                                            离异
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">
+                                        <span class="text-danger">*</span>
+                                        <span translate="person.identity.label"></span>
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="identity"
+                                               ng-model="form.identity"
+                                               required
+                                               pattern="(^\d{18}$)|(^\d{17}(\d|X|x)$)">
+                                        <span class="help-block text-danger"
+                                              ng-show="person_form.identity.$dirty && person_form.identity.$invalid">
+                                            <i class="fa fa-exclamation-circle text-danger"></i>&ensp;请填写正确的身份证号码，此项目必填
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">
+                                        <span class="text-danger">*</span>
+                                        <span translate="person.birthday.label"></span>
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="birthday"
+                                               placeholder="例如1949-10-01"
+                                               ng-model="form.birthday"
+                                               required
+                                               pattern="^(?:(?!0000)[0-9]{4}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1[0-9]|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[0-9]{2}(?:0[48]|[2468][048]|[13579][26])|(?:0[48]|[2468][048]|[13579][26])00)-02-29)$">
+                                        <span class="help-block text-danger"
+                                              ng-show="person_form.birthday.$dirty && person_form.birthday.$invalid">
+                                            <i class="fa fa-exclamation-circle text-danger"></i>&ensp;生日为必填，请输入正确的格式如1949-10-01
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label" translate="person.education.label"></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" ng-model="form.education" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label" translate="person.qq.label"></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" ng-model="form.qq" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label" translate="person.email.label"></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" ng-model="form.email" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label" translate="person.homeAddress.label"></label>
+                                    <div class="col-sm-8 clearfix">
+                                        <div class="pull-left inline m-r" style="width:calc( 33.3% - 15px );">
+                                            <input type="text" ng-model="form.homeProvince" class="form-control"
+                                                   placeholder="省">
+                                        </div>
+                                        <div class="pull-left inline m-r" style="width:calc( 33.3% - 15px );">
+                                            <input type="text" ng-model="form.homeCity" class="form-control"
+                                                   placeholder="市">
+                                        </div>
+                                        <div class="pull-left inline" style="width:calc( 33.3% );">
+                                            <input type="text" ng-model="form.homeDistrict" class="form-control"
+                                                   placeholder="区">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"></label>
+                                    <div class="col-sm-8 clearfix">
+                                        <div class="pull-left inline m-r" style="width:calc( 50% - 15px );">
+                                            <input type="text" ng-model="form.homeTown" class="form-control"
+                                                   placeholder="镇/县/街道等">
+                                        </div>
+                                        <div class="pull-left inline" style="width:calc( 50% );">
+                                            <input type="text" ng-model="form.homeAddress" class="form-control"
+                                                   placeholder="具体地址">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label" translate="person.letterTo.label"></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" ng-model="form.letterTo" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">
+                                        <span class="text-danger">*</span>
+                                        <span translate="person.creditGrant.label"></span>
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <div class="input-group">
+                                            <input type="text"
+                                                   class="form-control"
+                                                   name="creditGrant"
+                                                   ng-model="form.creditGrant"
+                                                   required
+                                                   pattern="^[0-9]+.?[0-9]*$">
+                                            <span class="input-group-addon">元</span>
+                                        </div>
+                                        <div>
+                                            <span class="help-block text-danger"
+                                                  ng-show="person_form.creditGrant.$dirty && person_form.creditGrant.$invalid">
+                                                <i class="fa fa-exclamation-circle text-danger"></i>&ensp;总授信为数字，且必填
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label" translate="person.jobGrade.label"></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" ng-model="form.jobGrade" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label" translate="person.companyName.label"></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" ng-model="form.companyName" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"
+                                           translate="person.companyTelephone.label"></label>
+                                    <div class="col-sm-8">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="companyTelephone"
+                                               ng-model="form.companyTelephone"
+                                               pattern="^(^([0\+]\d{2,3})\d{3,4}\-\d{3,8}$)|(^([0\+]\d{2,3})\d{3,4}\d{3,8}$)|(^([0\+]\d{2,3}){0,1}13\d{9}$)|(^\d{3,4}\d{3,8}$)|(^\d{3,4}\-\d{3,8}$)$">
+                                        <span class="help-block text-danger"
+                                              ng-show="person_form.companyTelephone.$dirty && person_form.companyTelephone.$invalid">
+                                            <i class="fa fa-exclamation-circle text-danger"></i>&ensp;请填写正确格式的手机号码或固定电话
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"
+                                           translate="person.companyAddress.label"></label>
+                                    <div class="col-sm-8 clearfix">
+                                        <div class="pull-left inline m-r" style="width:calc( 33.3% - 15px);">
+                                            <input type="text" ng-model="form.companyProvince" class="form-control"
+                                                   placeholder="省">
+                                        </div>
+                                        <div class="pull-left inline m-r" style="width:calc( 33.3% - 15px );">
+                                            <input type="text" ng-model="form.companyCity" class="form-control"
+                                                   placeholder="市">
+                                        </div>
+                                        <div class="pull-left inline" style="width:calc( 33.3%);">
+                                            <input type="text" ng-model="form.companyDistrict" class="form-control"
+                                                   placeholder="区">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"></label>
+                                    <div class="col-sm-8 clearfix">
+                                        <div class="pull-left inline m-r" style="width:calc( 50% - 15px );">
+                                            <input type="text" ng-model="form.companyTown" class="form-control"
+                                                   placeholder="镇/县/街道等">
+                                        </div>
+                                        <div class="pull-left inline" style="width:calc( 50% );">
+                                            <input type="text" ng-model="form.companyAddress" class="form-control"
+                                                   placeholder="具体地址">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"
+                                           translate="person.description.label"></label>
+                                    <div class="col-sm-8">
+                                        <textarea class="form-control" cols="30" rows="7"
+                                                  ng-model="form.description"></textarea>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">
+                                        <span class="text-danger">*</span>
+                                        <span translate="person.state.label"></span>
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control"
+                                                name="state"
+                                                ng-model="state"
+                                                ng-options="state.label for state in allStates"
+                                                required></select>
+                                        <span class="help-block text-danger"
+                                              ng-show="person_form.state.$dirty && person_form.state.$invalid">
+                                            <i class="fa fa-exclamation-circle text-danger"></i>&ensp;状态为必填
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-4 col-sm-offset-2">
+                                        <button ng-if="form._links"
+                                                ui-sref="workflowEntity.home.profile.info({id:id,entity_key:'person'})"
+                                                class="btn btn-default">
+                                            返回
+                                        </button>
+                                        <button ng-if="!form._links"
+                                                ui-sref="workflowEntity.list({entity_key:'person',workflow_id:workflow_id})"
+                                                class="btn btn-default">
+                                            返回
+                                        </button>
+                                        <button type="button"
+                                                class="btn btn-primary"
+                                                ng-disabled="person_form.$invalid"
+                                                ng-click="savePerson()">
+                                            保存
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /column -->
+</div>
+<!-- /hbox layout -->

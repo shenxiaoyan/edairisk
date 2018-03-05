@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>贷款申请</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <link rel="stylesheet" href="../../css/weui.css">
+    <link rel="stylesheet" href="../../css/weui2.css">
+    <link rel="stylesheet" href="../../css/jquery.mloading.css">
+      <link rel="stylesheet" href="../../css/animate.css">
+    <link rel="stylesheet" href="../../css/global.css">
+    <link rel="stylesheet" href="../../css/loading.css">
+    <style>
+        .weui_uploader_input_wrp:before{
+            width: 2px;
+            height: 12.5px;
+        }
+        .weui_uploader_input_wrp:after {
+            width: 12.5px;
+            height: 2px;
+        }
+        .weui_uploader_input_wrp {
+            float: left;
+            position: relative;
+            margin-right: 0;
+            margin-bottom: 0;
+            width: 20px;
+            height: 20px;
+            border: 1px #d9d9d9 dashed;
+        }
+        .weui_icon_success:before {
+            font-size: 16px;
+            color: #09bb07;
+        }
+        .weui_cells{
+            font-size: 16px;
+        }
+        .btn{
+  
+            width: 100%;
+            height: 40px;
+            background: #169BD5;
+            display: block;
+            text-align: center;
+            line-height: 40px;
+            color: white;
+            font-size: 16px;
+        }
+        .btn:active{
+            background: #CCCCCC;
+            color: white;
+        }
+       
+    </style>
+    
+</head>
+<script src="https://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+<script src="../../js/config.js"></script>
+<script src="../../js/jquery-3.2.1.js"></script>
+<script src="../../js/zepto.min.js"></script>
+<script src="../../js/picker.js"></script>
+<script src="../../js/picker-city.js"></script>
+<script src="../../js/jquery.mloading.js"></script>
+<script src="../../js/loading.js"></script>
+<body>
+<form id="form">
+    <!--<div class="weui_cells_title">基本信息</div>-->
+    <div class="weui_cells weui_cells_form" style="margin-top: 0;">
+        <div class="weui_cell weui_cell_select weui_select_after">
+            <div class="weui_cell_hd">
+                <label class="weui_label">产品类型</label>
+            </div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <select id="productType" class="weui_select" name="selectn1">
+                    <option value="随借随还">随借随还</option>
+                    <option value="网点贷信用贷">网点贷信用贷</option>
+                    <option value="融资租赁">融资租赁</option>
+                    <option value="网点面单白条">网点面单白条</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="weui_cell weui_cell_select weui_select_after">
+            <div class="weui_cell_hd">
+                <label class="weui_label">借款期限</label>
+            </div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <select id="term" class="weui_select" style="z-index: 0">
+                    <option value="3">3个月内</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="weui_cell weui_vcode">
+            <div class="weui_cell_hd"><label class="weui_label">借款金额</label></div>
+            <div class="weui_cell_bd weui_cell_primary" id="estimateDiv">
+                <input onchange="appOninput()" pattern="^[0-9]*$" id="amount" class="weui_input" type="number" notMatchTips="只能输入纯数字" emptyTips="请输入借款金额" required>
+            </div>
+            <div class="weui_cell_ft">
+                <i class="weui_icon_warn"></i>
+                <a href="javascript:;" class="weui-vcode-btn" style="padding: 0 1.6em 0 1.7em; color: #0D0D0D">元</a>
+            </div>
+        </div>
+    </div>
+    <div class="weui_cells_title">基本信息 <span style="height: 13px;width: 2px; background: #169BD5;display: inline-block;position: relative;top: 1px;"></span></div>
+    <div class="weui_cells weui_cells_form">
+        <div class="weui_cell weui_vcode" id="mdbtCnHide" style="display: none;height: 44px;">
+            <div class="weui_cell_hd"><label class="weui_label">企业名称</label></div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <input id="companyName" class="weui_input" type="text" readonly placeholder="请输入企业名称" emptyTips="请输入企业名称"/>
+            </div>
+            <div class="weui_cell_ft">
+                <i class="weui_icon_warn"></i>
+                <a id="mdbtCnChange" href="javascript:;" class="weui-vcode-btn" style="display: none;padding: 0 1.6em 0 1.7em; color: #000000">修改</a>
+            </div>
+        </div>
+        <div class="weui_cell">
+            <div class="weui_cell_hd"><label class="weui_label" id="nameLabel">申请人姓名</label></div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <input id="name" class="weui_input" type="text" pattern="[\u4E00-\u9FA5\uF900-\uFA2D]" placeholder="请输入姓名" notMatchTips="请输入正确的中文姓名" emptyTips="请输入姓名" required />
+            </div>
+            <div class="weui_cell_ft">
+                <i class="weui_icon_warn"></i>
+            </div>
+        </div>
+        <div class="weui_cell">
+            <div class="weui_cell_hd"><label class="weui_label">手机号码</label></div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <input id="mobile" class="weui_input" type="tel" pattern="^1(3|4|5|7|8)\d{9}$" required maxlength="11" placeholder="输入手机号码" emptyTips="请输入手机号" notMatchTips="请输入正确的手机号">
+            </div>
+            <div class="weui_cell_ft">
+                <i class="weui_icon_warn"></i>
+            </div>
+        </div>
+        <div class="weui_cell">
+            <div class="weui_cell_hd"><label class="weui_label">身份证号码</label></div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <input id="idcar" class="weui_input" type="text" pattern=".{15,18}" placeholder="请输入身份证号码" maxlength="18" emptyTips="请输入身份证号码" notMatchTips="请输入正确的身份证号码" required/>
+            </div>
+            <div class="weui_cell_ft">
+                <i class="weui_icon_warn"></i>
+            </div>
+        </div>
+        <div class="weui_cell">
+            <div class="weui_cell_hd"><label class="weui_label">快递网点名称</label></div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <input id="applyEnterpriseName" class="weui_input" type="text" placeholder="请输入快递网点名称" required emptyTips="请输入快递网点名称"/>
+            </div>
+            <div class="weui_cell_ft">
+                <i class="weui_icon_warn"></i>
+            </div>
+        </div>
+        <div class="weui_cell weui_vcode" id="unitPrice" style="display: none">
+            <div class="weui_cell_hd"><label class="weui_label">面单采购单价</label></div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <input id="mdUnitPrice" class="weui_input" type="number" placeholder="请输入面单采购单价" emptyTips="请输入面单采购单价">
+            </div>
+            <div class="weui_cell_ft">
+                <i class="weui_icon_warn"></i>
+                <a href="javascript:;" class="weui-vcode-btn" style="padding: 0 1.6em 0 1.7em; color: #0D0D0D">元/票</a>
+            </div>
+        </div>
+        <div id="applyDayPickExpressDiv" class="weui_cell">
+            <div class="weui_cell_hd"><label class="weui_label">日均收件量</label></div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <input id="applyDayPickExpress" class="weui_input" type="number" placeholder="请输入日均收件量" emptyTips="请输入日均收件量"/>
+            </div>
+            <div class="weui_cell_ft">
+                <i class="weui_icon_warn"></i>
+            </div>
+        </div>
+        <div id="applyDayPatchExpressDiv" class="weui_cell">
+            <div class="weui_cell_hd"><label class="weui_label">日均派件量</label></div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <input id="applyDayPatchExpress" class="weui_input" type="number" placeholder="请输入日均派件量" emptyTips="请输入日均派件量"/>
+            </div>
+            <div class="weui_cell_ft">
+                <i class="weui_icon_warn"></i>
+            </div>
+        </div>
+        <div class="weui_cell" id='comprehensiveIsHide'>
+            <div class="weui_cell_hd"><label class="weui_label">综合负债</label></div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <input id="comprehensive" class="weui_input" type="number" placeholder="请输入综合负债"  emptyTips="请输入综合负债"/>
+            </div>
+            <div class="weui_cell_ft">
+                <i class="weui_icon_warn"></i>
+            </div>
+        </div>
+        <div class="weui_cell" id='mortgageIsHide'>
+            <div class="weui_cell_hd"><label class="weui_label">抵押类负债</label></div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <input id="mortgage" class="weui_input" type="number" placeholder="请输入抵押类负债"  emptyTips="请输入抵押类负债"/>
+            </div>
+            <div class="weui_cell_ft">
+                <i class="weui_icon_warn"></i>
+            </div>
+        </div>
+        <div class="weui_cell weui_vcode">
+            <div class="weui_cell_hd"><label for="brand" class="weui_label">代理品牌</label></div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <input class="weui_input" type="text" value="" id='brand' placeholder="代理品牌"/>
+            </div>
+            <div class="weui_cell_ft">
+                <i class="weui_icon_warn"></i>
+                <a id="brandChoose" href="javascript:;" class="weui-vcode-btn" style="padding: 0 1.6em 0 1.7em; color: #000">选择</a>
+            </div>
+        </div>
+        <div class="weui_cell">
+            <div class="weui_cell_hd"><label for="applyEnterpriseReigionName" class="weui_label">经营区域</label></div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <input id="applyEnterpriseReigionName" class="weui_input" required type="text" value="" placeholder="请输入经营区域" emptyTips="请输入经营区域"/>
+            </div>
+            <div class="weui_cell_ft">
+                <i class="weui_icon_warn"></i>
+            </div>
+        </div>
+        <div class="weui_cell" id='applyEnterpriseAddressHide'>
+            <div class="weui_cell_hd"><label class="weui_label">办公地址</label></div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <input id="applyEnterpriseAddress" class="weui_input" type="text" placeholder="请输入办公地址" emptyTips="请输入办公地址"/>
+            </div>
+            <div class="weui_cell_ft">
+                <i class="weui_icon_warn"></i>
+            </div>
+        </div>
+        <div class="weui_cell">
+            <div class="weui_cell_hd"><label class="weui_label">推荐人</label></div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <input id="applyReferrerRealName" class="weui_input" type="text" placeholder="请输入推荐人"/>
+            </div>
+        </div>
+    </div>
+    <div class="page-bd-15" style="text-align: center;font-size: 14px;padding: 15px 0">
+        <input id='checked' required type="checkbox"  placeholder="请输入同意金融协议"><span style="color: #169BD5;">我已阅读,并同意</span><a href="userAgreement.html" style=" cursor: pointer;font-size: 12px;">&lt;&lt;信息服务协议&gt;&gt;</a>
+    </div>
+    <a id="formSubmitBtn" class='btn' >立即申请</a>
+</form>
+    
+<script>
+//jsSDK
+var JsUrl =window.location.href;
+$.ajax({
+    type: "get",
+    url: "/wechat/wlqz/getCofigure",
+    data:{'JsUrl':JsUrl},
+    dataType: "json",
+    success: function(res){
+    	console.log(res)
+        wx.config({
+            debug: false,
+            appId:res.appId ,
+            timestamp: res.timestamp,
+            nonceStr: res.nonceStr,
+            signature: res.signature,
+            jsApiList: [
+                'chooseImage',
+                'uploadImage',
+                'previewImage',
+                'getLocation'
+                // 所有要调用的 API 都要加到这个列表中
+            ]
+        });
+        wx.ready(function () {
+      	  wx.getLocation({
+        	    type: 'wgs84', // 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
+        	    success: function (res) {
+        	        var latitude = res.latitude; // 纬度，浮点数，范围为90 ~ -90
+        	        var longitude = res.longitude; // 经度，浮点数，范围为180 ~ -180。
+        	        var speed = res.speed; // 速度，以米/每秒计
+        	        var accuracy = res.accuracy; // 位置精度
+        	        console.log(latitude);
+        	        console.log(longitude);
+        	   			 //设置AJAX的全局默认选项  
+		          	      $.ajaxSetup( {  
+		          	         
+		          	          headers: { // 默认添加请求头  
+		          	        	 app_code:"WULIUQIANZHUANG",
+	          	           		 client:"wechat",
+	          	           		 latitude:latitude,
+        	           			 longitude:longitude
+		          	          }  
+		          	      } ); 
+        	        
+        	    }
+        	});
+      	  
+        	
+
+        });
+        wx.error(function(res){
+
+            // config信息验证失败会执行error函数，如签名过期导致验证失败，具体错误信息可以打开config的debug模式查看，也可以在返回的res参数中查看，对于SPA可以在这里更新签名。
+        });
+
+     
+    }
+})
+
+function loading() {
+	$('body').loading({
+		loadingWidth:120,
+		title:'',
+		name:'test',
+		discription:'',
+		direction:'column',
+		type:'origin',
+		// originBg:'#71EA71',
+		originDivWidth:40,
+		originDivHeight:40,
+		originWidth:6,
+		originHeight:6,
+		smallLoading:false,
+		loadingMaskBg:'rgba(0,0,0,0.2)'
+	});
+
+}
+
+//额度不超过最高的ONINPUT 事件
+function appOninput(){
+    if($('#productType').val() == '随借随还'){
+        if($('#amount').val() > 2000000){
+            $.alert('随借随还借款额度不超过200万')
+            $('#amount').val(' ')
+        }
+    }
+    else if($('#productType').val() == '网点贷信用贷'){
+        if($('#amount').val() > 2000000){
+            $.alert('网点贷信用贷借款额度不超过200万')
+            $('#amount').val(' ')
+        }
+    }else if($('#productType').val() == '网点面单白条'){
+        console.log($('#amount').val())
+        if($('#amount').val() > 30000000){
+            $.alert('网点面单白条借款额度不超过3000万')
+            $('#amount').val(' ')
+        }else if($('#amount').val() < 500000){
+            $.alert('网点面单白条借款额度不小于50万')
+            $('#amount').val(' ')
+        }
+    }
+}
+   $(function () {
+
+        if(window.location.search){
+            var href = window.location.href;
+
+            //从公司页面跳转过来
+            if(href.indexOf('companyid') > 0){
+                var state = href.split('&')[1];
+                state = state.split('=')[1];
+                var code = href.split('?')[1];
+                code = code.split('&')[0];
+                code = code.split('=')[1];
+                var companyid = href.split('&')[2];
+                companyid = companyid.split('=')[1];
+            }else {
+                var state = href.split('&')[1];
+                state = state.split('=')[1];
+                var code = href.split('?')[1];
+                code = code.split('&')[0];
+                code = code.split('=')[1];
+            }
+
+        }
+        
+
+
+        //默认产品和期限
+    if(localStorage.getItem('productType')){
+            var item=JSON.parse(localStorage.getItem('productType'));
+            var a=item.productType;
+
+            var select1 = document.getElementById('productType');
+            for (var i = 0; i < select1.options.length; i++){
+                if (select1.options[i].value == item.productType){
+                    select1.options[i].selected = true;
+                    break;
+                }
+            }
+            if(item.productType == '融资租赁'){
+
+
+            }else{
+                var amount=item.amount;
+                $('#amount').val(amount)
+                var applyDayPickExpress = item.consignee;
+                $('#applyDayPickExpress').val(applyDayPickExpress);
+                var applyDayPatchExpress =item.dayPatch;
+                $('#applyDayPatchExpress').val(applyDayPatchExpress);
+                var applyEnterpriseReigionName = item.area;
+                $('#applyEnterpriseReigionName').val(applyEnterpriseReigionName);
+                $('#brand').val(item.brand);
+                $('#mortgage').val(item.mortgage);
+                $('#comprehensive').val(item.comprehensive);
+                $('#mdUnitPrice').val(item.mdUnitPrice);
+
+                var select2 = document.getElementById('term');
+                for (var i = 0; i < select2.options.length; i++){
+                    if (select2.options[i].value == item.termKey){
+                        select2.options[i].selected = true;
+                        break;
+                    }
+                }
+            }
+
+        if($('#productType').val() == '随借随还'){
+            $('#term').html('<option value="3">3个月内</option>')
+        }else if($('#productType').val() == '网点贷信用贷'){
+            $('#term').html('<option value="3">3个月</option><option value="6">6个月</option><option value="12">12个月</option>')
+        }else if($('#productType').val() == '融资租赁'){
+            $('#term').html('<option value="24">24期</option><option value="36">36期</option>')
+
+        }else if($('#productType').val() == '网点面单白条'){
+            $('#term').html('<option value="3">授信期为一年，3个月循环</option>')
+
+        }else {
+            $('#term').html('<option value="3">授信期为一年，3个月循环</option>')
+        }
+
+
+    }
+   if($('#productType').val() == '随借随还'){
+      $('#comprehensiveIsHide').hide();
+      $('#mortgageIsHide').hide();
+      $('#applyEnterpriseAddressHide').show();
+      $('#nameLabel').text('申请人姓名');
+      $('#mdbtCnHide').hide();
+   }else if($('#productType').val() == '网点贷信用贷'){
+       $('#comprehensiveIsHide').show();
+       $('#mortgageIsHide').show();
+       $('#applyEnterpriseAddressHide').hide();
+       $('#nameLabel').text('申请人姓名');
+       $('#mdbtCnHide').hide();
+   }else if($('#productType').val() == '融资租赁'){
+       $('#applyEnterpriseAddressHide').hide();
+       $('#comprehensiveIsHide').hide();
+       $('#mortgageIsHide').hide();
+       $('#applyDayPickExpressDiv').show();
+       $('#applyDayPatchExpressDiv').show();
+       $('#nameLabel').text('申请人姓名');
+       $('#mdbtCnHide').hide();
+   }else if($('#productType').val() == '网点面单白条'){
+       $('#applyEnterpriseAddressHide').hide();
+       $('#comprehensiveIsHide').hide();
+       $('#mortgageIsHide').hide();
+       $('#applyDayPickExpressDiv').show();
+       $('#applyDayPatchExpressDiv').show();
+       $('#nameLabel').text('实际控制人');
+       $('#mdbtCnHide').show();
+       $('#unitPrice').show();
+   }
+
+
+       $.ajax({
+    	    type: 'GET',
+    	    url: '/wechat/wlqz/callback' ,
+    	    //data: {'code':code} ,
+    	    headers: {
+    	        app_code:"WULIUQIANZHUANG",
+    	        client:"wechat"
+    	    },
+    	    success: function (res) {
+
+    	        if(res.message == 'error'){
+    	        	 //用户没注册
+                  
+            		
+            		$.ajax({
+    	                type: 'GET',
+    	                url: '/wechatLogin' ,
+    	                data: {'code':code,'state':state} ,
+    	                headers: {
+    	                    app_code:"WULIUQIANZHUANG",
+    	                    client:"wechat"
+    	                },
+    	                success: function (res) {
+    	                    if(res.ErrorCode=='155'){
+    	                        //用户没注册
+    	                        var uri='http://'+window.config.location+'/wechat/wlqz/html/login.html';
+                       			uri=encodeURIComponent(uri);
+                        		window.location.href='https://open.weixin.qq.com/connect/oauth2/authorize?appid='+window.config.appid+'&redirect_uri='+uri+'&response_type=code&scope=snsapi_base&state='+state+'#wechat_redirect';
+                                
+                            }else{
+                                window.userid=res.message;
+                                identityLimit(window.userid)
+                                listowm(window.userid);
+                            }
+
+    	                } ,
+    	                dataType: 'json'
+    	            })
+
+    	        }else{
+    	            window.userid=res.message;
+                    identityLimit(window.userid)
+    	            listowm(window.userid);
+    	            
+    	        }
+    	    } ,
+    	    dataType: 'json'
+    	});
+
+        //是否允许修改公司
+       function isAllowChangeCompany() {
+           $.ajax({
+               type: 'get',
+               url: '/rest/companies/search/findByCreateBy?userid='+window.userid,
+               headers: {
+                   "Content-Type":"application/json",
+                   app_code:"WULIUQIANZHUANG",
+                   client:"wechat",
+               },
+               data:{},
+               success: function (res) {
+                   var companyid =res.id
+                   if(res.id){
+                       $.ajax({
+                           type: 'GET',
+                           url: '/user/getCompanyRole?userid='+window.userid,
+                           data: {} ,
+                           headers: {
+                               app_code:"WULIUQIANZHUANG",
+                               client:"wechat"
+                           },
+                           success: function (res) {
+                               console.log(res)
+                               //员工
+                               if(res.data == 'manager'){
+                                   var href = 'companyModify.html?companyId='+companyid
+                                   $('#mdbtCnChange').show();
+                                   $('#mdbtCnChange').attr('href',href)
+                               }
+                           } ,
+                           dataType: 'json'
+                       })
+                   }
+
+               },error:function(res){
+
+                   console.log(res)
+               },
+               dataType: 'json'
+           });
+
+       }
+       //是否是老板
+       function isBoss(id) {
+           $.ajax({
+               type: 'GET',
+               url: '/user/getCompanyRole?userid='+id,
+               data: {} ,
+               headers: {
+                   app_code:"WULIUQIANZHUANG",
+                   client:"wechat"
+               },
+               success: function (res) {
+                  console.log(res)
+                   //员工
+
+                   if(res.data == 'employee'){
+                     
+                      $('#formSubmitBtn').hide();
+                    $.alert('员工不能申请面单白条！')
+                   }
+               } ,
+               dataType: 'json'
+           })
+       }
+
+       //是否有公司
+       function isHaveCompany(userid) {
+           $.ajax({
+               type: 'get',
+               url: '/rest/companies/search/findByCreateBy?userid='+userid,
+               headers: {
+                   "Content-Type":"application/json",
+                   app_code:"WULIUQIANZHUANG",
+                   client:"wechat",
+               },
+               data:{},
+               success: function (res) {
+
+                   if(res.ErrorCode == '500'){
+
+                   }else {
+                       window.companyid =res.id
+                       $('#companyName').val(res.companyName);
+                       $("#mdbtCnHide").unbind(); //存在公司就不能跳转
+                   }
+
+
+               },error:function(res){
+
+                   console.log(res)
+               },
+               dataType: 'json'
+           });
+       }
+
+        function identityLimit(userid) {
+            $.ajax({
+                type: 'GET',
+                url: '/getuserproductinfo' ,
+                data: {
+                    userid:userid
+                } ,
+                headers: {
+                    app_code:"WULIUQIANZHUANG",
+                    client:"wechat"
+                },
+                success: function (res) {
+                    console.log(res)
+                    var resData =res.data;
+                    var arr=[];
+                    arr.push(resData.sjsh);
+                    arr.push(resData.wdxyd);
+                    arr.push(resData.rzzl);
+                    arr.push(resData.mdbt);
+
+                    //判断是否申请过，有就限制身份证
+                    var isAdopt =false;
+                    $.each(arr,function (key,val) {
+                        if(val.state !== 'CREATED' && val.state !== 'DENIED' && val.state !== null){
+                             isAdopt =true;
+                             console.log(val)
+                        }
+                    })
+
+                    console.log(isAdopt)
+                    $.each(arr,function (key,val) {
+                        if(val.apply){
+                            if(  ( val.state == 'CREATED' || val.state == 'DENIED' ) && isAdopt == false ){
+                                $.alert('您尚有产品在审核中!');
+                                $('#formSubmitBtn').hide();
+                            }else {
+                                $.ajax({
+                                    type: 'GET',
+                                    url: '/rest/users/'+userid+'/person' ,
+                                    data: {} ,
+                                    headers: {
+                                        app_code:"WULIUQIANZHUANG",
+                                        client:"wechat"
+                                    },
+                                    success: function (res) {
+                                        $('#idcar').val(res.identity).attr('disabled',true)
+                                        $('#name').val(res.name).attr('disabled',true)
+                                    } ,
+                                    dataType: 'json'
+                                })
+                            }
+                        }
+                    })
+
+                } ,
+                dataType: 'json'
+            })
+
+        }
+
+       
+		//判断是否申请  申请了跳到不同页面
+       function listowm(userid){
+    	   var productType = $('#productType').val();
+           if(productType == '随借随还'){
+        	   $.ajax({
+                   type: 'get',
+                   url: '/rest/orderwdsjshes/search/listOwn',
+                   headers: {
+                	   "Content-Type":"application/json",
+                       app_code:"WULIUQIANZHUANG",
+                       client:"wechat",
+                   },
+                   data:{},
+                   success: function (res) {
+                	    window.existence =res._embedded.orderwdsjshes;
+
+                	   if(window.existence.length > 0){
+                		   var id= res._embedded.orderwdsjshes[0].id;
+                		//$.alert('您已申请过随借随还，或授信还在审核中！');
+                		$.ajax({
+                            type: 'get',
+                            url: '/rest/orderwdsjshes/'+id+'/state',
+                            headers: {
+                         	   "Content-Type":"application/json",
+                                app_code:"WULIUQIANZHUANG",
+                                client:"wechat",
+                            },
+                            data:{},
+                            success: function (res) {
+                         	   var stateCode = res.stateCode;
+                         	  console.log(res)
+                         	  if(stateCode == 'CREATED' ||stateCode == 'DENIED' ||stateCode == 'ADOPT' ||stateCode == 'NOTPASS'||stateCode == 'SIGNED'){
+                         		  window.location.href='../my/myProfileLogin.html'
+                         	  } else if(stateCode == 'ENABLED'){
+                         		 window.location.href='../account/myLoanLogin.html'
+                         	  }
+
+                            },error:function(res){
+                         	   console.log(res)
+                            },
+                            dataType: 'json'
+                        });
+
+
+                	   }
+                	  console.log(res)
+
+                   },error:function(res){
+                	   console.log(res)
+                   },
+                   dataType: 'json'
+               });
+        	   
+           }else if(productType == '网点贷信用贷'){
+               $.ajax({
+                   type: 'get',
+                   url: '/rest/orderwdxyds/search/listOwn',
+                   headers: {
+                       "Content-Type":"application/json",
+                       app_code:"WULIUQIANZHUANG",
+                       client:"wechat",
+                   },
+                   data:{},
+                   success: function (res) {
+                       window.existence =res._embedded.orderwdxyds;
+
+                       if(window.existence.length > 0){
+                           var id= res._embedded.orderwdxyds[0].id;
+                           //$.alert('您已申请过随借随还，或授信还在审核中！');
+                           window.location.href='../my/myProfileLogin.html'
+                       }
+                       console.log(res)
+
+                   },error:function(res){
+                       console.log(res)
+                   },
+                   dataType: 'json'
+               });
+           }else if(productType == '融资租赁'){
+               $.ajax({
+                   type: 'get',
+                   url: '/rest/orderrzzls/search/listOwn',
+                   headers: {
+                       "Content-Type":"application/json",
+                       app_code:"WULIUQIANZHUANG",
+                       client:"wechat",
+                   },
+                   data:{},
+                   success: function (res) {
+                       window.existence =res._embedded.orderrzzls;
+
+                       if(window.existence.length > 0){
+                           //var id= res._embedded.orderwdxyds[0].id;
+                           //$.alert('您已申请过随借随还，或授信还在审核中！');
+                           window.location.href='../my/myProfileLogin.html'
+                       }
+                       console.log(res)
+
+                   },error:function(res){
+                       console.log(res)
+                   },
+                   dataType: 'json'
+               });
+           }else if(productType == '网点面单白条'){
+               isBoss(userid);
+               isHaveCompany(userid);
+               isAllowChangeCompany();
+               $.ajax({
+                   type: 'get',
+                   url: '/rest/ordermdbts/search/listOwn',
+                   headers: {
+                       "Content-Type":"application/json",
+                       app_code:"WULIUQIANZHUANG",
+                       client:"wechat",
+                   },
+                   data:{},
+                   success: function (res) {
+                       var res =res._embedded.ordermdbts;
+
+                       if(res.length > 0){
+                           alert('您已经申请过面单白条!')
+                        $('#formSubmitBtn').hide();
+                       }
+                       console.log(res)
+
+                   },error:function(res){
+                       console.log(res)
+                   },
+                   dataType: 'json'
+               });
+
+           }else{
+              
+        	   
+           }
+           
+    
+       }
+       
+		
+       //身份证号最后一位X大写
+       $('#idcar').change(function(){
+    	   var val =$('#idcar').val();
+    	   var idcar =val.toUpperCase();
+    	   $('#idcar').val(idcar)
+    	});
+       
+		//根据不同产品改变不同期限
+       $('#productType').change(function () {
+           if($('#productType').val() == '随借随还'){
+               $('#term').html('<option value="3">3个月内</option>');
+
+               $('#applyEnterpriseAddressHide').show();
+               $('#comprehensiveIsHide').hide();
+               $('#mortgageIsHide').hide();
+               $('#applyDayPickExpressDiv').show();
+               $('#applyDayPatchExpressDiv').show();
+               $('#nameLabel').text('申请人姓名');
+               $('#mdbtCnHide').hide();
+               $('#unitPrice').hide();
+           }else if($('#productType').val() == '网点贷信用贷'){
+               $('#term').html('<option value="3">3个月</option><option value="6">6个月</option><option value="12">12个月</option>')
+
+               $('#applyEnterpriseAddressHide').hide();
+               $('#comprehensiveIsHide').show();
+               $('#mortgageIsHide').show();
+               $('#applyDayPickExpressDiv').show();
+               $('#applyDayPatchExpressDiv').show();
+               $('#nameLabel').text('申请人姓名');
+               $('#mdbtCnHide').hide();
+               $('#unitPrice').hide();
+           }else if($('#productType').val() == '融资租赁'){
+               $('#term').html('<option value="24">24期</option><option value="36">36期</option>')
+               $('#applyEnterpriseAddressHide').hide();
+               $('#comprehensiveIsHide').hide();
+               $('#mortgageIsHide').hide();
+               $('#applyDayPickExpressDiv').show();
+               $('#applyDayPatchExpressDiv').show();
+               $('#nameLabel').text('申请人姓名');
+               $('#mdbtCnHide').hide();
+               $('#unitPrice').hide();
+           }else if($('#productType').val() == '网点面单白条'){
+               $('#term').html('<option value="3">授信期为一年，3个月循环</option>')
+               $('#applyEnterpriseAddressHide').hide();
+               $('#comprehensiveIsHide').hide();
+               $('#mortgageIsHide').hide();
+               $('#applyDayPickExpressDiv').show();
+               $('#applyDayPatchExpressDiv').show();
+               $('#nameLabel').text('实际控制人');
+               $('#mdbtCnHide').show();
+               $('#unitPrice').show();
+               isHaveCompany(window.userid);
+               isBoss(window.userid);
+               isAllowChangeCompany();
+           }else {
+               $('#term').html('<option value="3">3个月</option>')
+			    $('#term').attr('disabled','disabled')
+
+           }
+       });
+       $("#applyEnterpriseReigionName").cityPicker({
+           title: "选择经营区域",
+       });
+       $("#brandChoose").picker({
+           title: "代理品牌",
+           toolbarCloseText:'确定',
+           cols: [
+               {
+                   textAlign: 'center',
+                   values: ['中通快递','圆通快递','申通快递','百世快递','韵达快递','天天快递','龙邦快递','优速快递','速尔快递','其他'],
+                   displayValues:['中通快递','圆通快递','申通快递','百世快递','韵达快递','天天快递','龙邦快递','优速快递','速尔快递','其他'],
+               }
+           ],
+           onChange:function (e) {
+               console.log(e.value[0])
+               $('#brand').val(e.value[0])
+           }
+       });
+       $("#applyEnterpriseReigionName").change(function () {
+           var val = $("#applyEnterpriseReigionName").val()
+           if(val.indexOf("无") > 0 ){
+
+               var str =$("#applyEnterpriseReigionName").val();
+               var str2 = str.replace(/无/,' ');
+               $("#applyEnterpriseReigionName").val(str2);
+           }
+
+           // 验证选择不消失
+            //console.log($('#applyEnterpriseAddress').parent().parent())
+           $('#applyEnterpriseReigionName').parent().parent().removeClass('weui_cell_warn');
+       })
+
+       // 验证选择不消失
+       $("#brand").change(function () {
+           $('#brand').parent().parent().removeClass('weui_cell_warn');
+       })
+//       $('#toSeccess').click(function () {
+//           window.location.href='LoanAppSuccess.html';
+//       })
+
+
+       //跳转到企业补全资料
+       $('#mdbtCnHide').click(function () {
+           window.location.href="company.html?code="+code+"&state="+state+"&userid="+window.userid;
+       })
+
+       var $form = $("#form");
+       $form.form();
+       $("#formSubmitBtn").on("click", function(){
+           $form.validate(function(error){
+               if(error){
+            	   
+               }else{
+
+            	   if($('#checked').is(':checked')) {
+
+            	            if($('#amount').val() <= 0){
+            	                alert('申请额度应该大于0')
+                            }else{
+
+                                $('html, body').animate({scrollTop:0}, 1);
+                                loading();
+
+                                var applyAmount = $('#amount').val(); //申请金额
+                                var applyPeriodNumber=$('#term').val(); //申请借款周期
+                                var realName = $('#name').val(); //申请人姓名
+                                var applyMobile =$('#mobile').val(); //申请人手机号
+                                var applyIdentityNo =$('#idcar').val(); //申请人身份证
+                                var applyEnterpriseName =$('#applyEnterpriseName').val(); //快递网点名称
+                                var applyEnterpriseReigionName =$('#applyEnterpriseReigionName').val(); //快递网点经营区域
+                                var applyEnterpriseReigionNameAll = $('#applyEnterpriseReigionName').val().split(' ');
+                                var apply_enterprise_province =applyEnterpriseReigionNameAll[0];
+                                var apply_enterprise_city= applyEnterpriseReigionNameAll[1];
+                                var apply_enterprise_district= applyEnterpriseReigionNameAll[2];
+                                //var apply_enterprise_town= $('#applyEnterpriseAddress').val();
+                                var applyEnterpriseAddress =$('#applyEnterpriseAddress').val(); //快递网点经营地址
+                                var applyReferrerRealName=$('#applyReferrerRealName').val(); //推荐人
+                                var applyDayPickExpress = $('#applyDayPickExpress').val();  //日均收件量
+                                var applyDayPatchExpress= $('#applyDayPatchExpress').val(); //日均派件量
+                                var agentBrand=$('#brand').val();
+                                var applyPurchasePrice =$('#mdUnitPrice').val(); //面单费
+
+                                var productType = $('#productType').val();
+                                if(productType == '随借随还'){
+                                    var url ='/rest/orderwdsjshes';
+                                    var products='/rest/products/1'
+                                    var data={
+                                        createdByDepartment:'/rest/departments/2',
+                                        product:products,
+                                        applyAmount:applyAmount,
+                                        applyPeriodNumber:applyPeriodNumber,
+                                        realName:realName,
+                                        applyMobile:applyMobile,
+                                        applyIdentityNo:applyIdentityNo,
+                                        applyEnterpriseReigionName:applyEnterpriseReigionName,
+                                        applyEnterpriseProvince:apply_enterprise_province,
+                                        applyEnterpriseCity:apply_enterprise_city,
+                                        applyEnterpriseDistrict:apply_enterprise_district,
+                                        applyEnterpriseAddress:applyEnterpriseAddress,
+                                        applyEnterpriseName:applyEnterpriseName,
+                                        applyReferrerRealName:applyReferrerRealName,
+                                        applyDayPickExpress:applyDayPickExpress,
+                                        applyDayPatchExpress:applyDayPatchExpress,
+                                        agentBrand:agentBrand
+
+                                    };
+                                }else if(productType == '网点贷信用贷'){
+                                    var url ='/rest/orderwdxyds';
+                                    var products='/rest/products/2';
+
+                                    var comfirmComprehensiveLiabilities =$('#comprehensive').val();
+                                    var comfirmMortgageLiabilities = $('#mortgage').val();
+
+                                    var data={
+                                        act:'create',
+                                        comfirmComprehensiveLiabilities:comfirmComprehensiveLiabilities,
+                                        comfirmMortgageLiabilities:comfirmMortgageLiabilities,
+                                        createdByDepartment:'/rest/departments/2',
+                                        product:products,
+                                        applyAmount:applyAmount,
+                                        applyPeriodNumber:applyPeriodNumber,
+                                        realName:realName,
+                                        applyMobile:applyMobile,
+                                        applyIdentityNo:applyIdentityNo,
+                                        applyEnterpriseReigionName:applyEnterpriseReigionName,
+                                        applyEnterpriseProvince:apply_enterprise_province,
+                                        applyEnterpriseCity:apply_enterprise_city,
+                                        applyEnterpriseDistrict:apply_enterprise_district,
+                                        applyEnterpriseAddress:applyEnterpriseAddress,
+                                        applyEnterpriseName:applyEnterpriseName,
+                                        applyReferrerRealName:applyReferrerRealName,
+                                        applyDayPickExpress:applyDayPickExpress,
+                                        applyDayPatchExpress:applyDayPatchExpress,
+                                        agentBrand:agentBrand
+
+                                    };
+                                }else if(productType == '融资租赁'){
+                                    var url ='/rest/orderrzzls';
+                                    var products='/rest/products/3';
+
+                                    var data={
+                                        act:'create',
+                                        createdByDepartment:'/rest/departments/2',
+                                        product:products,
+                                        applyAmount:applyAmount,
+                                        applyPeriodNumber:applyPeriodNumber,
+                                        realName:realName,
+                                        applyMobile:applyMobile,
+                                        applyIdentityNo:applyIdentityNo,
+                                        applyEnterpriseProvince:apply_enterprise_province,
+                                        applyEnterpriseCity:apply_enterprise_city,
+                                        applyEnterpriseDistrict:apply_enterprise_district,
+                                        applyEnterpriseAddress:applyEnterpriseAddress,
+                                        applyEnterpriseName:applyEnterpriseName,
+                                        applyReferrerRealName:applyReferrerRealName,
+                                        applyDayPickExpress:applyDayPickExpress,
+                                        applyDayPatchExpress:applyDayPatchExpress,
+                                        applyEnterpriseReigionName:applyEnterpriseReigionName,
+                                        agentBrand:agentBrand
+                                    };
+                                }else if(productType == '网点面单白条'){
+                                    var url ='/rest/ordermdbts';
+                                    var products='/rest/products/4';
+
+                                    var data={
+                                        act:'create',
+                                        createdByDepartment:'/rest/departments/2',
+                                        product:products,
+                                        applyAmount:applyAmount,
+                                        applyPeriodNumber:applyPeriodNumber,
+                                        realName:realName,
+                                        applyMobile:applyMobile,
+                                        applyIdentityNo:applyIdentityNo,
+                                        applyEnterpriseProvince:apply_enterprise_province,
+                                        applyEnterpriseCity:apply_enterprise_city,
+                                        applyEnterpriseDistrict:apply_enterprise_district,
+                                        applyEnterpriseName:applyEnterpriseName,
+                                        applyReferrerRealName:applyReferrerRealName,
+                                        applyDayPickExpress:applyDayPickExpress,
+                                        applyDayPatchExpress:applyDayPatchExpress,
+                                        agentBrand:agentBrand,
+                                        applyEnterpriseReigionName:applyEnterpriseReigionName,
+                                        applyPurchasePrice:applyPurchasePrice,
+                                        company:'/rest/company/'+window.companyid
+                                    };
+                                }else {
+                                    var products='/rest/products/3'
+                                }
+
+
+                                var upDate=JSON.stringify(data);
+                                $.ajax({
+                                    type: 'post',
+                                    url: url,
+                                    headers: {
+                                        "Content-Type":"application/json",
+                                        app_code:"WULIUQIANZHUANG",
+                                        client:"wechat",
+                                        imei:window.unionid
+                                    },
+                                    data:upDate,
+                                    success: function (res) {
+                                        removeLoading('test');
+                                        if(res.ActionStatus == 'FAIL'){
+                                            alert(res.ErrorInfo)
+                                        }else{
+                                            window.location.href='LoanAppSuccess.html';
+                                        }
+
+                                    },error:function(res){
+                                        removeLoading('test');
+                                        console.log(res)
+                                        alert(res.responseJSON.message)
+                                        //alert(JSON.stringify(res))
+                                    },
+                                    dataType: 'json'
+                                });
+                            }
+
+					}else{
+						$.alert('请阅读并同意金融协议');
+					}
+            	
+                   
+               }
+           });
+
+       });
+   })
+</script>
+</body>
+</html>

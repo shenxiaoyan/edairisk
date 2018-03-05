@@ -1,0 +1,56 @@
+<script>
+    "use strict";
+    app.controller("companyHomeController",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "$state",
+            "entity",
+            function ($rootScope, $scope, $http, $stateParams, $state, entity) {
+
+                $scope.id = $stateParams.id;
+
+                $scope.profile     = {};
+                $scope.canActs     = [];
+                $scope.canFileActs = [];
+                $scope.userListUrl = "/rest/users/search/findAllByDepartment_Id?sort=id&size=20&departmentId=" + $scope.id;
+
+                /*
+                 * 获取实体详情
+                 * @author  金杭
+                 * */
+                entity.getDetail("/rest/companies/"+$scope.id).then(function (resResult) {
+                    $scope.info =resResult
+
+                    entity.getDetail("/user/getCompanyUsers?companyId=" + $scope.id).then(function (resResult) {
+                        console.log(resResult)
+                        $scope.companyUsers =resResult.data
+                    });
+
+                });
+
+                /*大方法的对象*/
+                $scope.departmentExcute = {
+                    "update": function () {
+                        $state.go("auditEntity.home.profile.form", {
+                            id: $scope.id,
+                            entity_key: "department"
+                        }, {reload: false});
+                    }
+                };
+
+            }
+        ]
+    );
+</script>
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light" ng-controller="companyHomeController">
+    <!-- column -->
+    <div class="col w-md lter b-l">
+        <div class="h-full" ui-view></div>
+    </div>
+    <!-- /column -->
+</div>
+<!-- /hbox layout -->

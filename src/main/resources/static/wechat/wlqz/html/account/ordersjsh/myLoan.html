@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../../../css/weui.css">
+    <link rel="stylesheet" href="../../../css/weui2.css">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <title>随借随还</title>
+    <link rel="stylesheet" href="../../../css/jquery.circliful.css">
+    <link rel="stylesheet" href="../../../css/icon.css">
+    <style>
+        .weui_tab_nav .weui_nav_red.bg_red {
+            border-color: #169BD5;!important;
+            color: #fff;
+            background: #169BD5;!important;
+        }
+        .weui_navbar_item{
+
+        }
+        .weui_navbar_item.tab-green{
+            background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
+            border-bottom: 3px solid #169BD5;
+            color: #169BD5;
+        }
+        .weui_tab_nav .weui_nav_red {
+            display: block;
+            -webkit-box-flex: 1;
+            -webkit-flex: 1;
+            flex: 1;
+            width: 100%;
+            height: 30px;
+            padding: 0;
+            font-size: 14px;
+            line-height: 31px;
+            text-align: center;
+            border: 1px solid #169BD5;
+            border-width: 1px 1px 1px 0;
+            color: #ef4f4f;
+            white-space: nowrap;
+            background: #fdfdfd;
+        }
+        .weui_tab_nav .weui_nav_red{
+            color: #169BD5;!important;
+        }
+        .weui_navbar{
+            background: #fff;
+        }
+        .btn{
+            width: 100%;
+            height: 40px;
+            background: #169BD5;
+            border-radius: 20px;
+            display: inline-block;
+            text-align: center;
+            line-height: 40px;
+            color: white;
+            font-size: 16px;
+        }
+        .btn:active{
+            background: #CCCCCC;
+            color: white;
+        }
+        .now_card{
+            display: block;
+            background: #fff;
+            margin-top: 15px;
+            border: 1px solid #e6e5e5;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+        a:link{
+            color: #0D0D0D;
+        }
+        a:active{
+            color: #0D0D0D;
+        }
+        a{
+            color: #0D0D0D;
+        }
+        .now_card span{
+            margin-left: 5px;
+        }
+        .now_card > div{
+            padding: 10px 15px;
+        }
+        .now_card_title_whk{
+            padding: 0 12px;
+            background: #169BD5;
+            color: white;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-top: 1px;
+        }
+        .now_card_title_wjq{
+            padding: 0 12px;
+            background: #14c7a7;
+            color: white;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-top: 1px;
+        }
+        .now_card_title_yq{
+            padding: 0 12px;
+            background: #f96c70;
+            color: white;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-top: 1px;
+        }
+        .now_card_title_yjq{
+            padding: 0 12px;
+            background: #ccc;
+            color: white;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-top: 1px;
+        }
+        .now_card_content{
+            border-top: 1px solid #e6e5e5;
+            padding: 15px;
+        }
+        .margin-top-5{
+            margin-top: 5px;
+        }
+        .text-linear{
+            color: #f35626;
+            background-image: -webkit-linear-gradient(92deg,#f35626,#feab3a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            -webkit-animation: hue 60s infinite linear;
+        }
+        .loanBtn{
+            display: inline-block;
+            flex: 1;
+            background: linear-gradient(to right, #12DAF9 , #009BEC);
+            text-align: center;
+            color: #fff;
+            font-size: 20px;
+            line-height: 50px;
+            color: #fff;
+        }
+        .loanBtn:active{
+            background: #ccc;
+            color: #fff;
+        }
+        .loanBtn:link{
+            color: #fff;
+        }
+    </style>
+
+
+</head>
+<body style="background: #f5f5f5;">
+<div id="accountNull" style="height: 100%;width: 100%;background: #fff;display:none;">
+    <div style="background: #fff;width: calc(100% - 30px); height: 44px;padding: 0 15px;border-bottom: 1px solid #e6e6e6;" class="clearfix">
+        <div style="float: left">
+            <i class="icon icon-109 f-black" style="font-size: 25px; line-height: 44px;"></i>
+        </div>
+        <div style="float: left;width: calc(100% - 130px); padding: 0 50px; height: 44px;text-align: center;line-height: 44px;font-weight: bolder">
+            随借随还
+        </div>
+    </div>
+    <div class="page-bd-15">
+        <div style="margin: 50px auto 30px;width: 111px;">
+            <img src="../../../images/null_con.png">
+        </div>
+        <p style="text-align: center;color: #666">您尚未申请产品授信额度，当前账户为空</p>
+        <p style="text-align: center;color: #666">请先申请产品授信额度~</p>
+        <a href="../../loan/appli.html" class="btn" style="margin-top: 30px;color:#fff">立即申请</a>
+    </div>
+</div>
+<div id="adopt" style="display: none;padding-top: 64px;">
+    <div id="sjsh">
+    	<div style="background: #fff; position: fixed;width: 100%;top: 0;">
+        <div class="weui_tab " style="height:44px;" id="tab1"><!--tab-fixed添加顶部-->
+            <div class="weui_navbar" style="height:44px;">
+                <div id="btn1" class="weui_navbar_item">
+                    额度管理
+                </div>
+                <div id="btn2" class="weui_navbar_item">
+                    借款历史
+                </div>
+                <div id="btn3" class="weui_navbar_item">
+                    还款历史
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="sjsh_1">
+
+
+        <div class="page-bd-15">
+            <div style="width: calc(100% - 30px); height:181px;border-radius: 5px;position: absolute; background: linear-gradient(to bottom right, #12DAF9 ,#00afec, #009BEC);overflow: hidden;box-shadow: 0 12px 24px 0 rgba(7,17,27,.2)">
+
+                <p style="color: #fff;text-align: center;margin-top: 30px;font-size: 12px;">总可用额度</p>
+                <p id="sjshAvailableCredit" style="font-weight: bolder;color: #fff;font-size: 27px;text-align: center"></p>
+                <p style="color: rgba(255,255,255,1);font-size: 17px;text-align: center">剩余额度 <span id="sjshSurplus" style="margin-left: 5px"></span></p>
+                <div class="clearfix" style="margin-top: 30px;padding: 0 15px;">
+                    <div class="left" style="font-size:12px;color: rgba(255,255,255,1)">已用额度 <span id="sjshUsed" style="margin-left: 5px;font-size: 12px;"></span></div>
+                    <div class="right" style="font-size: 12px;color: rgba(255,255,255,1)">有效期<span style="font-size: 12px;margin-left: 5px;" id="sjshCreatedAt"></span></div>
+                </div>
+                <div style="position:absolute;top:0;width: 55px;height: 55px;border-bottom-right-radius:100%;background: linear-gradient(to bottom right, #D2AB41 , #EDDA8C)"></div>
+                <p style="position:absolute;top:15px;font-size: 12px;color: #ffffff;transform: rotate(-50deg)">随借随还</p>
+                <a id="toRepayment" style="display: inline-block;position: absolute;top:20px;right:0;width: 68px;height: 35px;background: rgba(0,0,0,0.3);border-radius :20px 0 0 20px;line-height: 35px;color: #fff;text-align: right;padding-right:8px;font-size: 12px;">我要还款</a>
+                <div style="position: absolute;width: 90%;height: 1px;background: rgba(255,255,255,0.3);top:130px;left: 5%;"></div>
+                <div style="position: absolute;width: 1px;height: 21px;background: rgba(255,255,255,0.3);top:147px;left: 50%;"></div>
+            </div>
+        </div>
+        <div style="position: absolute;bottom: 0;height: 50px;display: flex;width: 100%">
+            <div style="flex: 1;background: #fff;padding: 0 10px;">
+                <div>
+                    <span id="sjshSurplus2" style="font-weight: bold;font-size: 22px;color: #eb6a17"></span><span style="color: #000;font-size: 14px;">元</span>
+                </div>
+                <div style="color: #999;font-size: 12px;margin-top: -5px;">剩余额度</div>
+            </div>
+            <a id="borrowMoney" class="loanBtn">立即借款</a>
+        </div>
+    </div>
+    <div id="sjsh_2" style="display: none;padding: 0 15px 15px 15px; background: #f5f5f5;">
+        <!-- <div style="padding: 15px; background: linear-gradient(to left,#ffbd1c,#ffd740);border-radius: 10px;color: white;font-size: 14px;">
+            <div class="clearfix"><p style="float: left">本月应还月息</p><p style="float: right">20000.00元</p></div>
+            <div class="clearfix" style="margin-top: 10px;"><p style="float: left">本月月息还款时间</p><p style="float: right">2017/9/10</p></div>
+        </div> -->
+        
+    </div>
+    <div id="sjsh_3" style="padding: 0 15px 15px 15px;display: none">
+       
+    </div>
+    
+    </div>
+    
+</div>
+</body>
+<script src="../../../js/jquery-3.2.1.js"></script>
+<script src="../../../js/zepto.min.js"></script>
+<script src="../../../js/jquery.circliful.min.js"></script>
+<script src="../../../js/config.js"></script>
+<script>
+    if(window.location.search){
+        var href = window.location.href;
+        window.userId = href.split('?')[1];
+        window.userId = href.split('&')[1];
+        window.userId = window.userId.split('=')[1];
+        window.cardId = href.split('&')[0];
+        window.cardId =  window.cardId.split('=')[1];
+    }
+    creditcards();
+
+
+    //是否是异常用户
+    function isAbnormal(mobile) {
+        $.ajax({
+            type: 'GET',
+            url:'/rest/users/'+window.userId+'/person',
+            data: {} ,
+            headers: {
+                app_code:"WULIUQIANZHUANG",
+                client:"wechat"
+            },
+            success: function (res) {
+                //如果是异常用户
+               if(res.accountStatus == 'ABNORMAL'){
+                   var href ='abnormalLoanApply.html?mobile='+mobile+'&personid='+res.id;
+                   $('#borrowMoney').attr('href',href);
+               }
+            } ,
+            dataType: 'json'
+        });
+    }
+//渲染随借随还   借款历史
+function loanBorrowing(id){
+	
+	$.ajax({
+        type: 'GET',
+        url:'/rest/creditcards/'+id+'/loans',
+        //data: {'code':code} ,
+        headers: {
+            app_code:"WULIUQIANZHUANG",
+            client:"wechat"
+        },
+        success: function (res) {
+            console.log(res._embedded.loans)
+            if(res._embedded.loans.length !== 0){
+            	var dataArr = res._embedded.loans;
+            	var newArr =dataArr.sort(sortId)
+                function sortId(a,b){
+                    return a.id-b.id
+                }
+
+                var newArr2 = newArr.reverse()
+                $.each(newArr2,function (key,val) {
+       	                  var principal = (val.principal).toFixed(2) + '元';
+       	                  var createdAt = (val.createdAt).split('T')[0];
+       	               var json = JSON.parse(val.information); 
+    	                  //console.log(json)
+    	                   var bh = (json.id).slice(0,15) + '...';
+                           var loanStartDateStr = json.loanStartDate;
+                           var loanStartDate = loanStartDateStr.substring(0,4)+'-'+loanStartDateStr.substring(4,6)+'-'+loanStartDateStr.substring(6,8)
+                           var loanEndDateStr = json.loanEndDate;
+                           var loanEndDate = loanEndDateStr.substring(0,4)+'-'+loanEndDateStr.substring(4,6)+'-'+loanEndDateStr.substring(6,8)
+      	                   var str = '<a class="now_card" href="myloadInfo.html?'+val.id+'"> <div class="clearfix"> <p class="left" style="font-size:14px">借款编号:'+bh+'</p> <p class="right now_card_title_whk">已借款</p> </div> <div class="now_card_content"> <div class="clearfix"> <p style="float: left;color: #a3a3a3;">借款金额</p> <p style="float: right">'+principal+'</p> </div> <div class="clearfix margin-top-5"> <p style="float: left;color: #a3a3a3;">借款时间</p> <p style="float: right">'+loanStartDate+'</p> </div> <div class="clearfix margin-top-5"> <p style="float: left;color: #a3a3a3;">还款时间</p> <p style="float: right">'+loanEndDate+'</p> </div> </div></a>'
+      	                   //var str = '<a class="now_card" href="https://appserv.beidoujinfu.com/bdjf/html5/repayment.html?mobile='+json.mobile+'&zcCode=1004"> <div class="clearfix"> <p class="left" style="font-size:14px">借款编号:'+bh+'</p> <p class="right now_card_title_whk">已借款</p> </div> <div class="now_card_content"> <div class="clearfix"> <p style="float: left;color: #a3a3a3;">借款金额</p> <p style="float: right">'+amount+'</p> </div> <div class="clearfix margin-top-5"> <p style="float: left;color: #a3a3a3;">借款时间</p> <p style="float: right">'+json.loanStartDate+'</p> </div> <div class="clearfix margin-top-5"> <p style="float: left;color: #a3a3a3;">还款时间</p> <p style="float: right">'+json.loanEndDate+'</p> </div> </div></a>'
+       	                  $('#sjsh_2').append(str);
+       	        })
+       	        
+            }else{
+            	  var str='<div class="page-bd-15"><div style="margin: 50px auto 30px;width: 111px;"> <img src="../../../images/null_con.png"> </div> <p style="text-align: center;color: #666">您尚未发生借款，借款历史为空</p> <p style="text-align: center;color: #666">请先申请借款~</p></div>'
+             	   $('#sjsh_2').append(str);
+            }
+            
+   	        
+        } ,
+        dataType: 'json'
+    });
+	
+}
+//渲染随借随还还款历史
+function loanrepay(Id){
+	var accountId =Id;
+	$.ajax({
+        type: 'GET',
+        url:'/rest/creditcards/'+Id+'/creditrepayments',
+        //data: {'code':code},
+        headers: {
+            app_code:"WULIUQIANZHUANG",
+            client:"wechat"
+        },
+        success: function (res) {
+            //console.log(res._embedded.moneyrepayments)
+            var dataArr = res._embedded.creditrepayments;
+
+            var newArr =dataArr.sort(sortId)
+            function sortId(a,b){
+                return a.id-b.id
+            }
+
+            var newArr2 = newArr.reverse()
+
+            if(res._embedded.creditrepayments.length !== 0){
+            	$.each(newArr2,function (key,val) {
+ 	                  var principal = (val.principal).toFixed(2) + '元';
+ 	                  var createdAt = (val.createdAt).split('T')[0];
+ 	                  
+ 	                  //console.log(val);
+ 	                 
+ 	                 var json = JSON.parse(val.information); 
+	                  //console.log(json)
+	                  var bh = (json.id).slice(0,15) + '...';
+	                  //console.log(bh)
+ 	                
+ 	                 var str = '<a class="now_card"><div class="clearfix"><p class="left">借款编号:<span>'+bh+'</span></p><p class="right now_card_title_yjq">已还款</p></div><div class="now_card_content"><div class="clearfix"><p style="float: left;color: #a3a3a3;">产品</p><p style="float: right">随借随还</p></div><div class="clearfix margin-top-5"><p style="float: left;color: #a3a3a3;">借款金额</p><p style="float: right">'+principal+'</p></div><div class="clearfix margin-top-5"><p style="float: left;color: #a3a3a3;">还款日期</p><p style="float: right">'+createdAt+'</p></div></div></a>'
+ 	                  $('#sjsh_3').append(str);
+ 	        	})
+            }else{
+                var str='<div class="page-bd-15"><div style="margin: 50px auto 30px;width: 111px;"> <img src="../../../images/null_con.png"> </div> <p style="text-align: center;color: #666">您尚未发生还款，还款历史为空</p> <p style="text-align: center;color: #666">请先申请借款~</p></div>'
+               	 $('#sjsh_3').append(str);
+            }
+            
+   	        
+        } ,
+        dataType: 'json'
+    });
+	
+}
+
+//我的借款
+function creditcards(){
+    $.ajax({
+        type: 'GET',
+        url: '/rest/creditcards/' + window.cardId,
+        data: {},
+        headers: {
+            app_code: "WULIUQIANZHUANG",
+            client: "wechat"
+        },
+        success: function (res) {
+            var creditcardIdentity=res.creditcardIdentity; //账户唯一标识
+
+            loanBorrowing(res.id);
+            loanrepay(res.id);
+
+
+            var availableCredit = (res.creditGrant).toFixed(2)
+            $('#sjshAvailableCredit').text(availableCredit);//总额度
+
+
+
+
+            var sjshUsed = res.creditGrant -res.creditBalance;
+            sjshUsed = sjshUsed.toFixed(2);
+            $('#sjshUsed').text(sjshUsed);//已用额度
+            var sjshSurplus = (res.creditBalance).toFixed(2);
+            $('#sjshSurplus').text(sjshSurplus);//剩余额度
+             $('#sjshSurplus2').text(sjshSurplus);//剩余额度
+            $('#adopt').show();
+            var href ='loanApply.html?'+res.creditcardIdentity;
+            //console.log(href);
+            $('#borrowMoney').attr('href',href); //借款
+
+            //还款
+            var repaymentLink = window.config.link+'/bdjf/html5/repayment.html?mobile='+res.creditcardIdentity+'&zcCode=1004'
+            $('#toRepayment').attr('href',repaymentLink); //还款
+
+//
+//            //Bond 保证金
+//            var Bond = (res.creditGrant*0.05).toFixed(2);
+//            var BondText = '保证金：'+Bond+'元';
+//            $('#sjshBond').text(BondText)
+
+            //期限
+            var createdAt = (res.createdAt).split('T')[0];
+            $('#sjshCreatedAt').text(createdAt);
+
+//            var sjshPercent =  (res.creditGrant -res.creditBalance)/res.creditGrant  // 百分比
+//            sjshPercent = sjshPercent*100;
+//
+//            $('#sjshCircliful').attr('data-percent',sjshPercent)
+//            $('#sjshCircliful').circliful(); //饼图
+//            $('.circle-info').css('lineHeight','125px'); //字体对齐
+
+
+            isAbnormal(creditcardIdentity); //异常用户，覆盖了之前点击的链接
+        }, error: function () {
+//            $('#accountNull').show();
+        },
+        dataType: 'json'
+
+    })
+
+
+}
+
+
+    $('#btn1').click(function () {
+        $('#sjsh_1').show();
+        $('#sjsh_2').hide();
+        $('#sjsh_3').hide();
+    })
+    $('#btn2').click(function () {
+        $('#sjsh_1').hide();
+        $('#sjsh_2').show();
+        $('#sjsh_3').hide();
+    })
+    $('#btn3').click(function () {
+        $('#sjsh_1').hide();
+        $('#sjsh_2').hide();
+        $('#sjsh_3').show();
+    })
+    $('#tab1').tab({defaultIndex:0,activeClass:"tab-green"});
+    $('#tab6').tab({defaultIndex:0,activeClass:"bg_red"});
+    //饼图JS
+    $('.circle-info').css('line-height','130.5px')
+
+</script>
+</html>

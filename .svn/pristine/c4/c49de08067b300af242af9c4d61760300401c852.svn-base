@@ -1,0 +1,117 @@
+
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light">
+
+
+	<div class="col w-md b-r ">
+
+		<div class="vbox">
+			<div class="wrapper-md b-b">
+				<div class="font-thin h4">门店</div>
+			</div>
+			<div class="wrapper b-b">
+				<div class="btn-group pos-stc">
+					<div class="btn-group dropdown">
+						<a ui-sref="stores.create"
+							class="pull-right btn btn-sm btn-danger w-auto-xs dropdown-toggle"
+							tooltip="新建门店" tooltip-placement="bottom"><i
+							class="fa fa-fw fa-tag"></i> 新建 </a>
+					</div>
+				</div>
+			</div>
+			<div class="row-row">
+				<div class="cell scrollable">
+					<div class="cell-inner">
+
+						<ul class="nav nav-pills nav-stacked nav-sm">
+							<li ui-sref-active="active"><a
+								ui-sref="stores.store.page({store_id:0,entity_type:'stores',view_type:'dashboard'})">&nbsp;&nbsp;<b>哒哒车服</b></a>
+							</li>
+							<li ui-sref-active="active"><a
+								ui-sref="stores.store.page({store_id:1,entity_type:'stores',view_type:'dashboard'})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;桐庐总部业务
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="stores.store.page({store_id:2,entity_type:'stores',view_type:'dashboard'})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;杭州萧山分部
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="stores.store.page({store_id:3,entity_type:'stores',view_type:'dashboard'})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;杭州桐庐分部
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="stores.store.page({store_id:4,entity_type:'stores',view_type:'dashboard'})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;杭州富阳分部
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="stores.store.page({store_id:5,entity_type:'stores',view_type:'dashboard'})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;湖州吴兴分部
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="stores.store.page({store_id:6,entity_type:'stores',view_type:'dashboard'})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;绍兴诸暨分部
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="stores.store.page({store_id:7,entity_type:'stores',view_type:'dashboard'})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;绍兴柯桥分部
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="stores.store.page({store_id:8,entity_type:'stores',view_type:'dashboard'})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;金华浦江分部
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="stores.store.page({store_id:9,entity_type:'stores',view_type:'dashboard'})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;成都云禾分部
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="stores.store.page({store_id:10,entity_type:'stores',view_type:'dashboard'})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;四川绵阳分部
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="stores.store.page({store_id:11,entity_type:'stores',view_type:'dashboard'})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;大连中山分部
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="stores.store.page({store_id:12,entity_type:'stores',view_type:'dashboard'})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;海南海口分部
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="stores.store.page({store_id:13,entity_type:'stores',view_type:'dashboard'})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;青岛市北分部
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="stores.store.page({store_id:14,entity_type:'stores',view_type:'dashboard'})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;徐州鼓楼分部
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="stores.store.page({store_id:15,entity_type:'stores',view_type:'dashboard'})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;泉州晋江分部
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="stores.store.page({store_id:16,entity_type:'stores',view_type:'dashboard'})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;台州椒江分部
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="stores.store.page({store_id:17,entity_type:'stores',view_type:'dashboard'})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;汇隆按揭渠道
+							</a></li>
+							<br />
+							<br />
+							<li ui-sref-active="active"><a
+								ui-sref="stores.store.page({store_id:100,entity_type:'stores',view_type:'dashboard'})">&nbsp;&nbsp;<b>红创公司（网点贷）</b></a>
+							</li>
+							<li ui-sref-active="active"><a
+								ui-sref="stores.store.page({store_id:101,entity_type:'stores',view_type:'dashboard'})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;销售部
+							</a></li>
+
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+	<div class="col lter" ui-view></div>
+</div>
+<!-- /hbox layout -->

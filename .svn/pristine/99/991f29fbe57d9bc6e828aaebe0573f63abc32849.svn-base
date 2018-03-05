@@ -1,0 +1,32 @@
+<div class="vbox bg-white">
+    <div class="wrapper bg-white b-b clearfix">
+        <button class="pull-left btn btn-sm btn-primary btn-addon"
+                ui-sref="workflowEntity.list({entity_key:'product',workflow_id:profile.workflow.id})"
+                ng-if="profile.workflow.id">
+            <i class="fa fa-arrow-left"></i>
+            返回
+        </button>
+        <ul class="nav nav-pills nav-sm pull-right">
+            <li ui-sref-active="active">
+                <a ui-sref="workflowEntity.home.profile.info">主页</a>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="workflowEntity.home.profile.page({entity_key:'product',view_type:'log'})">被操作记录</a>
+            </li>
+        </ul>
+    </div>
+    <!--<div class="wrapper b-b b-light clearfix" ng-if="canActs.length > 0">-->
+        <!--<button ng-class="act.btnClass"-->
+                <!--ng-click="productExcute[act.actCode]()"-->
+                <!--tooltip="{{act.help}}"-->
+                <!--tooltip-placement="bottom"-->
+                <!--ng-repeat="act in canActs">-->
+            <!--<i ng-class="act.iconClass"></i> {{act.label}}-->
+        <!--</button>-->
+    <!--</div>-->
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner" ui-view=""></div>
+        </div>
+    </div>
+</div>

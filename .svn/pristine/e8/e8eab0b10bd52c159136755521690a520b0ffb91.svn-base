@@ -1,0 +1,61 @@
+<script>
+    app.controller("bankHomeController",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$resource",
+            "$stateParams",
+            "$state",
+            "entity",
+            function ($rootScope, $scope, $http, $resource, $stateParams, $state, entity) {
+
+                $scope.id = $stateParams.id;
+
+                $scope.profile     = {};
+                $scope.canActs     = [];
+                $scope.canFileActs = [];
+
+                $scope.getProfile = function () {
+
+                    entity.getDetail("/rest/bankcards/" + $scope.id, ["createdBy", "state", "workflow"]).then(function (resResult) {
+
+                        $scope.profile = resResult;
+
+                        angular.forEach($scope.profile.currentUserCanActList, function (val, key) {
+                            if (val.actGroup == "UPDATE") {
+                                $scope.canActs.push(val);
+                            } else if (val.actGroup == "FILE_OPERATE") {
+                                $scope.canFileActs.push(val)
+                            }
+                        });
+
+                        $scope.state_code = $scope.profile.state.stateCode;
+
+                    });
+                };
+
+                $scope.getProfile();
+
+                /*大方法的对象*/
+                $scope.bankcardExcute = {
+                    "update": function () {
+                        $state.go("auditEntity.home.profile.form", {
+                            id: $scope.id,
+                            entity_key: 'bankcard'
+                        }, {reload: true});
+                    }
+                };
+            }
+        ]
+    );
+</script>
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light" ng-controller="bankHomeController">
+    <!-- column -->
+    <div class="col w-md lter b-l">
+        <div class="h-full" ui-view></div>
+    </div>
+    <!-- /column -->
+</div>
+<!-- /hbox layout -->

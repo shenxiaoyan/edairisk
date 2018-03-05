@@ -1,0 +1,321 @@
+<script>
+    "use strict";
+    app.controller("orderrzzlListController",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "entity",
+            function ($rootScope, $scope, $http, $stateParams, entity) {
+
+                $scope.states = [];
+
+                $scope.searchForm={
+                    realName:'',
+                    applyMobile:'',
+                    orderNo:''
+                };
+                $scope.$watch('searchForm',function (newValue,oldValue){
+                    $scope.searchForm.realName= $scope.searchForm.realName.replace(/#/g,'').replace(/%/g,'').replace(/&/g,'').replace(/\^/g,'')
+                    $scope.searchForm.applyMobile=$scope.searchForm.applyMobile.replace(/#/g,'').replace(/%/g,'').replace(/&/g,'').replace(/\^/g,'')
+                    $scope.searchForm.orderNo=$scope.searchForm.orderNo.replace(/#/g,'').replace(/%/g,'').replace(/&/g,'').replace(/\^/g,'')
+                },true)
+                $scope.searchList = function(page) {
+                    $http({
+                        method: "GET",
+                        url:'orderrzzl/commissionerlist?stateCode='+$scope.state_code+'&realName='+$scope.searchForm.realName+'&applyMobile='+$scope.searchForm.applyMobile+"&orderNo="+$scope.searchForm.orderNo+'&page='+page+'&size=10&sort=id,desc'
+                        //url: "orderwdsjsh/list?state.stateCode="+$scope.state_code+"&realName="+$scope.searchForm.realName+"&applyMobile="+$scope.searchForm.applyMobile+"&page="+page+"&size=20"
+                    }).success(function (resResult) {
+
+                        //console.log(resResult)
+                        $scope.list = resResult.data.content;
+
+                        //搜索的返回格式和 rest/search不一样
+                        $scope.pageList = {
+                            size: resResult.data.size,
+                            total_elements: resResult.data.totalElements,
+                            current_page: resResult.data.number,
+                            num_page: resResult.data.totalPages,
+                            total_page: resResult.data.totalPages
+                        };
+
+                        if ($scope.list.length > 0) {
+                            $("#orderrzzl_list_paginator").show();
+                            $rootScope.setPaginator("#orderrzzl_list_paginator", $scope.pageList, $scope.searchList);
+                        }else{
+                            $("#orderrzzl_list_paginator").hide();
+                        }
+
+                    });
+                }
+
+                //搜索按钮
+                $scope.searchFormBtn=function () {
+                    console.log( $scope.state_code)
+
+                    $scope.searchList(0)
+
+                }
+
+                //重置按钮
+                $scope.resetSearchFormBtn=function () {
+                    $scope.searchForm= {
+                        realName:'',
+                        applyMobile:''
+                    }
+                    $scope.searchList(0)
+                }
+
+                entity.getList("/rest/orderrzzlWorkflows/ " + $stateParams.workflow_id + "/states").then(function (resResult) {
+
+                    $scope.states = resResult._embeddedItems;
+                    $scope.states.push({stateCode:'',sort:0,label:'全部'});
+
+                    if ($scope.states.length > 0) {
+
+                        $scope.states = $scope.states.sort(function (a, b) {
+                            return a.sort - b.sort;
+                        });
+
+                        $scope.state_code = $scope.states[0].stateCode;
+                        $scope.getList(0);
+                    }
+                });
+
+                $scope.pageList = {
+                    size: 0,
+                    total_elements: 0,
+                    current_page: 0,
+                    num_page: 1,
+                    total_page: 1
+                };
+
+                $scope.list = [];
+
+
+                $scope.getList = function (page) {
+
+                    $scope.loading = true;
+
+                    $scope.list = [];
+
+                    //var link = "/rest/orderrzzles/search/listOwnDepartmentAndChildren?sort=lastModifiedAt,desc&size=20&page=" + page;
+
+                    //if($scope.state_code){
+                    //var link = "rest/orderrzzls/search/getOrderrzzlByServiceUserId?sort=id,desc&stateCode=" + $scope.state_code + "&size=20&page=" + page;
+                    //}
+                    var link='orderrzzl/commissionerlist?stateCode='+$scope.state_code+'&realName='+$scope.searchForm.realName+'&applyMobile='+$scope.searchForm.applyMobile+"&orderNo="+$scope.searchForm.orderNo+'&page='+page+'&size=10&sort=id,desc';
+
+//                    $scope.link = "rest/orderwdxyds/search/getOrderwdxydByServiceUserId?stateCode=" + $scope.state_code + "&sort=lastModifiedAt,desc&size=20&page=" + page;
+                    entity.getList(link, ["state"]).then(function (resResult) {
+                        console.log(resResult)
+                        $scope.loading = false;
+
+                        $scope.list = resResult.data.content;
+
+                        $scope.pageList = {
+                            size: resResult.data.size,
+                            total_elements: resResult.data.totalElements,
+                            current_page: resResult.data.number,
+                            num_page: resResult.data.totalPages,
+                            total_page: resResult.data.totalPages
+                        };
+
+                        if ($scope.list.length > 0) {
+                            $("#orderrzzl_list_paginator").show();
+                            $rootScope.setPaginator("#orderrzzl_list_paginator", $scope.pageList, $scope.getList);
+                        }else{
+                            $("#orderrzzl_list_paginator").hide();
+                        }
+
+                    });
+                };
+
+                $scope.stateSelect = function ($event, stateCode) {
+                    if ($event.target.nodeName === "INPUT") {
+                        $scope.state_code = stateCode;
+                        $scope.searchForm={
+                            realName:'',
+                            applyMobile:'',
+                            orderNo:''
+                        };
+                        $scope.getList(0);
+                    }
+                };
+            }
+        ]
+    );
+</script>
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light" ng-controller="orderrzzlListController">
+    <!-- column -->
+    <div class="col w-md lter b-l">
+        <div class="vbox">
+            <!--<div class="wrapper b-b b-light clearfix">-->
+            <!--<div class="pull-left m-r w inline">-->
+            <!--<label class="sr-only" for=""></label>-->
+            <!--<input type="text" class="form-control" id="">-->
+            <!--</div>-->
+            <!--<div class="pull-left m-r w inline">-->
+            <!--<label class="sr-only" for=""></label>-->
+            <!--<input type="text" class="form-control" id="">-->
+            <!--</div>-->
+            <!--<div class="pull-left m-r w inline">-->
+            <!--<label class="sr-only" for=""></label>-->
+            <!--<input type="text" class="form-control" id="">-->
+            <!--</div>-->
+            <!--<div class="pull-left m-r inline">-->
+            <!--<button class="btn btn-primary btn-addon">-->
+            <!--<i class="fa fa-search"></i>-->
+            <!--查询-->
+            <!--</button>-->
+            <!--</div>-->
+            <!--</div>-->
+            <div class="wrapper b-b b-light clearfix">
+                <div class="inline pull-left">
+                    <span translate="orderrzzl.self.label"></span>状态：
+                </div>
+                <!--<div class="inline pull-left m-r">-->
+                <!--<label class="i-checks pull-left m-n" ng-click="stateSelect($event,'')">-->
+                <!--<input type="radio" name="state" checked><i></i>  全部-->
+                <!--</label>-->
+                <!--</div>-->
+                <div class="inline pull-left m-r" ng-repeat="state in states">
+                    <label class="i-checks pull-left m-n" ng-click="stateSelect($event,state.stateCode)">
+                        <input type="radio" value="{{state.stateCode}}" ng-model="state_code" name="state"><i></i> {{
+                        state.label }}
+                    </label>
+                </div>
+            </div>
+            <div class="wrapper">
+
+                <form class="form-inline" name="search_form">
+                    <div class="form-group m-r">
+                        <label for="">订单编号: </label>
+                        <input ng-model="searchForm.orderNo" class="form-control" type="text" pattern="^\s*[\da-zA-Z]+\s*$" name="orderNo">
+                        <span class="help-block text-danger"
+                              ng-show="search_form.orderNo.$dirty && search_form.orderNo.$invalid">
+                            <i class="fa fa-exclamation-circle text-danger"></i>订单编号只能输入数字或英文
+                        </span>
+                    </div>
+                    <div class="form-group m-r">
+                        <label for="">姓名: </label>
+                        <input ng-model="searchForm.realName" class="form-control" type="text" pattern="^\s*[\u4e00-\u9fa5]+(·[\u4e00-\u9fa5]+)*\s*$" name="realName">
+                        <span class="help-block text-danger"
+                              ng-show="search_form.realName.$dirty && search_form.realName.$invalid">
+                            <i class="fa fa-exclamation-circle text-danger"></i>不符合姓名格式
+                        </span>
+                    </div>
+                    <div class="form-group m-r">
+                        <label for="">手机号: </label>
+                        <input ng-model="searchForm.applyMobile" class="form-control" type="tel" pattern="^\s*\d+\s*$" name="applyMobile">
+                        <span class="help-block text-danger"
+                              ng-show="search_form.applyMobile.$dirty && search_form.applyMobile.$invalid">
+                            <i class="fa fa-exclamation-circle text-danger"></i>手机号必须为数字
+                        </span>
+                    </div>
+                    <button class="btn btn-primary m-r" ng-click="searchFormBtn()" ng-disabled="search_form.$invalid">
+                        <i class="fa fa-search"></i>查询
+                    </button>
+                    <button class="btn btn-default m-r" ng-click="resetSearchFormBtn()">
+                        <i class="fa fa-refresh"></i>重置
+                    </button>
+                </form>
+            </div>
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner">
+                        <div class="wrapper">
+                            <div class="panel panel-default">
+                                <div class="panel-heading" ng-if="!loading && list.length > 0">
+                                    查询结果
+                                </div>
+                                <div ng-if="loading"
+                                     style="position: fixed;top: 50%;right: 50%;margin-left: -15px;margin-top: -15px;">
+                                    <div class="sk-spinner sk-spinner-cube-grid">
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                    </div>
+                                    <div class="text-center m-t">加载中请稍后</div>
+                                </div>
+                                <div class="panel-heading" ng-if="!loading && list.length < 1">
+                                    暂无数据！
+                                </div>
+                                <div class="table-responsive" ng-if="!loading && list.length > 0">
+                                    <table class="table table-hover b-light">
+                                        <thead>
+                                        <tr>
+                                            <th>操作</th>
+                                            <th>订单编号</th>
+                                            <th>姓名</th>
+                                            <th>手机号</th>
+                                            <th>是否分配</th>
+                                            <th>业务员</th>
+                                            <th>状态</th>
+                                            <th>创建时间</th>
+                                            <th>最后修改时间</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr ng-repeat="item in list">
+                                            <td class="v-middle clearfix">
+                                                <button ui-sref="workflowEntity.home.profile.info({id:item.id})"
+                                                        class="pull-left btn btn-xs btn-success m-r">详情
+                                                </button>
+                                                <!--<button ui-sref="workflowEntity.form({id:item.id})"-->
+                                                <!--class="pull-left btn btn-sm btn-danger m-r">编辑-->
+                                                <!--</button>-->
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.orderNo }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.realName }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.applyMobile }}
+                                            </td>
+                                            <td class="v-middle"
+                                                ng-class="{true: 'text-success', false: 'text-danger'}[item.isDistribution]">
+                                                {{ item.isDistribution?"是":"未分配" }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.serviceName }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.state.label || item.stateLabel }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.createdAt | datetime}}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.lastModifiedAt | datetime}}
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="wrapper b-t b-light clearfix">
+                <ul id="orderrzzl_list_paginator" style="margin:2px 0;float: right;"></ul>
+                <small class="m-l-md pull-right text-muted inline m-t-sm m-b-sm m-r">共 {{pageList.total_elements}} 条，本页共 {{ list.length }}
+                    条
+                </small>
+            </div>
+        </div>
+    </div>
+    <!-- /column -->
+</div>
+<!-- /hbox layout -->

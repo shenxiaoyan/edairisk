@@ -1,0 +1,47 @@
+<script>
+    "use strict";
+    app.controller("mdbtoverduceHomeController",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "$state",
+            "entity",
+            function ($rootScope, $scope, $http, $stateParams, $state, entity) {
+
+                $scope.id = $stateParams.id;
+                $scope.overdueUserInfo = $rootScope.mdbtItem
+
+
+                entity.getDetail("/rest/loanoverdues/" + $scope.id,['loan']).then(function (resResult) {
+
+                    console.log(resResult)
+                    $scope.profile = resResult;
+
+
+                });
+
+                /*大方法的对象*/
+                $scope.departmenttypeExcute = {
+                    "update": function () {
+                        $state.go("auditEntity.home.profile.form", {
+                            id: $scope.id,
+                            entity_key: "department"
+                        }, {reload: false});
+                    }
+                };
+
+            }
+        ]
+    );
+</script>
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light" ng-controller="mdbtoverduceHomeController">
+    <!-- column -->
+    <div class="col w-md lter b-l">
+        <div class="h-full" ui-view></div>
+    </div>
+    <!-- /column -->
+</div>
+<!-- /hbox layout -->

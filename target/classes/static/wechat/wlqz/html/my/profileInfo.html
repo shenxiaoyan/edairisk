@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>我的申请</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <link rel="stylesheet" href="../../css/weui.css">
+    <link rel="stylesheet" href="../../css/weui2.css">
+    <link rel="stylesheet" href="../../css/jquery.mloading.css">
+      <link rel="stylesheet" href="../../css/animate.css">
+    <link rel="stylesheet" href="../../css/global.css">
+    <link rel="stylesheet" href="../../css/loading.css">
+    <style>
+        .weui_uploader_input_wrp {
+            margin: 0 6px;
+            float: none;
+            display: inline-block;
+            width: 65px;
+            height: 65px;
+            border: 1px #d9d9d9 dashed;
+        }
+        .weui_icon_success:before {
+            font-size: 16px;
+            color: #09bb07;
+        }
+        .weui_cells{
+            font-size: 16px;
+        }
+        
+        .weui_tab_nav .weui_nav_red.bg_red {
+            border-color: #ffbd00;!important;
+            color: #fff;
+            background: #ffbd00;!important;
+        }
+        .weui_navbar_item{
+
+        }
+        .weui_navbar_item.tab-green{
+            background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
+            border-bottom: 3px solid #ffbd00;
+            color: #ffbd00;
+        }
+        .weui_tab_nav .weui_nav_red {
+            display: block;
+            -webkit-box-flex: 1;
+            -webkit-flex: 1;
+            flex: 1;
+            width: 100%;
+            height: 30px;
+            padding: 0;
+            font-size: 14px;
+            line-height: 31px;
+            text-align: center;
+            border: 1px solid #ffbd00;
+            border-width: 1px 1px 1px 0;
+            color: #ef4f4f;
+            white-space: nowrap;
+            background: #fdfdfd;
+        }
+        .weui_tab_nav .weui_nav_red{
+            color: #ffbd00;!important;
+        }
+        .weui_navbar{
+            background: #fff;
+        }
+        .btn{
+            width: 100%;
+            height: 40px;
+            background: #ffbd00;
+            border-radius: 20px;
+            display: inline-block;
+            text-align: center;
+            line-height: 40px;
+            color: white;
+            font-size: 16px;
+        }
+        .btn:active{
+            background: #CCCCCC;
+            color: white;
+        }
+        .now_card{
+            display: block;
+            background: #fff;
+            margin-top: 15px;
+            border: 1px solid #e6e5e5;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+       
+        .now_card span{
+            margin-left: 5px;
+        }
+        .now_card > div{
+            padding: 10px 15px;
+        }
+        .now_card_title_whk{
+            padding: 0 12px;
+            background: #ffc425;
+            color: white;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-top: 1px;
+        }
+        .now_card_title_wjq{
+            padding: 0 12px;
+            background: #14c7a7;
+            color: white;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-top: 1px;
+        }
+        .now_card_title_yq{
+            padding: 0 12px;
+            background: #f96c70;
+            color: white;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-top: 1px;
+        }
+        .now_card_title_yjq{
+            padding: 0 12px;
+            background: #ccc;
+            color: white;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-top: 1px;
+        }
+        .now_card_content{
+            border-top: 1px solid #e6e5e5;
+            padding: 15px;
+        }
+        .margin-top-5{
+            margin-top: 5px;
+        }
+        .timeline-item-tail{
+            background: #FFBD00;
+        }
+        .timeline-item-head{
+            background: #FFBD00;
+            height: 15px;
+            left: -2px;
+            top: 0px;
+            width: 15px;
+            border: 3px solid #FFE599;
+        }
+        .time_success{
+            color:#0D0D0D;
+        }
+        .timeline-item-content > p{
+            color:#B2B2B2;
+        }
+        .timeline h4 {
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .timeline-item-content {
+            padding: 0 0 1.5rem 1.6rem;
+        }
+        .timeline-item-tail_huise{
+            background: #CCCCCC;
+        }
+        .bkBtn{
+            position: fixed;
+            bottom:0;
+            background:#FFBD00;
+            text-align: center;
+            width: 100%;
+            height: 40px;
+            color:#fff;
+            line-height: 40px;
+            z-index: 100;
+            cursor:pointer;
+        }
+        .bkBtn:active{
+            background: #ccc;
+            color: white;
+        }
+        .imgBtn{
+        	cursor: pointer;
+        }
+        .delBtn{
+			position: absolute;
+			top: -8px;
+			right: -2px;
+			font-size: 20px;
+			color: #E64340;
+			width:20px;
+			height: 20px;
+			border-radius: 50%;
+			background: #fff;
+			cursor: pointer;
+		}
+    </style>
+
+
+</head>
+<body ontouchstart>
+<div id='stateCreat' style='display:none'>
+	<div class="weui-gallery" style="display: none;">
+	    <div style="position: absolute;top: 0;left: 0;height:calc(100% - 61px);width: 100%" onclick="$('.weui-gallery').hide();">
+	        <img style="margin: auto auto;width: auto; height: auto;display:block;max-width: 100%;max-height: 100%;" class="weui-gallery-img" />
+	    </div>
+	    <div class="weui-gallery-opr">
+	        <a id="delBtn" href="javascript:" class="weui-gallery-del">
+	            <i class="icon icon-26 f-gray"></i>
+	        </a>
+	    </div>
+	</div>
+	
+	<div class="weui_cells_title">基础信息</div>
+	<div class="weui_cells">
+				<div class="weui_cell">
+			<div class="weui_cell_hd"><label class="weui_label">申请人姓名</label></div>
+			<div class="weui_cell_bd weui_cell_primary">
+				<input style='text-align: right' id="realName" class="weui_input" type="text">
+			</div>
+		</div>
+		<div class="weui_cell">
+			<div class="weui_cell_hd"><label class="weui_label">手机号</label></div>
+			<div class="weui_cell_bd weui_cell_primary">
+				<input style='text-align: right' id="applyMobile" class="weui_input" type="text">
+			</div>
+		</div>
+		<div class="weui_cell">
+			<div class="weui_cell_hd"><label class="weui_label">身份证号</label></div>
+			<div class="weui_cell_bd weui_cell_primary">
+				<input style='text-align: right' id="applyIdentityNo" class="weui_input" type="text">
+			</div>
+		</div>
+		<div class="weui_cell">
+			<div class="weui_cell_hd"><label class="weui_label">快递网点名称</label></div>
+			<div class="weui_cell_bd weui_cell_primary">
+				<input style='text-align: right' id="applyEnterpriseName" class="weui_input" type="text">
+			</div>
+		</div>
+		<div class="weui_cell">
+			<div class="weui_cell_hd"><label class="weui_label">经营区域</label></div>
+			<div class="weui_cell_bd weui_cell_primary">
+				<input style='text-align: right' id="applyEnterpriseReigionName" class="weui_input" type="text">
+			</div>
+		</div>
+		<div class="weui_cell">
+			<div class="weui_cell_hd"><label class="weui_label">办公地址</label></div>
+			<div class="weui_cell_bd weui_cell_primary">
+				<input style='text-align: right' id="applyEnterpriseAddress" class="weui_input" type="text">
+			</div>
+		</div>
+	</div>
+	
+	
+	<div class="weui_cells_title">企业资质(必选)</div>
+	<div class="weui_cells" style="margin-top: 0">
+	    <div class="weui_cells_title">营业执照</div>
+	    <div class="weui_cell">
+	        <div id="yyzz">
+	        
+	            <div id="yyzzBtn" class="imgUp" style="display: inline-block;width: 67px; height: 67px; background: url('../../images/picture@3x.png') no-repeat;background-size:67px 67px;"></div>
+	        </div>
+	    </div>
+	</div>
+	<div class="weui_cells" style="margin-top: 0">
+	    <div class="weui_cells_title">快递经营许可证</div>
+	    <div class="weui_cell">
+	        <div id="kdjy">
+	          
+	            <div id="kdjyBtn" class="imgUp" style="display: inline-block;width: 67px; height: 67px; background: url('../../images/picture@3x.png') no-repeat;background-size:67px 67px;"></div>
+	        </div>
+	    </div>
+	</div>
+	<div class="weui_cells" style="margin-top: 0">
+	    <div class="weui_cells_title">法人、企业征信查询授权书</div>
+	    <div class="weui_cell">
+	        <div id="zxbg">
+	            <div id="zxbgBtn" class="imgUp" style="display: inline-block;width: 67px; height: 67px; background: url('../../images/picture@3x.png') no-repeat;background-size:67px 67px;"></div>
+	        </div>
+	    </div>
+	</div>
+	<div class="weui_cells" style="margin-top: 0">
+	    <div class="weui_cells_title">网点经营场地照片</div>
+	    <div class="weui_cell">
+	        <div id="jycd">
+	            <div id="jycdBtn" class="imgUp" style="display: inline-block;width: 67px; height: 67px; background: url('../../images/picture@3x.png') no-repeat;background-size:67px 67px;"></div>
+	        </div>
+	    </div>
+	</div>
+	<div class="weui_cells" style="margin-top: 0">
+	    <div class="weui_cells_title">网点系统截图</div>
+	    <div class="weui_cell">
+	        <div id="wdjt">
+	            <div id="wdjtBtn" class="imgUp" style="display: inline-block;width: 67px; height: 67px; background: url('../../images/picture@3x.png') no-repeat;background-size:67px 67px;"></div>
+	        </div>
+	    </div>
+	</div>
+	<div class="weui_cells" style="margin-top: 0">
+	    <div class="weui_cells_title">夫妻双方身份证,结婚证</div>
+	    <div class="weui_cell">
+	        <div id="fqsf">
+	           
+	            <div id="fqsfBtn" class="imgUp" style="display: inline-block;width: 67px; height: 67px; background: url('../../images/picture@3x.png') no-repeat;background-size:67px 67px;"></div>
+	        </div>
+	    </div>
+	</div>
+	<div class="weui_cells" style="margin-top: 0">
+	    <div class="weui_cells_title">其他</div>
+	    <div class="weui_cell">
+	        <div id="qt">
+	           
+	            <div id="qtBtn" class="imgUp" style="display: inline-block;width: 67px; height: 67px; background: url('../../images/picture@3x.png') no-repeat;background-size:67px 67px;"></div>
+	        </div>
+	    </div>
+	</div>
+	<div id="other" class="weui_cells_title">选填,资料越多额度越高 <i style="float: right" class="icon icon-74"></i></div>
+	<div id="other_item" style="display: none;">
+	    <div class="weui_cells" style="margin-top: 0">
+	        <div class="weui_cells_title">租房合同或土地证</div>
+	        <div class="weui_cell">
+	            <div id="zfht">
+	                <div id="zfhtBtn" class="imgUp" style="display: inline-block;width: 67px; height: 67px; background: url('../../images/picture@3x.png') no-repeat;background-size:67px 67px;"></div>
+	            </div>
+	        </div>
+	    </div>
+	    <div class="weui_cells" style="margin-top: 0">
+	        <div class="weui_cells_title">财务报表</div>
+	        <div class="weui_cell">
+	            <div id="cwbb">
+	                <div id="cwbbBtn" class="imgUp" style="display: inline-block;width: 67px; height: 67px; background: url('../../images/picture@3x.png') no-repeat;background-size:67px 67px;"></div>
+	            </div>
+	        </div>
+	    </div>
+	    <div class="weui_cells" style="margin-top: 0">
+	        <div class="weui_cells_title">个人名下房产证</div>
+	        <div class="weui_cell">
+	            <div id="grfc">
+	                <div id="grfcBtn" class="imgUp" style="display: inline-block;width: 67px; height: 67px; background: url('../../images/picture@3x.png') no-repeat;background-size:67px 67px;"></div>
+	            </div>
+	        </div>
+	    </div>
+	    <div class="weui_cells" style="margin-top: 0">
+	        <div class="weui_cells_title">个人名下车辆清单</div>
+	        <div class="weui_cell">
+	            <div id="grcl">
+	                <div id="grclBtn" class="imgUp" style="display: inline-block;width: 67px; height: 67px; background: url('../../images/picture@3x.png') no-repeat;background-size:67px 67px;"></div>
+	            </div>
+	        </div>
+	    </div>
+	    <div class="weui_cells" style="margin-top: 0">
+	        <div class="weui_cells_title">下设承包商的业务量清单</div>
+	        <div class="weui_cell">
+	            <div id="ywqd">
+	                <div id="ywqdBtn" class="imgUp" style="display: inline-block;width: 67px; height: 67px; background: url('../../images/picture@3x.png') no-repeat;background-size:67px 67px;"></div>
+	            </div>
+	        </div>
+	    </div>
+	    <div class="weui_cells" style="margin-top: 0">
+	        <div class="weui_cells_title">近6个月主要走账的银行流水</div>
+	        <div class="weui_cell">
+	            <div id="yhls">
+	                <div id="yhlsBtn" class="imgUp" style="display: inline-block;width: 67px; height: 67px; background: url('../../images/picture@3x.png') no-repeat;background-size:67px 67px;"></div>
+	            </div>
+	        </div>
+	    </div>
+	    <div class="weui_cells" style="margin-top: 0">
+	        <div class="weui_cells_title">对外借款及月还款清单</div>
+	        <div class="weui_cell">
+	            <div id="dwjk">
+	                <div id="dwjkBtn" class="imgUp" style="display: inline-block;width: 67px; height: 67px; background: url('../../images/picture@3x.png') no-repeat;background-size:67px 67px;"></div>
+	            </div>
+	        </div>
+	    </div>
+	    <div class="weui_cells" style="margin-top: 0">
+	        <div class="weui_cells_title">近3个月水电费清单</div>
+	        <div class="weui_cell">
+	            <div id="sdf">
+	                <div id="sdfBtn" class="imgUp" style="display: inline-block;width: 67px; height: 67px; background: url('../../images/picture@3x.png') no-repeat;background-size:67px 67px;"></div>
+	            </div>
+	        </div>
+	    </div>
+	    <div class="weui_cells" style="margin-top: 0">
+	        <div class="weui_cells_title">公司名下资产明细清单</div>
+	        <div class="weui_cell">
+	            <div id="zcmx">
+	                <div id="zcmxBtn" class="imgUp" style="display: inline-block;width: 67px; height: 67px; background: url('../../images/picture@3x.png') no-repeat;background-size:67px 67px;"></div>
+	            </div>
+	        </div>
+	    </div>
+	    <div class="weui_cells" style="margin-top: 0">
+	        <div class="weui_cells_title">与总公司签订的《网点加盟协议》</div>
+	        <div class="weui_cell">
+	            <div id="jmxy">
+	                <div id="jmxyBtn" class="imgUp" style="display: inline-block;width: 67px; height: 67px; background: url('../../images/picture@3x.png') no-repeat;background-size:67px 67px;"></div>
+	            </div>
+	        </div>
+	    </div>
+	</div>
+	
+	
+	<div class="page-bd-15 fixed_btn" style="padding: 20px 15px;background: #fff">
+	    <a id="subButton" href="javascript:;" class="btn" >提交</a>
+	</div>
+</div>
+<div class="weui_msg" id="beidouAdopt" style='display:none'>
+    <div class="weui_icon_area" style="margin-bottom: 0"><img src="../../images/Choice@3x.png" style="width: 80px; height: 80px;"/></div>
+    <div class="weui_text_area">
+        <h2 class="weui_msg_title" style="color: #ffbd00;">授信成功!</h2>
+        <p class="weui_msg_desc">请前往我的账户中申请借款吧！</p>
+        
+        <a href="../account/myLoanLogin.html" class="btn" style="margin-top: 30px;">我的账户</a>
+    </div>
+</div>
+
+<div id='stateExamine' style='display:none'>
+	<div style="height: 100%;">
+        <div style="background: #fff; height: 44px;padding: 0 15px;border-bottom: 1px solid #e6e6e6;" class="clearfix">
+            <div style="float: left">
+                <i class="icon icon-109 f-black" style="font-size: 25px; line-height: 44px;"></i>
+            </div>
+            <div style="float: left;width: calc(100% - 130px); padding: 0 50px; height: 44px;text-align: center;line-height: 44px;font-weight: bolder">
+                
+            </div>
+        </div>
+        <div style="padding: 15px;background: #fff">
+            <div class="clearfix">
+                <p style="float: left;color: #B2B2B2;">项目名称</p><p style="float: right">随借随还</p>
+            </div>
+            <div class="clearfix margin-top-5">
+                <p style="float: left;color: #B2B2B2;">申请金额</p><p id='examineMoney' style="float: right">130000.00元</p>
+            </div>
+            <div class="clearfix margin-top-5">
+                <p style="float: left;color: #B2B2B2;">申请时间</p><p id='examineDate' style="float: right">2017/09/08</p>
+            </div>
+            <div class="clearfix margin-top-5">
+                <p style="float: left;color: #B2B2B2;">保证金</p><p id="examineBond" style="float: right">200.00元</p>
+            </div>
+        </div>
+        <div style="padding: 15px 15px 5px 15px; color: #B2B2B2;font-size: 15px;border-bottom: 1px solid #e6e6e6;">
+            借款进度
+        </div>
+        <div style="min-height: calc(100% - 235px);background: #fff;width: 100%">
+            <div style="padding: 30px 0 30px 15%;">
+                <div class="timeline">
+                    <ul>
+                        <li class="timeline-item">
+                            <div class="timeline-item-head">
+                                <i class="weui_icon weui_icon_success_no_circle timeline-item-checked hide"></i>
+                            </div>
+                            <div class="timeline-item-tail"></div>
+                            <div class="timeline-item-content">
+                                <h4 class="time_success">提交申请</h4>
+                                <p style="height: 25px;"></p>
+                            </div>
+                        </li>
+                        <li class="timeline-item">
+                            <div  class="timeline-item-head">
+                                <i class="weui_icon weui_icon_success_no_circle timeline-item-checked hide" ></i>
+                            </div> <div class="timeline-item-tail" ></div>
+                            <div class="timeline-item-content">
+                                <h4 class="time_success">审核中</h4>
+                                <p style="height: 25px;"></p>
+                            </div>
+                        </li>
+                        <li class="timeline-item">
+                            <div  class="timeline-item-head">
+                                <i class="weui_icon weui_icon_success_no_circle timeline-item-checked hide" ></i>
+                            </div><div class="timeline-item-tail" style="background: #ccc"></div>
+                            <div class="timeline-item-content clearfix">
+                                <div class="left">
+                                    <h4 id='isAdopt' style="color:#FC2321;">初步审核未通过</h4>
+                                </div>
+                                <div id='isAdopt_ziliao' class="left" style="margin-left: 30px; cursor: pointer; ">
+                                    <p style="color:#FFD355;padding:2px 10px;border-radius:5px;border: 1px solid #FFD355">补充资料</p>
+                                </div>
+                                <p id='comment' style='clear:both'></p>
+                            </div>
+                        </li>
+                        <li class="timeline-item">
+							<div  class="timeline-item-head" style="border: 3px solid #ccc;background: #fff">
+								<i class="weui_icon weui_icon_success_no_circle timeline-item-checked hide" ></i>
+							</div>
+							<div class="timeline-item-content clearfix">
+								<div class="left">
+									<h4 id='bdsh'>终审通过</h4>
+								</div>
+								<p id='bdcomment' style='clear:both'></p>
+							</div>
+						</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div>
+            <a id='examineBtn' class="bkBtn">确定</a>
+        </div>
+    </div>
+</div>
+
+</body>
+<script src="../../js/config.js"></script>
+<script src="../../js/jquery-3.2.1.js"></script>
+<script src="../../js/zepto.min.js"></script>
+<script src="../../js/jquery.mloading.js"></script>
+<script src="https://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+<script src="../../js/loading.js"></script>
+<script src="../../js/picker.js"></script>
+<script src="../../js/picker-city.js"></script>
+<script>
+if(window.location.search){
+    var href = window.location.search;
+    window.id=href.split('?')[1];
+    //console.log(id)
+    
+}
+
+//jsSDK
+  var JsUrl =window.location.href;
+  $.ajax({
+      type: "get",
+      url: "/wechat/wlqz/getCofigure",
+      data:{'JsUrl':JsUrl},
+      dataType: "json",
+      success: function(res){
+      	console.log(res)
+          wx.config({
+              debug: false,
+              appId:res.appId ,
+              timestamp: res.timestamp,
+              nonceStr: res.nonceStr,
+              signature: res.signature,
+              jsApiList: [
+                  'chooseImage',
+                  'uploadImage',
+                  'previewImage',
+                  'getLocation'
+                  // 所有要调用的 API 都要加到这个列表中
+              ]
+          });
+          wx.ready(function () {
+        	  wx.getLocation({
+          	    type: 'wgs84', // 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
+          	    success: function (res) {
+          	        var latitude = res.latitude; // 纬度，浮点数，范围为90 ~ -90
+          	        var longitude = res.longitude; // 经度，浮点数，范围为180 ~ -180。
+          	        var speed = res.speed; // 速度，以米/每秒计
+          	        var accuracy = res.accuracy; // 位置精度
+          	        console.log(latitude);
+          	        console.log(longitude);
+          	   			 //设置AJAX的全局默认选项  
+		          	      $.ajaxSetup( {  
+		          	         
+		          	          headers: { // 默认添加请求头  
+		          	        	 app_code:"WULIUQIANZHUANG",
+	          	           		 client:"wechat",
+	          	           		 latitude:latitude,
+          	           			 longitude:longitude
+		          	          }  
+		          	      } ); 
+          	        
+          	    }
+          	});
+        	  
+          	
+
+          });
+          wx.error(function(res){
+
+              // config信息验证失败会执行error函数，如签名过期导致验证失败，具体错误信息可以打开config的debug模式查看，也可以在返回的res参数中查看，对于SPA可以在这里更新签名。
+          });
+
+       
+      }
+  })
+  
+function loading() {
+	$('#stateCreat').loading({
+		loadingWidth:120,
+		title:'',
+		name:'test',
+		discription:'',
+		direction:'column',
+		type:'origin',
+		// originBg:'#71EA71',
+		originDivWidth:40,
+		originDivHeight:40,
+		originWidth:6,
+		originHeight:6,
+		smallLoading:false,
+		loadingMaskBg:'rgba(0,0,0,0.2)'
+	});
+
+}
+  
+  $("#applyEnterpriseReigionName").cityPicker({
+      title: "选择经营区域",
+  });
+  
+  $("#applyEnterpriseReigionName").change(function () {
+      var val = $("#applyEnterpriseReigionName").val()
+      var str = '北京 北京 无';
+      if(val.indexOf("无") > 0 ){
+
+          var str =$("#applyEnterpriseReigionName").val();
+          var str2 = str.replace(/无/,' ');
+          $("#applyEnterpriseReigionName").val(str2);
+      }
+  });
+  
+//填充信息   
+$.ajax({
+    type: 'GET',
+    url: '/rest/orderwdsjshes/'+id ,
+    data: {} ,
+    headers: {
+        app_code:"WULIUQIANZHUANG",
+        client:"wechat"
+    },
+    success: function (res) {
+    	console.log(res.comment)
+    	$('#comment').text(res.comment);
+    	$('#realName').val(res.realName);
+    	$('#applyMobile').val(res.applyMobile);
+    	$('#applyIdentityNo').val(res.applyIdentityNo);
+    	$('#applyEnterpriseName').val(res.applyEnterpriseName);
+    	$('#applyEnterpriseReigionName').val(res.applyEnterpriseProvince+res.applyEnterpriseCity+res.applyEnterpriseDistrict);
+    	$('#applyEnterpriseAddress').val(res.applyEnterpriseAddress);
+    	
+    	var examineMoney = (res.applyAmount).toFixed(2) + '元';
+    	$('#examineMoney').text(examineMoney);
+    	
+    	var examineDate = res.createdAt;
+    		examineDate = examineDate.split('T')[0];
+    	$('#examineDate').text(examineDate);
+    	var examineBond = res.applyAmount * 0.05;
+    	$('#examineBond').text(examineBond);  //保证金
+    } ,
+    dataType: 'json'
+});
+console.log(window.config.link)
+$.ajax({
+    type: 'GET',
+    url: '/rest/orderwdsjshes/'+window.id+'/state' ,
+    data: {} ,
+    headers: {
+        app_code:"WULIUQIANZHUANG",
+        client:"wechat"
+    },
+    success: function (res) {
+    	if(res.ActionStatus == 'FAIL'){
+        	alert(res.ErrorInfo)
+        }else{
+        	console.log(res)
+        	//待审核
+        	if(res.stateCode=='CREATED'){
+        		$('#stateCreat').show(); //补全资料
+        		$('#stateExamine').hide();//审核状态
+        		$('#beidouAdopt').hide();
+        		
+        		//物流钱庄未通过
+        	}else if(res.stateCode == 'DENIED'){
+        		$('#stateCreat').hide(); //补全资料
+        		$('#stateExamine').show();//审核状态
+        		$('#beidouAdopt').hide();
+        		$('#examineBtn').text('去补全');
+        		
+        		$('#examineBtn').click(function(){
+        			$('#stateCreat').show(); //补全资料
+            		$('#stateExamine').hide();//审核状态
+            		$('#beidouAdopt').hide();
+        		})
+        	}
+        	//贝兜通过
+        	else if(res.stateCode == 'ENABLED'){
+        		$('#stateCreat').hide(); //补全资料
+        		$('#stateExamine').hide();//审核状态
+        		$('#beidouAdopt').show();
+        		
+        	}
+        	//贝兜未通过
+        	else if(res.stateCode == 'NOTPASS'){
+        		$('#stateCreat').hide(); //补全资料
+        		$('#stateExamine').show();//审核状态
+        		$('#beidouAdopt').hide();
+        		$('#isAdopt').text('初步审核通过')
+        		$('#isAdopt').css('color','#666');
+        		$('#isAdopt_ziliao').hide();
+        		
+				$('#examineBtn').text('去补全');
+				$('#bdsh').text('终审未通过')
+				$('#bdsh').css('color','#FC2321');
+        		$('#examineBtn').click(function(){
+        			$('#stateCreat').show(); //补全资料
+            		$('#stateExamine').hide();//审核状态
+            		$('#beidouAdopt').hide();
+        		})
+        		
+        	}
+        	//物流钱庄通过
+        	else if(res.stateCode == 'ADOPT'){
+        		$('#stateCreat').hide(); //补全资料
+        		$('#stateExamine').show();//审核状态
+        		$('#comment').hide(); //理由
+        		$('#examineBtn').text('下一步');
+        		$('#isAdopt').text('初步审核通过')
+        		$('#isAdopt').css('color','#666');
+        		$('#isAdopt_ziliao').hide();
+        		$('#examineBtn').click(function(){
+        			 //填充信息   
+        			$.ajax({
+        			    type: 'GET',
+        			    url: '/rest/orderwdsjshes/'+window.id ,
+        			    data: {} ,
+        			    headers: {
+        			        app_code:"WULIUQIANZHUANG",
+        			        client:"wechat"
+        			    },
+        			    success: function (res) {
+        			        var amount = res.applyAmount; 			    	
+        			    	var mobile = res.applyMobile;
+                	        var name = res.realName;
+                	        var idcar = res.applyIdentityNo;
+                	        var fileUrl =res.zipURL;
+                	       	var toUrl=window.config.link+'/bdjf/html5/basicInformation.html?mobile='+mobile+'&name='+name+'&idcar='+idcar+'&zcCode=1004&zcName='+window.config.zcName+'&ptproductId='+window.config.ptproductId+'&productName='+window.config.productName+'&amount='+amount+'&fileUrl='+fileUrl;
+                			window.location.href=toUrl;
+        			    } ,
+        			    dataType: 'json'
+        			});
+ 
+        		})
+        	}
+ 		    
+ 	   }
+    } ,
+    dataType: 'json'
+});   
+$.ajax({
+    type: 'get',
+    url: '/rest/orderwdsjshes/'+window.id+'/files' ,
+    data:{},
+    headers: {
+        app_code:"WULIUQIANZHUANG",
+        client:"wechat",
+        "Content-Type":"application/json",
+    },
+    success: function (res) {
+        var ImgData=res._embedded.orderwdsjshFiles;
+        $.each(ImgData,function (key,val) {
+            if(val.subcategory == '营业执照'){
+                //$('#yyzz').prepend('<img class="imgBtn" style="width: 67px; height: 67px;margin: 0 5px;" src="http://files.xiaojinpingtai.com/'+val.newFileName+'" upsrc="null">')
+                $('#yyzz').prepend('<div style="position: relative;display: inline-block"><img class="imgBtn" src="http://files.xiaojinpingtai.com/'+val.newFileName+'" upsrc="null" style="width: 67px; height: 67px;margin: 0 5px;"></div>')
+            }else if(val.subcategory == '快递经营许可证'){
+                //$('#kdjy').prepend('<img class="imgBtn" style="width: 67px; height: 67px;margin: 0 5px;" src="http://files.xiaojinpingtai.com/'+val.newFileName+'" upsrc="null">')
+                $('#kdjy').prepend('<div style="position: relative;display: inline-block"><img class="imgBtn" src="http://files.xiaojinpingtai.com/'+val.newFileName+'" upsrc="null" style="width: 67px; height: 67px;margin: 0 5px;"></div>')
+            }
+            else if(val.subcategory == '法人、企业征信查询授权书'){
+                //$('#zxbg').prepend('<img class="imgBtn" style="width: 67px; height: 67px;margin: 0 5px;" src="http://files.xiaojinpingtai.com/'+val.newFileName+'" upsrc="null">')
+                $('#zxbg').prepend('<div style="position: relative;display: inline-block"><img class="imgBtn" src="http://files.xiaojinpingtai.com/'+val.newFileName+'" upsrc="null" style="width: 67px; height: 67px;margin: 0 5px;"></div>')
+            }
+            else if(val.subcategory == '网点经营场地'){
+               //$('#jycd').prepend('<img class="imgBtn" style="width: 67px; height: 67px;margin: 0 5px;" src="http://files.xiaojinpingtai.com/'+val.newFileName+'" upsrc="null">')
+                $('#jycd').prepend('<div style="position: relative;display: inline-block"><img class="imgBtn" src="http://files.xiaojinpingtai.com/'+val.newFileName+'" upsrc="null" style="width: 67px; height: 67px;margin: 0 5px;"></div>')
+
+            }
+            else if(val.subcategory == '网点系统截图'){
+                //$('#wdjt').prepend('<img class="imgBtn" style="width: 67px; height: 67px;margin: 0 5px;" src="http://files.xiaojinpingtai.com/'+val.newFileName+'" upsrc="null">')
+                $('#wdjt').prepend('<div style="position: relative;display: inline-block"><img class="imgBtn" src="http://files.xiaojinpingtai.com/'+val.newFileName+'" upsrc="null" style="width: 67px; height: 67px;margin: 0 5px;"></div>')
+            }
+            else if(val.subcategory == '夫妻双方身份证,结婚证'){
+                //$('#fqsf').prepend('<img class="imgBtn" style="width: 67px; height: 67px;margin: 0 5px;" src="http://files.xiaojinpingtai.com/'+val.newFileName+'" upsrc="null">')
+                $('#fqsf').prepend('<div style="position: relative;display: inline-block"><img class="imgBtn" src="http://files.xiaojinpingtai.com/'+val.newFileName+'" upsrc="null" style="width: 67px; height: 67px;margin: 0 5px;"></div>')
+            }
+            else if(val.subcategory == '租房合同或土地证'){
+                //$('#zfht').prepend('<img class="imgBtn" style="width: 67px; height: 67px;margin: 0 5px;" src="http://files.xiaojinpingtai.com/'+val.newFileName+'" upsrc="null">')
+                $('#zfht').prepend('<div style="position: relative;display: inline-block"><img class="imgBtn" src="http://files.xiaojinpingtai.com/'+val.newFileName+'" upsrc="null" style="width: 67px; height: 67px;margin: 0 5px;"></div>')
+
+            }
+            else if(val.subcategory == '财务报表'){
+               // $('#cwbb').prepend('<img class="imgBtn" style="width: 67px; height: 67px;margin: 0 5px;" src="http://files.xiaojinpingtai.com/'+val.newFileName+'" upsrc="null">')
+                $('#cwbb').prepend('<div style="position: relative;display: inline-block"><img class="imgBtn" src="http://files.xiaojinpingtai.com/'+val.newFileName+'" upsrc="null" style="width: 67px; height: 67px;margin: 0 5px;"></div>')
+
+            }
+            else if(val.subcategory == '个人名下房产证'){
+               // $('#grfc').prepend('<img class="imgBtn" style="width: 67px; height: 67px;margin: 0 5px;" src="http://files.xiaojinpingtai.com/'+val.newFileName+'" upsrc="null">')
+                $('#grfc').prepend('<div style="position: relative;display: inline-block"><img class="imgBtn" src="http://files.xiaojinpingtai.com/'+val.newFileName+'" upsrc="null" style="width: 67px; height: 67px;margin: 0 5px;"></div>')
+
+            }
+            else if(val.subcategory == '个人名下车辆清单'){  	
+            	//$('#grcl').prepend('<img class="imgBtn" style="width: 67px; height: 67px;margin: 0 5px;" src="http://files.xiaojinpingtai.com/'+val.newFileName+'" upsrc="null">')
+                $('#grcl').prepend('<div style="position: relative;display: inline-block"><img class="imgBtn" src="http://files.xiaojinpingtai.com/'+val.newFileName+'" upsrc="null" style="width: 67px; height: 67px;margin: 0 5px;"></div>')
+            }
+            else if(val.subcategory == '下设承包商的业务量清单'){
+                //$('#ywqd').prepend('<img class="imgBtn" style="width: 67px; height: 67px;margin: 0 5px;" src="http://files.xiaojinpingtai.com/'+val.newFileName+'" upsrc="null">')
+                $('#ywqd').prepend('<div style="position: relative;display: inline-block"><img class="imgBtn" src="http://files.xiaojinpingtai.com/'+val.newFileName+'" upsrc="null" style="width: 67px; height: 67px;margin: 0 5px;"></div>')
+
+            }
+            else if(val.subcategory == '近6个月主要走账的银行流水'){
+                //$('#yhls').prepend('<img class="imgBtn" style="width: 67px; height: 67px;margin: 0 5px;" src="http://files.xiaojinpingtai.com/'+val.newFileName+'" upsrc="null">')
+                $('#yhls').prepend('<div style="position: relative;display: inline-block"><img class="imgBtn" src="http://files.xiaojinpingtai.com/'+val.newFileName+'" upsrc="null" style="width: 67px; height: 67px;margin: 0 5px;"></div>')
+
+            }
+            else if(val.subcategory == '对外借款及月还款清单'){
+                //$('#dwjk').prepend('<img class="imgBtn" style="width: 67px; height: 67px;margin: 0 5px;" src="http://files.xiaojinpingtai.com/'+val.newFileName+'" upsrc="null">')
+                $('#dwjk').prepend('<div style="position: relative;display: inline-block"><img class="imgBtn" src="http://files.xiaojinpingtai.com/'+val.newFileName+'" upsrc="null" style="width: 67px; height: 67px;margin: 0 5px;"></div>')
+
+            }
+            else if(val.subcategory == '近3个月水电费清单'){
+                //$('#sdf').prepend('<img class="imgBtn" style="width: 67px; height: 67px;margin: 0 5px;" src="http://files.xiaojinpingtai.com/'+val.newFileName+'" upsrc="null">')
+                $('#sdf').prepend('<div style="position: relative;display: inline-block"><img class="imgBtn" src="http://files.xiaojinpingtai.com/'+val.newFileName+'" upsrc="null" style="width: 67px; height: 67px;margin: 0 5px;"></div>')
+
+            }
+            else if(val.subcategory == '公司名下资产明细清单'){
+                //$('#zcmx').prepend('<img class="imgBtn" style="width: 67px; height: 67px;margin: 0 5px;" src="http://files.xiaojinpingtai.com/'+val.newFileName+'" upsrc="null">')
+                $('#zcmx').prepend('<div style="position: relative;display: inline-block"><img class="imgBtn" src="http://files.xiaojinpingtai.com/'+val.newFileName+'" upsrc="null" style="width: 67px; height: 67px;margin: 0 5px;"></div>')
+            }
+            else if(val.subcategory == '与总公司签订的《网点加盟协议》'){
+               // $('#jmxy').prepend('<img class="imgBtn" style="width: 67px; height: 67px;margin: 0 5px;" src="http://files.xiaojinpingtai.com/'+val.newFileName+'" upsrc="null">')
+                $('#jmxy').prepend('<div style="position: relative;display: inline-block"><img class="imgBtn" src="http://files.xiaojinpingtai.com/'+val.newFileName+'" upsrc="null" style="width: 67px; height: 67px;margin: 0 5px;"></div>')
+
+            }else if(val.subcategory == '其他'){
+                //$('#qt').prepend('<img class="imgBtn" style="width: 67px; height: 67px;margin: 0 5px;" src="http://files.xiaojinpingtai.com/'+val.newFileName+'" upsrc="null">')
+                $('#qt').prepend('<div style="position: relative;display: inline-block"><img class="imgBtn" src="http://files.xiaojinpingtai.com/'+val.newFileName+'" upsrc="null" style="width: 67px; height: 67px;margin: 0 5px;"></div>')
+
+            }
+        })
+    } ,
+    dataType: 'json'
+});
+    
+
+    //点击下拉显示更多
+    $('#other').click(function () {
+        if($('#other_item').css('display') == 'none'){
+            $('#other_item').slideDown();
+            $('#other').find('i').removeClass('icon-74').addClass('icon-35');
+        }else{
+            $('#other_item').slideUp();
+            $('#other').find('i').removeClass('icon-35').addClass('icon-74');
+        }
+
+    })
+  
+
+   //预览图片
+   $(document).on('click','.imgBtn',function(e){
+	   var data=[];
+	   var current=$(e.target).attr('src');
+	   data.push($(e.target).attr('src'));
+		
+		$.each($(e.target).parent().siblings().find('img'),function(key,val){
+			if(val.tagName == 'IMG'){
+				
+				data.push(val.src)
+			}
+			console.log(val.tagName)
+		})
+		console.log(data)
+		wx.previewImage({
+		    current: current, // 当前显示图片的http链接
+		    urls: data // 需要预览的图片http链接列表
+		});
+   });
+    
+
+    Array.prototype.removeByValue = function(val) {
+    	  for(var i=0; i<this.length; i++) {
+    	    if(this[i] == val) {
+    	      this.splice(i, 1);
+    	      break;
+    	    }
+    	  }
+    	}
+
+    //删除按钮
+    $(document).on('click','.delBtn',function(e){
+	  	//奇怪的Jquery对象
+    	//console.log($(e.target).siblings()[0].attributes[1].value)
+    	//console.log($(e.target).parent().parent().parent().prev().text());
+	  	//二级分类
+	  	var subcategory = $(e.target).parent().parent().parent().prev().text();
+	  	//微信SERVERID
+	  	var serverId = $(e.target).siblings()[0].attributes[1].value;
+	  	
+	  	//DOM删除图片节点
+	  $(e.target).parent().remove();
+	  	
+    	$.each(arrData,function(key,val){
+    		console.log(val)
+    		if(subcategory == val.subcategory){
+    			$.each(val.wechatFiles,function(k,v){
+    	    		if(v == serverId)
+    	    			val.wechatFiles.removeByValue(v)
+    	    			console.log(val.wechatFiles)
+    	    	})
+    		}
+    	})
+   });
+    
+
+    //上传图片
+    var arrData=[];
+  
+    $('.imgUp').click(function (e) {
+        wx.chooseImage({
+            count: 5, // 默认9
+            sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
+            sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
+            success: function (res) {
+                if(res.errMsg == 'chooseImage:ok'){
+                    //console.log(res)
+                    var Obj = {};
+                    console.log($(e.target).parent().parent().prev().text())
+                    if($(e.target).parent().parent().prev().text() == '营业执照'){
+                        Obj.topcategory = '身份证明类';
+                        Obj.subcategory = '营业执照';
+                    } else if($(e.target).parent().parent().prev().text() == '快递经营许可证'){
+                        Obj.topcategory = '身份证明类';
+                        Obj.subcategory = '快递经营许可证';
+                    }else if($(e.target).parent().parent().prev().text() == '法人、企业征信查询授权书'){
+                        Obj.topcategory = '身份证明类';
+                        Obj.subcategory = '法人、企业征信查询授权书';
+                    }else if($(e.target).parent().parent().prev().text() == '网点经营场地照片'){
+                        Obj.topcategory = '资产证明类';
+                        Obj.subcategory = '网点经营场地';
+                    }else if($(e.target).parent().parent().prev().text() == '网点系统截图'){
+                        Obj.topcategory = '资产证明类';
+                        Obj.subcategory = '网点系统截图';
+                    }else if($(e.target).parent().parent().prev().text() == '夫妻双方身份证,结婚证'){
+                        Obj.topcategory = '身份证明类';
+                        Obj.subcategory = '夫妻双方身份证,结婚证';
+                    }else if($(e.target).parent().parent().prev().text() == '租房合同或土地证'){
+                        Obj.topcategory = '资产证明类';
+                        Obj.subcategory = '租房合同或土地证';
+                    }else if($(e.target).parent().parent().prev().text() == '财务报表'){
+                        Obj.topcategory = '资产证明类';
+                        Obj.subcategory = '财务报表';
+                    }else if($(e.target).parent().parent().prev().text() == '个人名下房产证'){
+                        Obj.topcategory = '资产证明类';
+                        Obj.subcategory = '个人名下房产证';
+                    }else if($(e.target).parent().parent().prev().text() == '个人名下车辆清单'){
+                        Obj.topcategory = '资产证明类';
+                        Obj.subcategory = '个人名下车辆清单';
+                    }else if($(e.target).parent().parent().prev().text() == '下设承包商的业务量清单'){
+                        Obj.topcategory = '资产证明类';
+                        Obj.subcategory = '下设承包商的业务量清单';
+                    }else if($(e.target).parent().parent().prev().text() == '近6个月主要走账的银行流水'){
+                        Obj.topcategory = '资产证明类';
+                        Obj.subcategory = '近6个月主要走账的银行流水';
+                    }else if($(e.target).parent().parent().prev().text() == '对外借款及月还款清单'){
+                        Obj.topcategory = '资产证明类';
+                        Obj.subcategory = '对外借款及月还款清单';
+                    }else if($(e.target).parent().parent().prev().text() == '近3个月水电费清单'){
+                        Obj.topcategory = '资产证明类';
+                        Obj.subcategory = '近3个月水电费清单';
+                    }else if($(e.target).parent().parent().prev().text() == '公司名下资产明细清单'){
+                        Obj.topcategory = '资产证明类';
+                        Obj.subcategory = '公司名下资产明细清单';
+                    }else if($(e.target).parent().parent().prev().text() == '与总公司签订的《网点加盟协议》'){
+                        Obj.topcategory = '合同协议类';
+                        Obj.subcategory = '与总公司签订的《网点加盟协议》';
+                    }
+                    else if($(e.target).parent().parent().prev().text() == '其他'){
+                        Obj.topcategory = '其他';
+                        Obj.subcategory = '其他';
+                    }
+                  
+                    Obj.wechatFiles =[];
+                    var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
+                    var localIdslength1=localIds.length;
+                  
+                    wxuploadImage(localIds,Obj,e.target);
+
+                    
+
+                }
+
+            }
+        })
+    })
+	//递归上传图片
+	function wxuploadImage(localIds,obj1,target){
+    	
+        var localId = localIds.pop();
+        wx.uploadImage({
+            localId: localId, // 需要上传的图片的本地ID，由chooseImage接口获得
+            isShowProgressTips: 1, // 默认为1，显示进度提示
+            success: function (res) {
+                //console.log(res)
+                if(res.errMsg == 'uploadImage:ok'){
+                    var serverId = res.serverId; // 返回图片的服务器端ID
+                    if(localIds.length > 0){
+                    	console.log(obj1)
+                    	var img = '<div style="position: relative;display: inline-block"><div class="icon icon-72 delBtn"></div><img class="imgBtn" upsrc="'+serverId+'" src="'+localId+'" style="width: 67px; height: 67px;margin: 0 5px;"></div>'
+                       $(target).parent().prepend(img);
+                    	obj1.wechatFiles.push(serverId);
+                        wxuploadImage(localIds,obj1,target);
+                    }else {
+                    	var img = '<div style="position: relative;display: inline-block"><div class="icon icon-72 delBtn"></div><img class="imgBtn" upsrc="'+serverId+'" src="'+localId+'" style="width: 67px; height: 67px;margin: 0 5px;"></div>'
+                        $(target).parent().prepend(img);
+                    	obj1.wechatFiles.push(serverId);
+                        arrData.push(obj1);
+                        console.log(arrData)
+                     
+					}
+
+                }
+
+            }
+        });
+	}
+    
+
+	//上传图片按钮
+    $('#subButton').click(function () {
+    	 $('html, body').animate({scrollTop:0}, 1);
+    	loading();
+
+  
+    	//兼容LOADING效果
+    	/* $(document).on('touchmove',function(e){
+    		e.preventDefault();
+    	})
+    	document.documentElement.style.overflow='hidden'; */
+
+    	 //$("body").mLoading();
+    	
+    	//alert(JSON.stringify(arrData))
+    	
+		//console.log(arrData)
+    	//alert(arrData.length);
+    	//alert(JSON.stringify(arrData))
+    	var realName = $('#realName').val();
+    	var applyMobile = $('#applyMobile').val();
+    	var applyIdentityNo = $('#applyIdentityNo').val();
+    	var applyEnterpriseName = $('#applyEnterpriseName').val();
+    	//$('#applyEnterpriseReigionName').val();
+    	var applyEnterpriseAddress = $('#applyEnterpriseAddress').val();
+    	
+    	var applyEnterpriseReigionName =$('#applyEnterpriseReigionName').val(); //快递网点经营区域
+        applyEnterpriseReigionName = applyEnterpriseReigionName.split(' ');
+        var apply_enterprise_province =applyEnterpriseReigionName[0];
+        var apply_enterprise_city= applyEnterpriseReigionName[1];
+        var apply_enterprise_district= applyEnterpriseReigionName[2];
+    	var data ={
+    			state:'/rest/orderwdsjshStates/1',
+                act:'confirm',
+    			realName:realName,
+    			applyMobile:applyMobile,
+    			applyIdentityNo:applyIdentityNo,
+    			applyEnterpriseName:applyEnterpriseName,
+    			applyEnterpriseAddress:applyEnterpriseAddress,
+    			applyEnterpriseProvince:apply_enterprise_province,
+                applyEnterpriseCity:apply_enterprise_city,
+                applyEnterpriseDistrict:apply_enterprise_district,
+    			
+    	};
+    	console.log(data)
+    	 var updata=JSON.stringify(data);
+    	$.ajax({
+                    type: 'patch',
+                    url: '/rest/orderwdsjshes/'+window.id ,
+                    data:updata,
+                    headers: {
+                        app_code:"WULIUQIANZHUANG",
+                        client:"wechat",
+                        "Content-Type":"application/json",
+                    },
+                    success: function (res) {
+                    	 if(res.ActionStatus == 'FAIL'){
+                            	alert(res.ErrorInfo)
+                            }else{
+                            	if(arrData.length>0){
+                            		//alert(JSON.stringify(arrData))
+                                	var k=1;
+                                	var length=arrData.length;
+                                    $.each(arrData,function (key,val) {
+                                        var updata = JSON.stringify(val);
+
+                                        $.ajax({
+                                            type: 'patch',
+                                            url: '/rest/orderwdsjshes/'+window.id ,
+                                            data:updata,
+                                            headers: {
+                                                app_code:"WULIUQIANZHUANG",
+                                                client:"wechat",
+                                                "Content-Type":"application/json",
+                                            },
+                                            success: function (res) {
+                                            	//removeLoading('test');
+                                            	 if(res.ActionStatus == 'FAIL'){
+                                                    	alert(res.ErrorInfo)
+                                                    }else{
+                                                    	if(k==length){
+                                                    	//alert(k)
+                                                    	window.location.href='success.html';
+                                                    	}else{
+                                                    		k++;
+                                                    	}
+                                                    	
+                                                    	//alert(JSON.stringify(res))
+                                             		    
+                                             	   }
+                        						
+                                            }, 
+                                            error: function(res) {
+                                            	removeLoading('test');
+                                            	alert(res.responseJSON.message); 
+                                            } ,
+                                            dataType: 'json'
+                                        });
+                                    })
+                                }else{
+                                	
+                                	window.location.href='success.html';
+                                }
+                     	   }
+						
+                    }, 
+                    error: function(res) { 
+                    	 removeLoading('test');
+                    	 alert('身份证或手机号已被注册')
+                    	//alert(res.responseJSON.message); 
+                    } ,
+                    dataType: 'json'
+                });
+        
+    })
+    
+
+</script>
+</html>

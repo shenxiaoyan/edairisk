@@ -1,0 +1,68 @@
+<script>
+    "use strict";
+    app.controller("repaymentCustomerHomeController",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "$state",
+            "entity",
+            function ($rootScope, $scope, $http, $stateParams, $state, entity) {
+
+                $scope.id = $stateParams.id;
+                $scope.info = $rootScope.repaymentInfo; //详细信息
+
+                $scope.sjshShow = false;
+                $scope.mdbtShow =false;
+                $scope.sjshIsHaveLoan =false;
+
+                //随借随还 和面单白条数据格式不一致，有很多不同处，分别做了2张详细表
+                entity.getDetail("/rest/creditcards/" + $scope.id,['product']).then(function (resResult) {
+                    console.log(resResult)
+                    //随借随还
+                    if(resResult.product.id == '1'){
+                        $scope.sjshShow =true;
+                    }
+                    //面单白条
+                    else if(resResult.product.id == '4'){
+                        $scope.mdbtShow =true;
+                    }
+
+                    entity.getDetail("/person/getcreditcarddetail?creditcardId=" + $scope.id).then(function (resResult) {
+                        console.log(resResult)
+                        $scope.profile = resResult.data;
+
+                        angular.forEach($scope.profile,function (data,index) {
+                            data.index = index + 1;
+                            data.show = false
+                        })
+
+                    });
+                });
+
+
+
+                //显示隐藏信息
+                $scope.trToggle=function (index) {
+                    angular.forEach($scope.profile,function (val,key) {
+                        if( val.index == index){
+                            val.show = ! val.show
+                            console.log(val.show)
+                        }
+                    })
+                }
+
+            }
+        ]
+    );
+</script>
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light" ng-controller="repaymentCustomerHomeController">
+    <!-- column -->
+    <div class="col w-md lter b-l">
+        <div class="h-full" ui-view></div>
+    </div>
+    <!-- /column -->
+</div>
+<!-- /hbox layout -->

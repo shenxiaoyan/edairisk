@@ -1,0 +1,41 @@
+
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light">
+
+
+	<div class="col w-md ">
+
+		<div class="vbox">
+			<div class="wrapper-md b-b">
+				<div class="font-thin h4">提现</div>
+			</div>
+			<div class="row-row">
+				<div class="cell scrollable">
+					<div class="cell-inner">
+						<ul class="nav nav-pills nav-stacked nav-sm">
+							<li ui-sref-active="active"><a
+								ui-sref="widthdraws.list({status:'all'})"> &nbsp; <b
+									class="badge bg-info pull-right">312</b> <b>全部</b></a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="widthdraws.list({status:'unsubmit'})"> &nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;待审核
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="widthdraws.list({status:'comfirmed'})">
+									&nbsp;&nbsp;<i class="fa fa-angle-right"></i>
+									&nbsp;&nbsp;已审核/待打款
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="widthdraws.list({status:'finished'})"> &nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;已打款
+							</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+	<div class="col lter" ui-view></div>
+</div>
+<!-- /hbox layout -->

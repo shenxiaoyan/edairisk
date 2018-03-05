@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>申请调额</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../../../css/weui.css">
+    <link rel="stylesheet" href="../../../css/weui2.css">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <link rel="stylesheet" href="../../../css/jquery.circliful.css">
+    <link rel="stylesheet" href="../../../css/icon.css">
+    <style>
+        .btn{
+            width: 100%;
+            height: 40px;
+            background: #169BD5;
+            border-radius: 20px;
+            display: inline-block;
+            text-align: center;
+            line-height: 40px;
+            color: white;
+            font-size: 16px;
+        }
+        .btn:active{
+            background: #CCCCCC;
+            color: white;
+        }
+    </style>
+</head>
+<body style="background: #fff">
+    <p style="margin-top: 20px;text-align: center">可根据个人需要申请调整额度</p>
+    <div style="width: 200px;margin: 20px auto 10px">
+        <input id="quotaAmount" type="number" style="border: none;font-weight:bolder;font-size: 28px;width: 200px;text-align: center">
+    </div>
+    <div style="width: 150px; border-top: 1px dashed #000;margin: 0 auto">
+        <p style="text-align:center;margin-top: 10px;">调整以1,000为单位</p>
+    </div>
+    <div style="height: 30px;width: 100%;background:#F2F2F2;margin-top: 20px;"></div>
+
+    <div style="color: #999999;width: 280px; margin: 0 auto">
+        <p style="margin-top: 20px;text-align: center;margin-bottom: 20px;">调整规则</p>
+        <p>1.每次申请在审核中无法修改申请额度.</p>
+        <p>2.申请成功后,授信额度及时生效.</p>
+        <p>3.额度调整后无法撤销,只能再次申请.</p>
+    </div>
+    <div class="page-bd-15" style="margin-top: 50px;">
+        <div class="btn" id="changeBtn">
+            申请调整
+        </div>
+    </div>
+</body>
+<script src="../../../js/jquery-3.2.1.js"></script>
+<script src="../../../js/zepto.min.js"></script>
+<script src="../../../js/jquery.circliful.min.js"></script>
+<script src="../../../js/config.js"></script>
+<script>
+    if(window.location.search){
+        var href = window.location.href;
+        var creditcardId = href.split('&')[1];
+        creditcardId = creditcardId.split('=')[1];
+        var creditGrant = href.split('?')[1];
+        creditGrant = creditGrant.split('&')[0];
+        creditGrant = creditGrant.split('=')[1];
+        $('#quotaAmount').val(creditGrant);
+    }
+
+    //一个月只能申请一次
+    $.ajax({
+        type: 'post',
+        url:'/quota/queryQuotaRecord',
+        data: {
+            'creditcardId':creditcardId
+        },
+        headers: {
+            app_code:"WULIUQIANZHUANG",
+            client:"wechat"
+        },
+        success: function (res) {
+           console.log(res.data)
+            if(res.data !== 0) {
+               $('#changeBtn').unbind().css('background', '#CCCCCC');
+            }
+        } ,
+        error:function (res) {
+            alert(res.responseJSON.message)
+        },
+        dataType: 'json'
+    });
+
+    $('#changeBtn').click(function () {
+        var quotaAmount = $('#quotaAmount').val();
+        if((quotaAmount % 1000) == 0){
+            console.log(quotaAmount)
+            console.log(creditGrant)
+            if( parseFloat(quotaAmount) <= parseFloat(creditGrant) ){
+                $.alert('申请提额金额不能小于原来的额度!')
+            }else {
+                $.showLoading();
+
+                $.ajax({
+                    type: 'post',
+                    url:'/quota/quotaApplication',
+                    data: {
+                        'creditcardId':creditcardId,
+                        'quotaAmount':quotaAmount
+                    },
+                    headers: {
+                        app_code:"WULIUQIANZHUANG",
+                        client:"wechat"
+                    },
+                    success: function (res) {
+                        $.hideLoading();
+                        $.toast(res.data);
+                        setTimeout(function () {
+                            window.location.href="../myLoanLogin.html"
+                        },2500)
+                        console.log(res)
+                    } ,
+                    error:function (res) {
+                        $.hideLoading();
+                        console.log(res)
+                        alert(res.responseJSON.message)
+                    },
+                    dataType: 'json'
+                });
+            }
+
+        }else {
+            $.alert('调整金额请输入1000的整数倍')
+        }
+
+    })
+
+</script>
+</html>

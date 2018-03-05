@@ -1,0 +1,47 @@
+
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light">
+
+
+	<div class="col w-md b-r ">
+
+		<div class="vbox">
+			<div class="wrapper-md b-b">
+				<div class="font-thin h4">产品线</div>
+			</div>
+			<div class="wrapper b-b">
+				<div class="btn-group pos-stc">
+					<div class="btn-group dropdown">
+						<a ui-sref="products.create"
+							class="pull-right btn btn-sm btn-danger w-auto-xs dropdown-toggle"
+							tooltip="新建产品线" tooltip-placement="bottom"><i
+							class="fa fa-fw fa-tag"></i> 新建 </a>
+					</div>
+				</div>
+			</div>
+			<div class="row-row">
+				<div class="cell scrollable">
+					<div class="cell-inner">
+						<div class="wrapper-md">
+
+							<ul class="nav nav-pills nav-stacked nav-sm">
+								<li ui-sref-active="active"><a
+									ui-sref="products.product.page({product_id:1,view_type:'dashboard'})">面单白条</a>
+								</li>
+								<li ui-sref-active="active"><a
+									ui-sref="products.product.page({product_id:21,view_type:'dashboard'})">先息后本</a>
+								</li>
+								<li ui-sref-active="active"><a
+									ui-sref="products.product.page({product_id:13,view_type:'dashboard'})">随借随还</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+	<div class="col lter" ui-view></div>
+</div>
+<!-- /hbox layout -->

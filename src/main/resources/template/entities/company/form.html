@@ -1,0 +1,254 @@
+<script>
+    "use strict";
+    app.controller("departmentFormController",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "$state",
+            "entity",
+            function ($rootScope, $scope, $http, $stateParams, $state, entity) {
+
+                $scope.allStates          = null;//所有状态
+                $scope.state              = null;//默认或关联的状态
+                $scope.allDepartmenttypes = null;//所有部门类型
+                $scope.departmenttype     = null;//默认或关联的部门类型
+                $scope.allEnterprises     = null;//所有企业
+                $scope.enterprise         = null;//默认或关联的企业
+
+                //新建部门
+                if ($stateParams.id) {
+
+                    //存储id便于跳转回详情页
+                    $scope.id = $stateParams.id;
+
+                    //load数据
+                    entity.getDetail("rest/departments/" + $stateParams.id, ["state", "departmenttype", "enterprise"]).then(function (resResult) {
+
+                        $scope.form = resResult;
+
+                        //获取所有部门状态
+                        entity.getList("rest/departmentStates").then(function (statesResResult) {
+                            $scope.allStates = statesResResult._embeddedItems;
+                            //获取关联的部门状态
+                            $scope.state     = entity.getSelectedMyOwn($scope.allStates, $scope.form.state);
+                        });
+
+                        //获取所有部门类型
+                        entity.getList("rest/departmenttypes").then(function (departtypesResResult) {
+                            $scope.allDepartmenttypes = departtypesResResult._embeddedItems;
+                            //获取关联的部门类型
+                            $scope.departmenttype     = entity.getSelectedMyOwn($scope.allDepartmenttypes, $scope.form.departmenttype);
+
+                        });
+
+                        //获取所有企业
+                        entity.getList("rest/enterprises").then(function (enterprisesResResult) {
+                            $scope.allEnterprise = enterprisesResResult._embeddedItems;
+                            //获取关联的企业
+                            $scope.enterprise    = entity.getSelectedMyOwn($scope.allEnterprise, $scope.form.enterprise);
+                        });
+
+                    });
+
+                } else {//修改部门
+
+                    //数据为空
+                    $scope.form = {};
+
+                    //获取所有部门状态
+                    entity.getList("rest/departmentStates").then(function (resResult) {
+                        $scope.allStates = resResult._embeddedItems;
+                        $scope.state     = $scope.allStates[0];
+                    });
+
+                    //获取所有部门类型，并设置默认
+                    entity.getList("rest/departmenttypes").then(function (resResult) {
+                        $scope.allDepartmenttypes = resResult._embeddedItems;
+                        $scope.departmenttype     = $scope.allDepartmenttypes[0];
+                    });
+
+                    //获取所有企业，并设置默认
+                    entity.getList("rest/enterprises").then(function (enterpriseResResult) {
+                        $scope.allEnterprise = enterpriseResResult._embeddedItems;
+                        $scope.enterprise    = $scope.allEnterprise[0];
+                    });
+
+                }
+
+                /*
+                 * 保存部门
+                 * @author  金杭
+                 * @param   无
+                 * @return  无
+                 * */
+                $scope.saveDepartment = function () {
+
+                    //将关联数据设置成资源
+                    $scope.form.departmenttype = $scope.departmenttype ? $scope.departmenttype._links.self.href : null;
+                    $scope.form.enterprise     = $scope.enterprise ? $scope.enterprise._links.self.href : null;
+                    $scope.form.state          = $scope.state ? $scope.state._links.self.href : null;
+
+                    //修改时的请求
+                    if ($scope.form._links) {
+
+                        //加入行为code
+                        $scope.form.act = "update";
+
+                        $http({
+                            method: "PATCH",
+                            url: $scope.form._links.self.href,
+                            data: $scope.form
+                        }).success(function (resResult) {
+                            $state.go("auditEntity.home.profile.info", {
+                                id: resResult.id,
+                                entity_key: "department"
+                            }, {reload: true});
+                            $rootScope.toasterSuccess("修改成功！", "部门修改成功！");
+                        });
+
+                    } else {//新建时的保存
+
+                        //加入行为code
+                        $scope.form.act = "create";
+
+                        $scope.form.parent = "rest/departments/" + $rootScope.myinfo.department.id;
+
+                        $http({
+                            method: "POST",
+                            url: "rest/departments",
+                            data: $scope.form
+                        }).success(function (resResult) {
+                            $state.go("auditEntity.list", {entity_key: "department"}, {reload: true});
+                            $rootScope.toasterSuccess("保存成功！", "部门保存成功！");
+                        });
+
+                    }
+
+                };
+
+            }
+        ]
+    )
+</script>
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs" ng-controller="departmentFormController">
+    <!-- column -->
+    <div class="col">
+        <div class="vbox">
+            <div class="wrapper b-b" ng-if="!form._links">
+                <div class="font-thin h4">
+                    <span translate="department.self.label"></span>新建
+                </div>
+            </div>
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner">
+                        <div class="wrapper">
+                            <form name="department_form" class="form-horizontal">
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">
+                                        <span class="text-danger">*</span>
+                                        <span translate="department.label.label"></span>
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="label"
+                                               ng-model="form.label"
+                                               required>
+                                        <span class="help-block text-danger"
+                                              ng-show="department_form.label.$dirty && department_form.label.$invalid">
+                                            <i class="fa fa-exclamation-circle text-danger"></i>&ensp;部门名称为必填
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">
+                                        <span class="text-danger">*</span>
+                                        <span translate="department.sort.label"></span>
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="sort"
+                                               ng-model="form.sort"
+                                               required
+                                               pattern="^[0-9]{1,}$">
+                                        <span class="help-block text-danger"
+                                              ng-show="department_form.sort.$dirty && department_form.sort.$invalid">
+                                            <i class="fa fa-exclamation-circle text-danger"></i>&ensp;排序为必填，且为数字
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">
+                                        <span class="text-danger">*</span>
+                                        <span translate="department.state.label"></span>
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control"
+                                                name="state"
+                                                ng-model="state"
+                                                ng-options="state.label for state in allStates"
+                                                required></select>
+                                        <span class="help-block text-danger"
+                                              ng-show="department_form.state.$dirty && department_form.state.$invalid">
+                                            <i class="fa fa-exclamation-circle text-danger"></i>&ensp;状态为必填
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">
+                                        <span class="text-danger">*</span>
+                                        <span translate="department.departmenttype.label"></span>
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control"
+                                                name="departmenttype"
+                                                ng-model="departmenttype"
+                                                ng-options="departmenttype.label for departmenttype in allDepartmenttypes"
+                                                required></select>
+                                        <span class="help-block text-danger"
+                                              ng-show="department_form.departmenttype.$dirty && department_form.departmenttype.$invalid">
+                                            <i class="fa fa-exclamation-circle text-danger"></i>&ensp;部门类型为必填
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"
+                                           translate="department.enterprise.label"></label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" ng-model="enterprise"
+                                                ng-options="enterprise.label for enterprise in allEnterprise"></select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-4 col-sm-offset-2">
+                                        <button ng-if="form._links"
+                                                ui-sref="auditEntity.home.profile.info({id:id,entity_key:'department'})"
+                                                class="btn btn-default">返回
+                                        </button>
+                                        <button ng-if="!form._links"
+                                                ui-sref="auditEntity.list({entity_key:'department'})"
+                                                class="btn btn-default">返回
+                                        </button>
+                                        <button type="button"
+                                                class="btn btn-primary"
+                                                ng-disabled="department_form.$invalid"
+                                                ng-click="saveDepartment()">
+                                            保存
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /column -->
+</div>
+<!-- /hbox layout -->

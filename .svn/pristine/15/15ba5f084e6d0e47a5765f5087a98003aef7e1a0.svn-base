@@ -1,0 +1,107 @@
+<div class="wrapper bg-white b-b clearfix">
+    <ul class="nav nav-pills nav-sm">
+        <li ng-click="tabshow = false" ng-class="{true: '', false: 'active'}[tabshow]">
+            <a>还款计划</a>
+        </li>
+        <li ng-click="tabshow = true" ng-class="{true: 'active', false: ''}[tabshow]">
+            <a>逾期记录</a>
+        </li>
+        <!--<li ui-sref-active="active">-->
+        <!--<a ui-sref="workflowEntity.home.profile.page({entity_key:'capitalproduct',view_type:'log'})">操作记录</a>-->
+        <!--</li>-->
+    </ul>
+</div>
+<div class="wrapper">
+    <!--<div class="panel panel-warning" ng-show="state_code=='DISABLED'">-->
+        <!--<div class="panel-heading">-->
+            <!--未通过理由-->
+        <!--</div>-->
+        <!--<div class="m-l m-r m-b-sm m-t-sm">-->
+            <!--{{ profile.comment?profile.comment:'未填写'}}-->
+        <!--</div>-->
+    <!--</div>-->
+    <div ng-if="!tabshow" class="panel panel-info">
+        <div class="panel-heading">
+            还款计划
+        </div>
+        <table class="table table-striped m-b-none">
+            <tbody>
+            <tr>
+                <td class="v-middle text-right w-sm">借款单号：</td>
+                <td class="v-middle w-xl" ng-click="toLoanDetail(repaymentPlans.loanSn)"><a style="text-decoration: underline;cursor: pointer">{{repaymentPlans.loanSn}}</a> <i class="icon-share-alt" style="font-size: 15px;margin-left: 10px;"></i></td>
+                <td class="v-middle text-right w-sm">还款计划单号：</td>
+                <td class="v-middle w-xl">{{ repaymentPlans.planSn }}</td>
+            </tr>
+            <tr>
+                <td class="v-middle text-right w-sm">本月应还本金：</td>
+                <td class="v-middle w-xl">{{ repaymentPlans.principal }}</td>
+                <td class="v-middle text-right w-sm">本月应还利息：</td>
+                <td class="v-middle w-xl">{{ repaymentPlans.interest }}</td>
+            </tr>
+            <tr>
+                <td class="v-middle text-right w-sm">操作人：</td>
+                <td class="v-middle w-xl">{{ repaymentPlans.debtorName }}</td>
+                <td class="v-middle text-right w-sm">还款截止时间：</td>
+                <td class="v-middle w-xl">{{ repaymentPlans.debtorRepaymentDate }}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div ng-if="tabshow" class="panel panel-default">
+        <div class="panel-heading" ng-if="listInfo.isHaveCreditRepayments">
+            还款记录
+        </div>
+        <div class="panel-heading" ng-if="!listInfo.isHaveCreditRepayments">
+            暂无还款记录！
+        </div>
+        <div class="table-responsive" ng-if="listInfo.isHaveCreditRepayments">
+            <table class="table table-hover b-light">
+                <thead>
+                <tr>
+                    <th>订单号</th>
+                    <th>客户名</th>
+                    <th>联系方式</th>
+                    <th>还款金额(元)</th>
+                    <th>是否逾期</th>
+                    <th>本金(元)</th>
+                    <th>罚息(元)</th>
+                    <th>利息+手续费(元)</th>
+                    <th>还款时间</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="item in infoList.creditrepayments._embeddedItems">
+                    <td class="v-middle">
+                        {{item.informationJson.id}}
+                    </td>
+                    <td class="v-middle">
+                        {{ personName }}
+                    </td>
+                    <td class="v-middle">
+                        {{ item.informationJson.mobile }}
+                    </td>
+                    <td class="v-middle">
+                        {{ item.informationJson.payAmount }}
+                    </td>
+                    <td class="v-middle">
+                        {{ item.payPlans.isOverdue == 0 ? '否' : '逾期' }}
+                    </td>
+                    <td class="v-middle">
+                        {{ item.payPlans.planCorpus }}
+                    </td>
+                    <td class="v-middle">
+                        {{ item.payPlans.penatly }}
+                    </td>
+                    <td class="v-middle">
+                        {{ item.payPlans.planInterest }}
+                    </td>
+                    <td class="v-middle">
+                        {{ item.informationJson.payDate.substring(0,8)}}
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

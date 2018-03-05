@@ -1,0 +1,241 @@
+<script>
+    /*
+     * 创建人：刘雅倩
+     * 创建时间：2017/08/15
+     * 集团看到的公司贷款报表
+     *
+     * */
+    "use strict";
+    app.controller("groupLoanCtrl", [
+        "$scope",
+        function($scope) {
+//                              测试用的
+
+            $scope.branchList = [
+                {
+                    name: "公司",
+                    login: "560000",
+                    fee: "5120000"
+                }
+            ];
+
+            $scope.brandChart = echarts.init(document.getElementById('branch_dashboard_chart'));
+
+            $scope.option = {
+                title: {
+                    text: '公司贷款报表',
+                    left: 'left',
+                    top: 'bottom'
+                },
+                tooltip: {
+                    trigger: 'item',
+                    formatter: "{a} <br/>{b} : {c}%"
+                },
+                toolbox: {
+                    orient: 'vertical',
+                    top: 'center',
+                    feature: {
+                        dataView: {
+                            readOnly: false
+                        },
+                        restore: {},
+                        saveAsImage: {}
+                    }
+                },
+                legend: {
+                    //                        orient: 'vertical',
+                    //                        left: 'left',
+                    data: ['放款笔数', '贷款笔数', '贷款申请笔数', '平台总访问量']
+                },
+                calculable: true,
+                series: [{
+                    name: '漏斗图',
+                    type: 'funnel',
+                    left: '0.1%',
+                    top: 50,
+                    //x2: 80,
+                    bottom: 50,
+                    width: '50%',
+                    // height: {totalHeight} - y - y2,
+                    min: 0,
+                    max: 100,
+                    minSize: '0%',
+                    maxSize: '100%',
+                    sort: 'descending',
+                    gap: 2,
+                    label: {
+                        normal: {
+                            show: true,
+                            position: 'inside'
+                        },
+                        emphasis: {
+                            textStyle: {
+                                fontSize: 20
+                            }
+                        }
+                    },
+                    labelLine: {
+                        normal: {
+                            length: 10,
+                            lineStyle: {
+                                width: 1,
+                                type: 'solid'
+                            }
+                        }
+                    },
+                    itemStyle: {
+                        normal: {
+                            borderColor: '#fff',
+                            borderWidth: 1
+                        }
+                    },
+                    data: [{
+                        value: 40,
+                        name: '放款笔数'
+                    }, {
+                        value: 60,
+                        name: '贷款笔数'
+                    }, {
+                        value: 80,
+                        name: '贷款申请笔数'
+                    }, {
+                        value: 100,
+                        name: '平台总访问量'
+                    }]
+                }, {
+                    name: '漏斗图',
+                    type: 'funnel',
+                    left: '50.1%',
+                    top: 50,
+                    bottom: 50,
+                    width: '50%',
+                    min: 0,
+                    max: 100,
+                    minSize: '0%',
+                    maxSize: '100%',
+                    sort: 'descending',
+                    gap: 2,
+                    label: {
+                        normal: {
+                            show: true,
+                            position: 'inside'
+                        },
+                        emphasis: {
+                            textStyle: {
+                                fontSize: 20
+                            }
+                        }
+                    },
+                    labelLine: {
+                        normal: {
+                            length: 10,
+                            lineStyle: {
+                                width: 1,
+                                type: 'solid'
+                            }
+                        }
+                    },
+                    itemStyle: {
+                        normal: {
+                            borderColor: '#fff',
+                            borderWidth: 1
+                        }
+                    },
+                    data: [{
+                        value: 20,
+                        name: '放款金额'
+                    }, {
+                        value: 40,
+                        name: '贷款金额'
+                    }, {
+                        value: 60,
+                        name: '贷款申请金额'
+                    }, {
+                        value: 80,
+                        name: '平台访问量'
+                    }]
+                }]
+            };
+
+
+
+            $scope.brandChart.setOption($scope.option);
+
+            //窗口大小改变时重新绘制图表
+            $(window).resize(function() {
+                $scope.brandChart.resize();
+            });
+        }
+    ]);
+</script>
+
+<div class="hbox hbox-auto-xs lter" ng-controller="groupLoanCtrl">
+    <!-- column -->
+    <div class="col">
+        <div class="vbox">
+            <div class="bg-light lter b-b clearfix" style="padding: 14.5px 20px;">
+                <select class="pull-left m-r-sm input-sm form-control w-sm inline v-middle" ng-options="branch.name for branch in branchList" ng-model="branch">
+                    <option value=""> --请选择公司-- </option>
+                </select>
+
+                <div class="pull-right">
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-default" ng-click="changeView()">今天</button>
+                        <button class="btn btn-sm btn-default" ng-click="changeView()">昨天</button>
+                        <button class="btn btn-sm btn-default" ng-click="changeView()">前天</button>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-default" ng-click="changeView('agendaDay')">本周</button>
+                        <button class="btn btn-sm btn-default" ng-click="changeView('agendaWeek')">上周</button>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-default" ng-click="changeView('month')">本月</button>
+                        <button class="btn btn-sm btn-default" ng-click="changeView('month')">上月</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner wrapper-md">
+                        <div style="padding-top: 0;">
+                            <div class="panel wrapper">
+                                <div id="branch_dashboard_chart" style="height:400px;"></div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="table-responsive">
+                                <table class="table table-striped b-t b-light">
+                                    <thead>
+                                        <tr>
+                                            <th>公司</th>
+                                            <th>平台总访问量</th>
+                                            <th>贷款申请笔数</th>
+                                            <th>贷款笔数</th>
+                                            <th>放款笔数</th>
+                                            <th>贷款申请金额</th>
+                                            <th>贷款金额</th>
+                                            <th>放款金额</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="list in branchList">
+                                            <td><span class="pull-left waybill_item_number"><a>{{ list.name}}</a></span></td>
+                                            <td class="report_amount"><span class="text-ellipsis">{{ list.login }}</span></td>
+                                            <td class="report_amount"><span class="text-ellipsis">{{ list.login }}</span></td>
+                                            <td class="report_amount"><span class="text-ellipsis">{{ list.fee }}</span></td>
+                                            <td class="report_amount"><span class="text-ellipsis">{{ list.fee }}</span></td>
+                                            <td class="report_amount"><span class="text-ellipsis">{{ list.login }}</span></td>
+                                            <td class="report_amount"><span class="text-ellipsis">{{ list.fee }}</span></td>
+                                            <td class="report_amount"><span class="text-ellipsis">{{ list.login }}</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

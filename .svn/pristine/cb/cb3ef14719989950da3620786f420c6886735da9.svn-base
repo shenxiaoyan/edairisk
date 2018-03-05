@@ -1,0 +1,472 @@
+<script>
+
+    "use strict";
+    app.controller("riskspersonIntelligentCtrl", [
+        "$scope",
+        function ($scope) {
+
+            $scope.totalMoney = 0;
+
+            $scope.risksList = [
+                {
+                    id: "",
+                    name: "身份核查",
+                    price: "￥1.00",
+                    active: false,
+                    msg: '一致'
+
+                },
+                {
+                    id: "",
+                    name: "入网时长核查",
+                    price: "￥1.00",
+                    active: false,
+                    msg:'100年'
+                },
+                {
+                    id: "",
+                    name: "手机号归属地查询",
+                    price: "￥1.00",
+                    active: false,
+                    msg: {
+                        province: '安徽',
+                        city: '利辛',
+                        description:'安徽移动全球通卡',
+                        shop:'中国移动'
+                    }
+                },
+                {
+                    id: "",
+                    name: "手机号状态核查",
+                    price: "￥1.00",
+                    active: false
+
+                },
+                {
+                    id: "",
+                    name: "肖像核查",
+                    price: "￥1.00",
+                    active: false
+                },
+                {
+                    id: "",
+                    name: "ocr身份信息识别",
+                    price: "￥1.00",
+                    active: false
+                },
+                {
+                    id: "",
+                    name: "智能人脸识别验证",
+                    price: "￥1.00",
+                    active: false
+                },
+                {
+                    id: "",
+                    name: "人像对比认证",
+                    price: "￥1.00",
+                    active: false
+                },
+                {
+                    id: "",
+                    name: "刑事案底核查",
+                    price: "￥1.00",
+                    active: false
+                },
+                {
+                    id: "",
+                    name: "个人银联账单验证",
+                    price: "￥1.00",
+                    active: false
+                },
+                {
+                    id: "",
+                    name: "老赖核查",
+                    price: "￥1.00",
+                    active: false
+                },
+                {
+                    id: "",
+                    name: "多头借贷全量核查",
+                    price: "￥1.00",
+                    active: false
+                },
+                {
+                    id: "",
+                    name: "多头借贷信息核查",
+                    price: "￥1.00",
+                    active: false
+                },
+                {
+                    id: "",
+                    name: "个人法院失信简项",
+                    price: "￥1.00",
+                    active: false
+                },
+                {
+                    id: "",
+                    name: "个人法院失信详情",
+                    price: "￥1.00",
+                    active: false
+                },
+                {
+                    id: "",
+                    name: "个人法院判决简项",
+                    price: "￥1.00",
+                    active: false
+                },
+                {
+                    id: "",
+                    name: "个人判决文书详情",
+                    price: "￥1.00",
+                    active: false
+                },
+                {
+                    id: "",
+                    name: "失联人员地址修复",
+                    price: "￥1.00",
+                    active: false
+                },
+                {
+                    id: "",
+                    name: "综合风险验证",
+                    price: "￥1.00",
+                    active: false
+                },
+                {
+                    id: "",
+                    name: "逾期风险验证",
+                    price: "￥1.00",
+                    active: false
+                },
+                {
+                    id: "",
+                    name: "助贷中介机构查询",
+                    price: "￥1.00",
+                    active: false
+                },
+                {
+                    id: "",
+                    name: "银行卡核查",
+                    price: "￥1.00",
+                    active: false
+                },
+                {
+                    id: "",
+                    name: "银联消费报告",
+                    price: "￥1.00",
+                    active: false
+                },
+                {
+                    id: "",
+                    name: "银联消费画像",
+                    price: "￥1.00",
+                    active: false
+                },
+                {
+                    id: "",
+                    name: "手机绑定银行卡信息",
+                    price: "￥1.00",
+                    active: false
+                },
+                {
+                    id: "",
+                    name: "个人投资核查",
+                    price: "￥1.00",
+                    active: false
+                },
+                {
+                    id: "",
+                    name: "学历信息核查",
+                    price: "￥1.00",
+                    active: false
+                },
+                {
+                    id: "",
+                    name: "航旅信息核查",
+                    price: "￥1.00",
+                    active: false
+                }
+            ];
+
+            $scope.mockData = {
+                name: '沈小艳',
+                phone: '18860469557',
+                idCard: '123456'
+            }
+
+            $scope.info = {
+                name: '沈小艳',
+                phone: '18860469557',
+                idCard: '123456'
+            }
+
+
+            $scope.resultSwitch = false;
+
+
+            $scope.Allchoice = false;
+
+            $scope.allSelect = function () {
+                $scope.totalMoney = 0
+                if (!$scope.Allchoice) {
+                    angular.forEach($scope.risksList, function (risk) {
+                        risk.active = false
+                    })
+
+                    $scope.totalMoney = 0
+                } else {
+                    angular.forEach($scope.risksList, function (risk) {
+                        risk.active = true
+                        $scope.totalMoney += parseInt(risk.price.substr(1))
+                    })
+
+                }
+            }
+
+            $scope.selectOne = function (active) {
+                if (!active) {
+                    $scope.Allchoice = false
+
+                } else {
+                    var flag = false
+                    angular.forEach($scope.risksList, function (risk) {
+                        if (!risk.active) {
+                            flag = true
+                            $scope.Allchoice = false
+                        }
+                    })
+                    if (!flag) {
+                        $scope.Allchoice = true
+
+                    }
+
+                }
+                calTotalMoney()
+
+            }
+            function calTotalMoney() {
+                $scope.totalMoney = 0
+                angular.forEach($scope.risksList, function (risk) {
+                    if (risk.active) {
+                        $scope.totalMoney += parseInt(risk.price.substr(1))
+                    }
+                })
+            }
+
+
+//            提交
+
+            $scope.submitInfo = function (){
+                $scope.resultSwitch = true;
+            }
+
+
+
+
+        }
+
+
+    ]);
+
+
+</script>
+<div class="hbox hbox-auto-xs bg-light" ng-controller="riskspersonIntelligentCtrl">
+    <!-- column -->
+    <div class="col col-sm-9" style="padding: 0">
+        <div class="vbox">
+            <!--<div class="wrapper-md bg-light lter b-b clearfix">-->
+            <!--<div class="font-thin h4">个人智能查询</div>-->
+            <!--</div>-->
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner">
+                        <div class="wrapper-md">
+                            <div class="panel panel-info input-panel" style="margin-bottom: 20px">
+                                <div class="panel-heading wrapper" style="font-size: 16px">个人身份核查</div>
+                                <div class="panel-body">
+                                    <form name="myForm" class="form-horizontal">
+                                        <div class="form-group validate">
+                                            <label class="col-sm-4 col-md-2 control-label"><span style="color: #ff0000">*</span>姓名：</label>
+                                            <div class="col-sm-8 col-md-4">
+                                                <input type="text" ng-model="info.name" name="name" class="form-control"
+                                                       ng-required="true">
+                                            </div>
+                                            <div class="col-sm-offset-4 col-sm-8 col-md-offset-0 col-md-3 control-label padder"
+                                                 style="text-align:left"
+                                                 ng-show="myForm.name.$dirty&&myForm.name.$invalid">
+                                                <span style="color: #ff0000" ng-show="myForm.name.$error.required">姓名不能为空</span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group validate">
+                                            <label class="col-sm-4 col-md-2 control-label"><span style="color: #ff0000">*</span>手机号：</label>
+                                            <div class="col-sm-8 col-md-4">
+                                                <input type="text" ng-model="info.phone" name="phone"
+                                                       class="form-control" ng-required="true">
+                                            </div>
+                                            <div class="col-sm-offset-4 col-sm-8 col-md-offset-0 col-md-3 control-label padder"
+                                                 style="text-align:left"
+                                                 ng-show="myForm.phone.$dirty && myForm.phone.$invalid">
+                                                <span style="color: #ff0000" ng-show="myForm.phone.$error.required">手机号不能为空</span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group validate">
+                                            <label class="col-sm-4 col-md-2 control-label"><span style="color: #ff0000">*</span>身份证：</label>
+                                            <div class="col-sm-8 col-md-4">
+                                                <input type="text" ng-model="info.idCard" name="idCard"
+                                                       class="form-control" ng-required="true">
+                                            </div>
+                                            <div class="col-sm-offset-4 col-sm-8 col-md-offset-0 col-md-3 control-label padder"
+                                                 style="text-align: left"
+                                                 ng-show="myForm.idCard.$dirty && myForm.idCard.$invalid">
+                                                <span style="color: #ff0000" ng-show="myForm.idCard.$error.required">身份证号不能为空</span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-sm-offset-4 col-md-offset-2 col-sm-8"
+                                                 style="padding-left: 20px">
+                                                <button type="button" class="btn btn-info" ng-click="submitInfo()">提交</button>
+                                                <button type="button" class="btn btn-info">重置</button>
+                                                <button type="button" class="btn btn-danger"><i
+                                                        class="fa fa-file-pdf-o"></i> 生成PDF
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <!--样例-->
+                            <div class="panel panel-info input-panel" ng-show="!resultSwitch">
+                                <div class="panel-heading">
+                                    <span style="color: #474747;">查询结果</span>
+                                    <span style="color: red;">样例</span>
+                                </div>
+                                <div>
+                                    <table class="table-border-style">
+                                        <tr>
+                                            <td width="50%">姓名、身份证</td>
+                                            <td width="50%">一致</td>
+                                        </tr>
+                                        <tr>
+                                            <td>姓名、手机号</td>
+                                            <td>一致</td>
+                                        </tr>
+                                        <tr>
+                                            <td>姓名、手机号、身份证</td>
+                                            <td>一致</td>
+                                        </tr>
+                                        <tr>
+                                            <td>姓名、手机号、银行卡、身份证</td>
+                                            <td>一致</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <!--结果-->
+                            <div class="panel panel-info input-panel" ng-show="resultSwitch">
+                                <div class="panel-heading">
+                                    <span style="color: #474747;">查询结果</span>
+                                </div>
+                                <div ng-show="risksList[0].active">
+                                    <table class="table-border-style">
+
+                                        <tr>
+                                            <td>姓名、手机号、身份证</td>
+                                            <td>{{risksList[0].msg}}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+
+                                <div ng-show="risksList[1].active">
+                                    <table class="table-border-style">
+                                        <tr>
+                                            <td>手机入网年限</td>
+                                            <td>{{risksList[1].msg}}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+
+                                <div ng-show="risksList[2].active">
+                                    <table class="table-border-style">
+                                        <tr>
+                                            <td>手机号所在省份</td>
+                                            <td>{{risksList[2].msg.province}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>手机号所在区域名字</td>
+                                            <td>{{risksList[2].msg.city}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>手机号简单描述</td>
+                                            <td>{{risksList[2].msg.description}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>手机号供应商</td>
+                                            <td>{{risksList[2].msg.shop}}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col col-sm-3" style="padding: 0">
+        <div class="vbox">
+            <!--<div class="wrapper-md bg-light lter b-b clearfix">-->
+            <!--<div class="font-thin h4">个人智能查询</div>-->
+            <!--</div>-->
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner">
+                        <div class="wrapper-md">
+                            <div class="panel b-a input-panel" style="margin-bottom: 0">
+                                <div class="wrapper bg-light">
+                                    <div class="font-thin h4">
+                                        信息查询总览
+                                    </div>
+                                </div>
+                                <table class="table table-hover table-condensed">
+                                    <tr>
+                                        <td>
+
+                                        </td>
+                                        <td style="border-top: none;">
+                                            <input type="checkbox" style="width: 15px;height:15px;" ng-model="Allchoice"
+                                                   ng-click="allSelect()">
+                                            <span style="font-size: 16px;font-weight: bold">全选</span>
+                                        </td>
+                                    </tr>
+                                    <tr ng-repeat="list in risksList">
+                                        <td style="border-top: none;">
+                                            <div>
+                                                <input type="checkbox" ng-model="list.active"
+                                                       ng-click="selectOne(list.active)">
+                                                <span>{{list.name}}</span>
+                                            </div>
+                                        </td>
+                                        <td style="border-top: none;">
+                                            <span>{{list.price}}</span>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <div class="panel-footer">
+                                    <span style="font-size: 16px;font-weight: 400">价格总计：￥{{totalMoney}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+

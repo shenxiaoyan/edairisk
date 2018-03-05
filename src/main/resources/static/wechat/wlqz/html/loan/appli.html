@@ -1,0 +1,700 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>还款预览</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <link rel="stylesheet" href="../../css/weui.css">
+    <link rel="stylesheet" href="../../css/icon.css">
+    <link rel="stylesheet" href="../../css/weui2.css">
+  <link rel="stylesheet" href="../../css/layer.css">
+    <style>
+        .btn{
+            width: 100%;
+            height: 40px;
+            background: #169BD5;
+            border-radius: 20px;
+            display: inline-block;
+            text-align: center;
+            line-height: 40px;
+            color: white;
+            font-size: 16px;
+        }
+        .btn:active{
+            background: #CCCCCC;
+            color: white;
+        }
+        input::-webkit-input-placeholder { /* WebKit browsers */
+            font-size:14px;
+        }
+        input:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+            font-size:14px;
+        }
+        input::-moz-placeholder { /* Mozilla Firefox 19+ */
+            font-size:14px;
+        }
+        input:-ms-input-placeholder { /* Internet Explorer 10+ */
+            font-size:14px;
+        }
+        .weui-picker-overlay, .weui-picker-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 0;
+            width: 100%;
+            z-index: 33333;
+        }s
+    </style>
+
+
+</head>
+<script src="../../js/config.js"></script>
+<script src="../../js/jquery-3.2.1.js"></script>
+<script src="../../js/zepto.min.js"></script>
+<script src="../../js/picker.js"></script>
+<script src="../../js/picker-city.js"></script>
+<script src="../../js/layer.js"></script>
+
+<body>
+<div class="weui_cells weui_cells_form" style="margin-top: 0;">
+    <div class="weui_cell weui_cell_select weui_select_after">
+        <div class="weui_cell_hd">
+            <label class="weui_label">产品类型</label>
+        </div>
+        <div class="weui_cell_bd weui_cell_primary">
+            <select id="productType" class="weui_select" name="selectn1">
+                <option value="随借随还">随借随还</option>
+                <option value="网点贷信用贷">网点贷信用贷</option>
+                <option value="网点面单白条">网点面单白条</option>
+            </select>
+        </div>
+    </div>
+    <div class="weui_cell weui_cell_select weui_select_after">
+        <div class="weui_cell_hd">
+            <label class="weui_label">借款期限</label>
+        </div>
+        <div class="weui_cell_bd weui_cell_primary">
+            <select id="term" class="weui_select" style="z-index: 0">
+                <option value="3">3个月内</option>
+            </select>
+        </div>
+    </div>
+</div>
+<div class="weui_cells weui_cells_form">
+    <div class="weui_cell">
+        <div class="weui_cell_hd"><label id='dateSj' class="weui_label">日均收件量</label><label id='monSj' class="weui_label" style="display: none;width: 170px;">近6个月日均收件量</label></div>
+        <div class="weui_cell_bd weui_cell_primary">
+            <input oninput="sjshCon()" id="consignee" class="weui_input" type="number" required  placeholder="输入日均收件量">
+        </div>
+        <div class="weui_cell_ft">
+            <i class="weui_icon_warn"></i>
+        </div>
+    </div>
+    <div class="weui_cell">
+        <div class="weui_cell_hd"><label id='datePj' class="weui_label">日均派件量</label><label id='monPj' class="weui_label" style="display: none;width: 170px">近6个月日均派件量</label></div>
+        <div class="weui_cell_bd weui_cell_primary">
+            <input id="dayPatch" class="weui_input" type="number" required  placeholder="输入日均派件量">
+        </div>
+        <div class="weui_cell_ft">
+            <i class="weui_icon_warn"></i>
+        </div>
+    </div>
+</div>
+
+<div id="fuzai" class="weui_cells weui_cells_form" style="display: none">
+    <div class="weui_cell">
+        <div class="weui_cell_hd"><label class="weui_label">综合负债</label></div>
+        <div class="weui_cell_bd weui_cell_primary">
+            <input oninput="sjshCon()" id="comprehensive" class="weui_input" type="number" required  placeholder="输入综合负债">
+        </div>
+        <div class="weui_cell_ft">
+            <i class="weui_icon_warn"></i>
+        </div>
+    </div>
+    <div class="weui_cell">
+        <div class="weui_cell_hd"><label class="weui_label">抵押类负债</label></div>
+        <div class="weui_cell_bd weui_cell_primary">
+            <input oninput="sjshCon()" id="mortgage" class="weui_input" type="number" required  placeholder="输入抵押类负债">
+        </div>
+        <div class="weui_cell_ft">
+            <i class="weui_icon_warn"></i>
+        </div>
+    </div>
+</div>
+
+<div class="weui_cells weui_cells_form">
+    <div class="weui_cell weui_vcode" id="unitPrice" style="display: none">
+        <div class="weui_cell_hd"><label class="weui_label">面单采购单价</label></div>
+        <div class="weui_cell_bd weui_cell_primary">
+            <input oninput="sjshCon()" id="mdUnitPrice" class="weui_input" type="number" placeholder="请输入面单采购单价" emptyTips="请输入面单采购单价">
+        </div>
+        <div class="weui_cell_ft">
+            <i class="weui_icon_warn"></i>
+            <a href="javascript:;" class="weui-vcode-btn" style="padding: 0 1.6em 0 1.7em; color: #0D0D0D">元/票</a>
+        </div>
+    </div>
+    <div class="weui_cell">
+        <div class="weui_cell_hd"><label for="area" class="weui_label">代理区域</label></div>
+        <div class="weui_cell_bd weui_cell_primary">
+            <input class="weui_input" readonly type="text" value="" id='area' placeholder="代理区域"/>
+        </div>
+    </div>
+</div>
+<div class="weui_cells weui_cells_form">
+    <div class="weui_cell weui_vcode">
+        <div class="weui_cell_hd"><label for="brand" class="weui_label">代理品牌</label></div>
+        <div class="weui_cell_bd weui_cell_primary">
+            <input class="weui_input" type="text" value="" id='brand' placeholder="代理品牌"/>
+        </div>
+        <div class="weui_cell_ft">
+            <i class="weui_icon_warn"></i>
+            <a id="brandChoose" href="javascript:;" class="weui-vcode-btn" style="padding: 0 1.6em 0 1.7em; color: #0a1015">选择</a>
+        </div>
+    </div>
+</div>
+<div class="weui_cells weui_cells_form">
+    <div class="weui_cell weui_vcode" style="height: 44px;">
+        <div class="weui_cell_hd"><label class="weui_label">申请额度</label></div>
+        <div class="weui_cell_bd weui_cell_primary">
+            <input onchange="appOninput()" id="appliLimit" class="weui_input" type="number" placeholder="输入您的借款金额">
+        </div>
+        <div class="weui_cell_ft" id="previewBtn">
+            <i class="weui_icon_warn"></i>
+            <a id="ms3" href="javascript:;" class="weui-vcode-btn" style="padding: 0 1.6em 0 1.7em; color: #169BD5">还款预览</a>
+        </div>
+    </div>
+</div>
+<div class="page-bd-15" style="margin-top: 20px;">
+    <div style="border: 2px dotted #169BD5; padding: 10px 0; border-radius: 5px; text-align: center" id="assessmentDiv">
+        <p style="color: #169BD5">您的最高申请额度为:<span id="estimate1" style="color: #0D0D0D">0</span><span style="color: #0D0D0D">元</span></p>
+         <p id="tips" style="color: darkred;font-size: 14px;display: none">若申请额度200万以上，请选择网点面单白条产品</p>
+    </div>
+    <a id="appBtn" class="btn" style="margin-top: 20px;">下一步</a>
+</div>
+
+
+<script>
+
+    function setTitle(name) {
+        document.setTitle = function(t) {
+            document.title = t;
+            var i = document.createElement('iframe');
+            i.style.display = 'none';
+            i.onload = function() {
+                setTimeout(function(){
+                    i.remove();
+                }, 9)
+            }
+            document.body.appendChild(i);
+        }
+        setTimeout(function(){
+            document.setTitle(name)
+        }, 100)
+    }
+
+	$(function(){
+
+        if(window.location.search){
+            var product = window.location.search.split('=')[1];
+            if(product == 1){
+                $('#productType').html('<option value="随借随还">随借随还</option><option value="网点贷信用贷">网点贷信用贷</option><option value="网点面单白条">网点面单白条</option>')
+                //$('#productType').children().eq(0).attr('selected','selected')
+            }else if(product == 2){
+                $('#productType').html('<option value="网点贷信用贷">网点贷信用贷</option><option value="随借随还">随借随还</option><option value="网点面单白条">网点面单白条</option>')
+                //$('#productType').children().eq(1).attr('selected','selected')
+                $('#term').html('<option value="3">3个月</option><option value="6">6个月</option><option value="12">12个月</option>')
+                $('#fuzai').show();
+                $('#dateSj').hide();
+                $('#datePj').hide();
+                $('#monPj').show();
+                $('#monSj').show();
+                $('#consignee').attr('placeholder','输入近6个月日均收件量');
+                $('#dayPatch').attr('placeholder','输入近6个月日均派件量');
+            }else if(product == 3){
+                $('#productType').html('<option value="网点贷信用贷">网点贷信用贷</option><option value="随借随还">随借随还</option><option value="网点面单白条">网点面单白条</option>')
+                //$('#productType').children().eq(1).attr('selected','selected')
+                $('#term').html('<option value="24">24期</option><option value="36">36期</option>')
+                $('#previewBtn').hide();
+                $('#assessmentDiv').hide();
+                setTitle('申请信息')
+            }else if(product == 4){
+                $('#productType').html('<option value="网点面单白条">网点面单白条</option><option value="网点贷信用贷">网点贷信用贷</option><option value="随借随还">随借随还</option>')
+                //$('#productType').children().eq(1).attr('selected','selected')
+                $('#term').html('<option value="3">授信期为一年，3个月循环</option>');
+                $('#previewBtn').hide();
+                $('#assessmentDiv').show();
+                $('#unitPrice').show();
+            }
+        }
+
+		$("#area").cityPicker({
+	        title: "选择代理区域"
+	    });
+
+        $("#brandChoose").picker({
+            title: "代理品牌",
+            toolbarCloseText:'确定',
+            cols: [
+                {
+                    textAlign: 'center',
+                    values: ['中通快递','圆通快递','申通快递','百世快递','韵达快递','天天快递','龙邦快递','优速快递','速尔快递','其他'],
+                    displayValues:['中通快递','圆通快递','申通快递','百世快递','韵达快递','天天快递','龙邦快递','优速快递','速尔快递','其他'],
+                }
+            ],
+            onChange:function (e) {
+                console.log(e.value[0])
+                $('#brand').val(e.value[0])
+            }
+        });
+
+
+
+
+	    $("#preDate6").picker({
+	        title: "选择期限",
+	        toolbarCloseText:'确定',
+	        cols: [
+	            {
+	                textAlign: 'center',
+	                values: ['6','12'],
+	                displayValues:['6个月','12个月'],
+	            }
+	        ]
+	    });
+	})
+
+    $('#appBtn').click(function () {
+            var productType = $('#productType').val();
+            var termKey = $('#term').val();
+            var termValue = $('#term').text();
+            var amount = $('#appliLimit').val();
+            var consignee=$('#consignee').val();
+            var dayPatch =$('#dayPatch').val();
+            var area = $('#area').val();
+            var brand=$('#brand').val();
+            var comprehensive = $('#comprehensive').val();
+            var mortgage =$('#mortgage').val();
+            var mdUnitPrice = $('#mdUnitPrice').val();
+
+            var item ={comprehensive:comprehensive,mortgage:mortgage,productType:productType,termKey:termKey,termValue:termValue,amount:amount,consignee:consignee,dayPatch:dayPatch,area:area,brand:brand,mdUnitPrice:mdUnitPrice};
+            item = JSON.stringify(item)
+            localStorage.setItem('productType',item);
+
+            if($('#productType').val() == '网点面单白条'){
+                if($('#appliLimit').val() > 30000000){
+                    $.alert('网点面单白条借款额度不超过3000万')
+                    $('#appliLimit').val(' ')
+                }else if($('#appliLimit').val() < 500000){
+                    $.alert('网点面单白条借款额度不小于50万')
+                    $('#appliLimit').val(' ')
+                }else {
+                    $.ajax({
+                        type: 'GET',
+                        url: '/wechat/wlqz/state' ,
+                        data: {} ,
+                        headers: {
+                            app_code:"WULIUQIANZHUANG",
+                            client:"wechat"
+                        },
+                        success:function (res) {
+                            var state=res;
+                            console.log(state)
+                            var uri='http://'+window.config.location+'/wechat/wlqz/html/loan/loanApplication.html';
+                            uri=encodeURIComponent(uri);
+                            window.location.href='https://open.weixin.qq.com/connect/oauth2/authorize?appid='+window.config.appid+'&redirect_uri='+uri+'&response_type=code&scope=snsapi_base&state='+state+'#wechat_redirect';
+                        } ,
+                        dataType: 'text'
+                    })
+                }
+            }else {
+                $.ajax({
+                    type: 'GET',
+                    url: '/wechat/wlqz/state' ,
+                    data: {} ,
+                    headers: {
+                        app_code:"WULIUQIANZHUANG",
+                        client:"wechat"
+                    },
+                    success:function (res) {
+                        var state=res;
+                        console.log(state)
+                        var uri='http://'+window.config.location+'/wechat/wlqz/html/loan/loanApplication.html';
+                        uri=encodeURIComponent(uri);
+                        window.location.href='https://open.weixin.qq.com/connect/oauth2/authorize?appid='+window.config.appid+'&redirect_uri='+uri+'&response_type=code&scope=snsapi_base&state='+state+'#wechat_redirect';
+                    } ,
+                    dataType: 'text'
+                })
+            }
+
+
+
+
+
+    });
+
+    $('#ms3').click(function(){
+        var con = $('#appliLimit').val();
+        if(con == ''){
+            $.alert('借款金额不能为空!')
+        }else {
+            if($('#productType').val() == '随借随还'){
+            	 var dailyInterest=0.000417 * $('#appliLimit').val(); //每日利息
+            	 dailyInterest = dailyInterest.toFixed(2);
+                 //$('#dailyInterest').val(dailyInterest);
+            	  var html ='<div style="color: #169BD5;font-size: 16px;border-bottom: 1px solid #ececec;padding: 0 15px 7px;letter-spacing: 2px;">还款预览</div>' +
+                  '<div style="padding: 25px 15px;"><div class="clearfix" style="border-bottom: 1px dashed #ccc;font-size: 16px;padding-bottom: 8px;"><span style="float: left">预借天数</span><input id="yjdate" oninput="changeDate()" style="float:left;border: none;outline:none;height: 20px;font-size: 16px;margin: 1px 0 0 40px;" placeholder="天数应在1-90天之间" /><span style="float: right">天</span></div><div class="clearfix" style="border-bottom: 1px dashed #ccc;font-size: 16px;padding-bottom: 8px; margin-top: 20px;"><span style="float: left">每日利息</span><input id="dailyIn" style="float:left;border: none;outline:none;height: 20px;font-size: 16px;margin: 1px 0 0 40px;" readonly value="'+ dailyInterest+'" /><span style="float: right">元</span></div></div>' +
+                  '<div class="clearfix" style="height: 47px;border-top: 1px solid #ececec"><div style="float: left;width: 50%;text-align: center;line-height: 47px;font-size: 16px;">合计利息:<span id="conIn" style="color: #e55050"></span></div><div id="okBtn" style="float: left;line-height:47px;font-size:16px;text-align:center;width: 50%;background: #169BD5;color: white;height: 100%;cursor: pointer;" onclick="layer.closeAll()">确定</div></div>'
+		        //页面层
+		        layer.open({
+		            type: 1
+		            ,content: html
+		            ,anim: 'up'
+		            ,style: 'position:fixed; bottom:0; left:0; width: 100%;  padding:10px 0 0 0; border:none;'
+		        });
+                //$('#msg1').fadeIn();
+               
+                
+            }else if($('#productType').val() == '网点贷信用贷'){
+                var dailyInterest=0.01 * $('#appliLimit').val(); //每月利息
+                dailyInterest = dailyInterest.toFixed(2);
+                //$('#dailyInterest').val(dailyInterest);
+                var html ='<div style="color: #169BD5;font-size: 16px;border-bottom: 1px solid #ececec;padding: 0 15px 7px;letter-spacing: 2px;">还款预览</div>' +
+                    '<div style="padding: 25px 15px;"><div class="clearfix" style="border-bottom: 1px dashed #ccc;font-size: 16px;padding-bottom: 8px;"><span style="float: left">预借季数</span><input id="yjdate" oninput="changeDate()" style="float:left;border: none;outline:none;height: 20px;font-size: 16px;margin: 1px 0 0 40px;" placeholder="月数应在1-12之间" /><span style="float: right">个月</span></div><div class="clearfix" style="border-bottom: 1px dashed #ccc;font-size: 16px;padding-bottom: 8px; margin-top: 20px;"><span style="float: left">每月利息</span><input id="dailyIn" style="float:left;border: none;outline:none;height: 20px;font-size: 16px;margin: 1px 0 0 40px;" readonly value="'+ dailyInterest+'" /><span style="float: right">元</span></div></div>' +
+                    '<div class="clearfix" style="height: 47px;border-top: 1px solid #ececec"><div style="float: left;width: 50%;text-align: center;line-height: 47px;font-size: 16px;">合计利息:<span id="conIn" style="color: #e55050"></span></div><div id="okBtn" style="float: left;line-height:47px;font-size:16px;text-align:center;width: 50%;background: #169BD5;color: white;height: 100%;cursor: pointer;" onclick="layer.closeAll()">确定</div></div>'
+                //页面层
+                layer.open({
+                    type: 1
+                    ,content: html
+                    ,anim: 'up'
+                    ,style: 'position:fixed; bottom:0; left:0; width: 100%;  padding:10px 0 0 0; border:none;'
+                });
+
+            }else if($('#productType').val() == '网点面单白条'){
+                $.alert('网点面单白条没有还款预览!')
+            }
+        }
+    });
+    
+   
+    $("#area").change(function () {
+        var val = $("#area").val()
+        var str = '北京 北京 无';
+        if(val.indexOf("无") > 0 ){
+
+            var str =$("#area").val();
+            var str2 = str.replace(/无/,' ');
+            $("#area").val(str2);
+        }
+    })
+    
+    function appOninput(){
+        if($('#productType').val() == '随借随还'){
+            if($('#appliLimit').val() > 2000000){
+                $.alert('随借随还借款额度不超过200万')
+                $('#appliLimit').val(' ')
+            }
+        }
+        else if($('#productType').val() == '网点贷信用贷'){
+            if($('#appliLimit').val() > 2000000){
+                $.alert('网点贷信用贷借款额度不超过200万')
+                $('#appliLimit').val(' ')
+            }
+        }else if($('#productType').val() == '网点面单白条'){
+//            if($('#appliLimit').val() > 30000000){
+//                $.alert('网点面单白条借款额度不超过3000万')
+//                $('#appliLimit').val(' ')
+//            }else if($('#appliLimit').val() < 500000){
+//                $.alert('网点面单白条借款额度不小于50万')
+//                $('#appliLimit').val(' ')
+//            }
+        }
+    }
+
+    function sjshCon() {
+
+        if($('#productType').val() == '随借随还'){
+            var con = $('#consignee').val() * 30 * 2.5;
+            var maxed =edChange(con);
+            if(maxed > 2000000){
+                var fixed=2000000;
+                fixed=fixed.toFixed(2)
+                $('#estimate1').text(fixed);
+                $('#tips').show()
+            }else {
+                maxed = maxed.toFixed(2);
+                $('#estimate1').text(maxed);
+                $('#tips').hide()
+            }
+
+        }else if($('#productType').val() == '网点贷信用贷'){
+
+            var con = $('#consignee').val() * 30 * 2.5;
+            var comprehensive = $('#comprehensive').val();
+            var mortgage = $('#mortgage').val();
+            var maxed = con - ( comprehensive - mortgage )
+           // var maxed =edChange(con);
+
+            if(maxed > 2000000){
+                var fixed=2000000;
+                fixed=fixed.toFixed(2)
+                $('#estimate1').text(fixed);
+                $('#tips').show()
+            }else {
+                maxed = maxed.toFixed(2);
+                $('#estimate1').text(maxed);
+                $('#tips').hide()
+            }
+        }else if($('#productType').val() == '网点面单白条'){
+
+            var con = $('#consignee').val() * 90 * $('#mdUnitPrice').val() *0.7;
+            maxed =con;
+            maxed = maxed.toFixed(2);
+            $('#estimate1').text(maxed);
+
+//            var maxed =edChange(con);
+//            if(maxed > 30000000){
+//                var fixed=30000000;
+//                fixed=fixed.toFixed(2)
+//                $('#estimate1').text(fixed);
+//            }else {
+//                maxed = maxed.toFixed(2);
+//                $('#estimate1').text(maxed);
+//            }
+        }
+    }
+    //根据代理品牌改变额度
+    function edChange(con) {
+        var brand = $('#brand').val();
+        var ed =con;
+        if(brand == '中通快递' || brand == '圆通快递' || brand =='申通快递'){
+            ed = ed + ed * 0.1;
+            return ed;
+        }else if(brand == '百世快递' || brand == '韵达快递' || brand =='天天快递'){
+            ed = ed - ed * 0.1;
+            return ed
+        }else if(brand == '龙邦快递' || brand== '优速快递' || brand== '速尔快递' || brand == '其他'){
+            ed = ed - ed * 0.2;
+             return ed;
+        }else {
+            ed = ed - ed * 0.2;
+            return ed;
+        }
+    }
+   
+    function changeDate() {
+    	var preDate = $('#yjdate').val();
+    	console.log(preDate)
+    	if(preDate<=0 || preDate >90){
+    		//alert('预借天数应在0-90之间');
+    	}else{
+    		console.log($('#dailyIn').val())
+    		 var con = $('#yjdate').val() * $('#dailyIn').val();
+    	        con =con.toFixed(2)
+    	        con2 = '￥'+con+'元'
+    	        $('#conIn').text(con2);
+    	}
+      
+        
+    }
+
+    $('#productType').change(function () {
+        if($('#productType').val() == '随借随还'){
+            $('#term').html('<option value="3">3个月内</option>');
+            $('#fuzai').hide();
+            $('#dateSj').show();
+            $('#datePj').show();
+            $('#monPj').hide();
+            $('#monSj').hide();
+            $('#consignee').attr('placeholder','输入日均收件量');
+            $('#dayPatch').attr('placeholder','输入日均派件量');
+            $('#previewBtn').show();
+            $('#assessmentDiv').show();
+            $('#unitPrice').hide();
+
+            setTitle('还款预览')
+        }else if($('#productType').val() == '网点贷信用贷'){
+            $('#term').html('<option value="3">3个月</option><option value="6">6个月</option><option value="12">12个月</option>')
+            $('#fuzai').show();
+            $('#dateSj').hide();
+            $('#datePj').hide();
+            $('#monPj').show();
+            $('#monSj').show();
+            $('#consignee').attr('placeholder','输入近6个月日均收件量');
+            $('#dayPatch').attr('placeholder','输入近6个月日均派件量');
+            $('#previewBtn').show();
+            $('#assessmentDiv').show();
+            $('#unitPrice').hide();
+            setTitle('还款预览')
+//			 $('#term').attr('disabled',false)
+        }else if($('#productType').val() == '融资租赁'){
+            $('#term').html('<option value="24">24期</option><option value="36">36期</option>')
+            $('#fuzai').hide();
+            $('#dateSj').show();
+            $('#datePj').show();
+            $('#monPj').hide();
+            $('#monSj').hide();
+            $('#consignee').attr('placeholder','输入日均收件量');
+            $('#dayPatch').attr('placeholder','输入日均派件量');
+            $('#previewBtn').hide();
+            $('#assessmentDiv').hide();
+            $('#unitPrice').hide();
+            setTitle('申请信息')
+//			 $('#term').attr('disabled',false)
+        }else if($('#productType').val() == '网点面单白条'){
+            $('#term').html('<option value="3">授信期为一年，3个月循环</option>')
+            $('#fuzai').hide();
+            $('#dateSj').show();
+            $('#datePj').show();
+            $('#monPj').hide();
+            $('#monSj').hide();
+            $('#consignee').attr('placeholder','输入日均收件量');
+            $('#dayPatch').attr('placeholder','输入日均派件量');
+            $('#previewBtn').hide();
+            $('#assessmentDiv').show();
+            $('#unitPrice').show();
+            setTitle('申请信息')
+//			 $('#term').attr('disabled',false)
+        }else {
+            $('#term').html('<option value="3">3个月</option>');
+//			 $('#term').attr('disabled','disabled')
+        }
+    });
+
+    $('#brand').change(function () {
+        if($('#productType').val() == '随借随还'){
+            var brand = $('#brand').val();
+            if(brand == '中通快递' || brand == '圆通快递' || brand =='申通快递'){
+                var ed = $('#consignee').val() * 30 * 2.5;
+                ed = ed + ed * 0.1;
+                if(ed > 2000000){
+                    var ed =2000000;
+                    ed = ed.toFixed(2);
+                    $('#estimate1').text(ed);
+                    $('#tips').show()
+                }else{
+                    ed = ed.toFixed(2);
+                    $('#estimate1').text(ed);
+                    $('#tips').hide()
+                }
+
+
+            }else if(brand == '百世快递' || brand == '韵达快递' || brand =='天天快递'){
+                var ed = $('#consignee').val() * 30 * 2.5;
+                ed = ed - ed * 0.1;
+                if(ed > 2000000){
+                    var ed =2000000;
+                    ed = ed.toFixed(2);
+                    $('#estimate1').text(ed);
+                    $('#tips').show()
+                }else{
+                    ed = ed.toFixed(2);
+                    $('#estimate1').text(ed);
+                    $('#tips').hide()
+                }
+
+
+            }else if(brand == '龙邦快递' || brand== '优速快递'|| brand== '速尔快递' || brand == '其他'){
+                var ed = $('#consignee').val() * 30 * 2.5;
+                ed = ed - ed * 0.2;
+                if(ed > 2000000){
+                    var ed =2000000;
+                    ed = ed.toFixed(2);
+                    $('#estimate1').text(ed);
+                    $('#tips').show()
+                }else{
+                    ed = ed.toFixed(2);
+                    $('#estimate1').text(ed);
+                    $('#tips').hide()
+                }
+
+            }
+
+        }else if($('#productType').val() == '网点贷信用贷'){
+            var brand = $('#brand').val();
+            if(brand == '中通快递' || brand == '圆通快递' || brand =='申通快递'){
+                var ed = $('#consignee').val() * 30 * 2.5;
+                ed = ed + ed * 0.1;
+                if(ed > 2000000){
+                    var ed =2000000;
+                    ed = ed.toFixed(2);
+                    $('#estimate1').text(ed);
+                    $('#tips').show()
+                }else{
+                    ed = ed.toFixed(2);
+                    $('#estimate1').text(ed);
+                    $('#tips').hide()
+                }
+
+            }else if(brand == '百世快递' || brand == '韵达快递' || brand =='天天快递'){
+                var ed = $('#consignee').val() * 30 * 2.5;
+                ed = ed - ed * 0.1;
+                if(ed > 2000000){
+                    var ed =2000000;
+                    ed = ed.toFixed(2);
+                    $('#estimate1').text(ed);
+                    $('#tips').show()
+                }else{
+                    ed = ed.toFixed(2);
+                    $('#estimate1').text(ed);
+                    $('#tips').hide()
+                }
+            }else if(brand == '龙邦快递' || brand== '优速快递'|| brand== '速尔快递' || brand == '其他'){
+                var ed = $('#consignee').val() * 30 * 2.5;
+                ed = ed - ed * 0.2;
+                if(ed > 2000000){
+                    var ed =2000000;
+                    ed = ed.toFixed(2);
+                    $('#estimate1').text(ed);
+                    $('#tips').show()
+                }else{
+                    ed = ed.toFixed(2);
+                    $('#estimate1').text(ed);
+                    $('#tips').hide()
+                }
+            }
+
+        }else if($('#productType').val() == '网点面单白条'){
+//            var brand = $('#brand').val();
+//            if(brand == '中通快递' || brand == '圆通快递' || brand =='申通快递'){
+//                var ed = $('#consignee').val() * 30 * 2.5 * 3 * 0.7;
+//                ed = ed + ed * 0.1;
+//                if(ed > 30000000){
+//                    var ed =30000000;
+//                    ed = ed.toFixed(2);
+//                    $('#estimate1').text(ed);
+//                }else{
+//                    ed = ed.toFixed(2);
+//                    $('#estimate1').text(ed);
+//                }
+//
+//            }else if(brand == '百世快递' || brand == '韵达快递' || brand =='天天快递'){
+//                var ed = $('#consignee').val() * 30 * 2.5 * 3 * 0.7;
+//                ed = ed - ed * 0.1;
+//                if(ed > 30000000){
+//                    var ed =30000000;
+//                    ed = ed.toFixed(2);
+//                    $('#estimate1').text(ed);
+//                }else{
+//                    ed = ed.toFixed(2);
+//                    $('#estimate1').text(ed);
+//                }
+//
+//            }else if(brand == '龙邦快递' || brand== '优速快递' || brand== '速尔快递'|| brand == '其他'){
+//                var ed = $('#consignee').val() * 30 * 2.5 * 3 * 0.7;
+//                ed = ed - ed * 0.2;
+//                if(ed > 30000000){
+//                    var ed =30000000;
+//                    ed = ed.toFixed(2);
+//                    $('#estimate1').text(ed);
+//                }else{
+//                    ed = ed.toFixed(2);
+//                    $('#estimate1').text(ed);
+//                }
+//            }
+        }
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,156 @@
+<script>
+    /*
+     * 创建人：刘雅倩
+     * 创建时间：2017/08/15
+     * 公司看到的贷款报表
+     *
+     * */
+    "use strict";
+    app.controller("groupLoanCtrl", [
+        "$scope",
+        function($scope) {
+			// 测试用的
+
+            $scope.branchList = [
+                {
+                    name: '网点信用贷',
+                    login: "560052",
+                    fee: "5124567"
+                },
+                {
+                    name: '网点面单白条',
+                    login: "823671",
+                    fee: "892342"
+                }, {
+                    name: '网点随借随还',
+                    login: "546892",
+                    fee: "567345"
+                }
+               
+              
+            ];
+
+            $scope.brandChart = echarts.init(document.getElementById('branch_dashboard_chart'));
+
+            $scope.option = {
+                title: {
+                    text: '产品贷款数量统计'
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                },
+                legend: {
+                    data: ['贷款申请数', '贷款数', '实际放款数']
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'value',
+                    boundaryGap: [0, 0.01]
+                },
+                yAxis: {
+                    type: 'category',
+                    data: ['网点信用贷','网点面单白条','网点随借随还']
+                },
+                series: [
+                    {
+                        name: '贷款申请数',
+                        type: 'bar',
+                        data: [58203, 53489, 69034]
+                    },
+                    {
+                        name: '贷款数',
+                        type: 'bar',
+                        data: [49325, 43438, 51000]
+                    },
+                    {
+                        name: '实际放款数',
+                        type: 'bar',
+                        data: [34970, 31744, 33023]
+                    }
+                ]
+            };
+
+            $scope.brandChart.setOption($scope.option);
+
+            //窗口大小改变时重新绘制图表
+            $(window).resize(function() {
+                $scope.brandChart.resize();
+            });
+        }
+    ]);
+</script>
+
+<div class="hbox hbox-auto-xs lter" ng-controller="groupLoanCtrl">
+    <!-- column -->
+    <div class="col">
+        <div class="vbox">
+            <div class="bg-light lter b-b clearfix" style="padding: 14.5px 20px;">
+                <!--<select class="pull-left m-r-sm input-sm form-control w-sm inline v-middle" ng-options="branch.name for branch in branchList" ng-model="branch">-->
+                    <!--<option value=""> &#45;&#45;请选择公司&#45;&#45; </option>-->
+                <!--</select>-->
+
+                <button type="button" class="m-r btn btn-sm btn-addon btn-info">
+                    <i class="fa fa-plus" ng-class="iconClass[btn]"></i><span>打印</span>
+                </button>
+
+                <div class="pull-right">
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-default" ng-click="changeView()">今天</button>
+                        <button class="btn btn-sm btn-default" ng-click="changeView()">昨天</button>
+                        <button class="btn btn-sm btn-default" ng-click="changeView()">前天</button>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-default" ng-click="changeView('agendaDay')">本周</button>
+                        <button class="btn btn-sm btn-default" ng-click="changeView('agendaWeek')">上周</button>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-default" ng-click="changeView('month')">本月</button>
+                        <button class="btn btn-sm btn-default" ng-click="changeView('month')">上月</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner wrapper-md">
+                        <div style="padding-top: 0;">
+                            <div class="panel wrapper">
+                                <div id="branch_dashboard_chart" style="height:400px;"></div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="table-responsive">
+                                <table class="table table-striped b-t b-light">
+                                    <thead>
+                                        <tr>
+                                            <th>产品名称</th>
+                                            <th>贷款申请数量</th>
+                                            <th>贷款数量</th>
+                                            <th>实际放款数量</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="list in branchList">
+                                            <td><span class="pull-left waybill_item_number"><a>{{ list.name}}</a></span></td>
+                                            <td class="report_amount"><span class="text-ellipsis">{{ list.login }}</span></td>
+                                            <td class="report_amount"><span class="text-ellipsis">{{ list.login }}</span></td>
+                                            <td class="report_amount"><span class="text-ellipsis">{{ list.fee }}</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

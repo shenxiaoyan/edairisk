@@ -1,0 +1,55 @@
+<div class="wrapper">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    部门类型详细信息
+                </div>
+                <table class="table table-striped m-b-none">
+                    <tbody>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="departmenttype.label.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.label }}</td>
+                        <td class="v-middle text-right">
+                            <span translate="departmenttype.code.label"></span>：
+                        </td>
+                        <td class="v-middle">{{ profile.code.label }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="departmenttype.departmenttypeCode.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.departmenttypeCode }}</td>
+                        <td class="v-middle text-right">
+                            <span translate="departmenttype.creareByDepartment.label"></span>：
+                        </td>
+                        <td class="v-middle">{{ profile.creareByDepartment.label }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="departmenttype.createdBy.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.createdBy.nickname }}</td>
+                        <td class="v-middle text-right">
+                            <span translate="departmenttype.createdAt.label"></span>：
+                        </td>
+                        <td class="v-middle">{{ profile.createdAt | datetime }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="departmenttype.lastModifiedBy.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.lastModifiedBy.label }}</td>
+                        <td class="v-middle text-right">
+                            <span translate="departmenttype.lastModifiedAt.label"></span>：
+                        </td>
+                        <td class="v-middle">{{ profile.lastModifiedAt | datetime }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

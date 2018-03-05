@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <link rel="stylesheet" href="../../css/weui.css"/>
+    <link rel="stylesheet" href="../../css/weui2.css"/>
+    <title>APP下载</title>
+    <style>
+        a:hover{
+            color: #0a1015;
+        }
+        a:link{
+            color: #0a1015;
+        }
+    </style>
+    <script src="../../js/vconsole.min.js"></script>
+</head>
+<body>
+<div style="margin: 30px auto 0;width: 200px" id="qrcodeimg"></div>
+<a download="驿贷.apk" href="../../../../app-release.apk" style="text-align: center;display: inline-block;width: 100%">
+    点击下载
+</a>
+<div class="weui-share" onclick="$(this).fadeOut();$(this).removeClass('fadeOut')">
+    <div class="weui-share-box">
+        点击右上角在浏览器上打开,然后进行下载 <i style="background:url('../../images/show.png') no-repeat 90% 5px;background-size: 56px 61px;"></i>
+    </div>
+</div>
+</body>
+<script src="../../js/config.js"></script>
+<script src="../../js/zepto.min.js"></script>
+<script src="../../js/qrcode.js"></script>
+
+<script>
+    (function () {
+        function isWeiXin(){
+            var ua = window.navigator.userAgent.toLowerCase();
+            if(ua.match(/MicroMessenger/i) == 'micromessenger'){
+                return true;
+            }else{
+                return false;
+            }
+        }
+        var isWeiXin =isWeiXin()
+
+        $('a').click(function () {
+            if(isWeiXin){
+                $('.weui-share').fadeIn();
+            }
+        })
+
+        var txt = window.config.location + '/app-release.apk'
+       $("#qrcodeimg").empty().qrcode({render:"image",ecLevel:"L",size:200,background:"#fff",fill:"#000",text:txt});
+   })()
+
+
+</script>
+
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>我的申请</title>
+
+
+</head>
+<body>
+</body>
+<script src="../../js/config.js"></script>
+<script src="../../js/jquery-3.2.1.js"></script>
+<script>
+    $.ajax({
+        type: 'GET',
+        url: '/wechat/wlqz/state' ,
+        data: {} ,
+        headers: {
+            app_code:"WULIUQIANZHUANG",
+            client:"wechat"
+        },
+        success: function (res) {
+            var state=res;
+          
+            var uri='http://'+window.config.location+'/wechat/wlqz/html/my/myProfile.html';
+            uri=encodeURIComponent(uri);
+            window.location.href='https://open.weixin.qq.com/connect/oauth2/authorize?appid='+window.config.appid+'&redirect_uri='+uri+'&response_type=code&scope=snsapi_base&state='+state+'#wechat_redirect';
+        } ,
+        dataType: 'text'
+    })
+</script>
+</html>

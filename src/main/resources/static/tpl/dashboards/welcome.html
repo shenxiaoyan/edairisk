@@ -1,0 +1,326 @@
+<script>
+    app.controller("WelcomeCtrl",
+            [
+                "$rootScope",
+                "$scope",
+                "$http",
+                "FileUploader",
+                function ($rootScope, $scope, $http, FileUploader) {
+
+
+
+                    $scope.metrics = {};
+
+                    $scope.loanCharts = [ [0,0],[3,0],[6,0],[9,0],[12,0],[15,0],[18,0],[21,0],[24,0],[27,0],[30,0] ];
+
+                    $scope.repaymentCharts = [ [0,0],[3,0],[6,0],[9,0],[12,0],[15,0],[18,0],[21,0],[24,0],[27,0],[30,0] ];
+
+                    //以下是上传文件的动作详情参考前端框架示例 js/controllers/file-upload.js
+                    $scope.uploader = new FileUploader({
+                        url: '/fileUpload'
+                    });
+
+                    $scope.getMetrics = function () {
+                        $http.get('/metrics').success(function (resResult) {
+
+                            resResult.instance_uptime = resResult["instance.uptime"];
+                            resResult.heap_used = resResult["heap.used"];
+                            resResult.classes_loaded = resResult["classes.loaded"];
+                            resResult.threads_totalStarted = resResult["threads.totalStarted"];
+
+                            $scope.metrics = resResult;
+                        });
+
+                        //客户借款情况
+                        $http.get('/person/getProductPersonSituation').success(function (resResult) {
+                            $scope.presonLoan = resResult.data;
+                            $scope.sjshAll = $scope.presonLoan.sjsh.hkPerson + $scope.presonLoan.sjsh.wzPerson + $scope.presonLoan.sjsh.zjPerson;
+                            $scope.mdbtAll = $scope.presonLoan.mdbt.hkPerson + $scope.presonLoan.mdbt.wzPerson + $scope.presonLoan.mdbt.zjPerson;
+
+                        });
+
+                        //客户借款情况
+                        $http.get('/orderwdsjsh/getproductAmount').success(function (resResult) {
+                            $scope.loanInfo = resResult.data;
+                        });
+
+                        //曲线图接口
+                        $http.get('/loan/getDayMoneySumSituation').success(function (resResult) {
+                            console.log(resResult)
+                            var loan = resResult.loan;
+                            var repayment = resResult.creditrepayment;
+                            $scope.loanCharts = [[0,loan[0]],[3,loan[1]],[6,loan[2]],[9,loan[3]],[12,loan[4]],[15,loan[5]],[18,loan[6]],[21,loan[7]],[24,loan[8]],[27,loan[9]],[30,loan[10]]];
+                            $scope.repaymentCharts = [[0,repayment[0]],[3,repayment[1]],[6,repayment[2]],[9,repayment[3]],[12,repayment[4]],[15,repayment[5]],[18,repayment[6]],[21,repayment[7]],[24,repayment[8]],[27,repayment[9]],[30,repayment[10]]];
+                            console.log($scope.loanCharts)
+                            $scope.showSpline = true;
+                        });
+
+                    }
+                    $scope.getMetrics();
+
+
+                    $scope.uploader.filters.push({
+                        name: 'customFilter',
+                        fn: function (item, options) {
+                            return this.queue.length < 1;
+                        }
+                    });
+
+                    $scope.uploader.onAfterAddingFile = function (fileItem) {
+
+                        if (fileItem.file.type !== "application/x-zip-compressed") {
+
+                            $rootScope.toasterError("警告！", "审核文件的格式需要为ZIP的压缩文件格式！");
+
+                            fileItem.remove();
+
+                        } else {
+                            fileItem.formData = [{fileType: "file"}]
+                        }
+
+                        $("#audit_zip_file_input").val("");
+
+                    };
+
+                    $scope.uploader.onErrorItem = function (fileItem, response, status, headers) {
+                        $rootScope.toasterError("上传失败！", fileItem.file.name + " 上传失败！");
+                    };
+
+                    $scope.uploader.onSuccessItem = function (fileItem, response, status, headers) {
+
+
+
+                    };
+
+                    $scope.d = [ [1,6.5],[2,6.5],[3,7],[4,8],[5,7.5],[6,7],[7,6.8],[8,7],[9,7.2],[10,7],[11,6.8],[12,7] ];
+
+                    $scope.d1_1 = [ [10, 120], [20, 70], [30, 70], [40, 60] ];
+
+                    $scope.d1_2 = [ [10, 50],  [20, 60], [30, 90],  [40, 35] ];
+
+                    $scope.d1_3 = [ [10, 80],  [20, 40], [30, 30],  [40, 20] ];
+
+                    $scope.d2 = [];
+
+                    for (var i = 0; i < 20; ++i) {
+                        $scope.d2.push([i, Math.round( Math.sin(i)*100)/100] );
+                    }
+
+                    $scope.d3 = [
+                        { label: "iPhone5S", data: 40 },
+                        { label: "iPad Mini", data: 10 },
+                        { label: "iPad Mini Retina", data: 20 },
+                        { label: "iPhone4S", data: 12 },
+                        { label: "iPad Air", data: 18 }
+                    ];
+
+                    $scope.refreshData = function(){
+                        $scope.d0_1 = $scope.d0_2;
+                    };
+
+                    $scope.getRandomData = function() {
+                        var data = [],
+                            totalPoints = 150;
+                        if (data.length > 0)
+                            data = data.slice(1);
+                        while (data.length < totalPoints) {
+                            var prev = data.length > 0 ? data[data.length - 1] : 50,
+                                y = prev + Math.random() * 10 - 5;
+                            if (y < 0) {
+                                y = 0;
+                            } else if (y > 100) {
+                                y = 100;
+                            }
+                            data.push(Math.round(y*100)/100);
+                        }
+                        // Zip the generated y values with the x values
+                        var res = [];
+                        for (var i = 0; i < data.length; ++i) {
+                            res.push([i, data[i]])
+                        }
+                        return res;
+                    }
+
+                    $scope.d4 = $scope.getRandomData();
+
+
+                }
+            ]
+            )
+</script>
+<div class="hbox hbox-auto-xs hbox-auto-sm" ng-controller="WelcomeCtrl">
+    <!-- main -->
+    <div class="col">
+        <!-- main header -->
+        <div class="bg-light lter b-b wrapper-md">
+            <h1 class="m-n font-thin h3 text-black">驿贷</h1>
+            <small class="text-muted">物流金融方案解决专家</small>
+        </div>
+        <!-- / main header -->
+
+        <div class=" row">
+            <div class="col-xs-7">
+                <div class="wrapper-md">
+                    <!-- stats -->
+                    <div class="row row-sm text-center">
+                        <div class="col-xs-6">
+                            <div class="panel padder-v item">
+                                <div class="h1 text-info font-thin h1">{{metrics.uptime / 1000}}</div>
+                                <span class="text-muted text-xs">小金系统在线时间</span>
+                                <div class="top text-right w-full">
+                                    <i class="fa fa-caret-down text-warning m-r-sm"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-6">
+                            <a href class="block panel padder-v bg-primary item">
+                                <span class="text-white font-thin h1 block">{{metrics.heap_used}}</span>
+                                <span class="text-muted text-xs">计算量（次）</span>
+                                <span class="top text-right w-full">
+                                    <i class="fa fa-cloud-upload text-muted m-r-sm"></i>
+                                </span>
+                            </a>
+                        </div>
+                        <div class="col-xs-6">
+                            <a href class="block panel padder-v bg-info item">
+                                <span class="text-white font-thin h1 block">{{metrics.threads_totalStarted}}</span>
+                                <span class="text-muted text-xs">并行计算线程数</span>
+                                <span class="top">
+                                    <i class="fa fa-caret-up text-warning m-l-sm m-r-sm"></i>
+                                </span>
+                            </a>
+                        </div>
+                        <div class="col-xs-6">
+                            <div class="panel padder-v item">
+                                <div class="font-thin h1">{{metrics.classes_loaded}}</div>
+                                <span class="text-muted text-xs">处理事务量（次）</span>
+                                <div class="bottom" style="height: 0;background: none;bottom: 20px">
+                                    <i class="fa fa-caret-up text-warning m-l-sm m-r-sm"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="wrapper-md bg-white-only b-b" style="margin: 0 20px;">
+                    <div class="row text-center">
+                        <div class="col-sm-3 col-xs-6">
+                            <div>随借随还 <i class="fa fa-fw fa-caret-up text-success text-sm"></i></div>
+                            <div class="h2 m-b-sm">{{ loanInfo["网点随借随还"] }}</div>
+                        </div>
+                        <div class="col-sm-3 col-xs-6">
+                            <div>面单白条 <i class="fa fa-fw fa-caret-down text-warning text-sm"></i></div>
+                            <div class="h2 m-b-sm">{{ loanInfo["面单白条"] }}</div>
+                        </div>
+                        <div class="col-sm-3 col-xs-6">
+                            <div>网点信用贷 <i class="fa fa-fw fa-caret-up text-success text-sm"></i></div>
+                            <div class="h2 m-b-sm">{{ loanInfo["网点信用贷"] }}</div>
+                        </div>
+                        <div class="col-sm-3 col-xs-6">
+                            <div>融资租赁 <i class="fa fa-fw fa-caret-down text-danger text-sm"></i></div>
+                            <div class="h2 m-b-sm">{{ loanInfo["融资租赁"] }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-5">
+                <div class="wrapper-md">
+                    <div class="panel hbox hbox-auto-xs no-border">
+                        <div style="height: 343px" class="col wrapper-lg w-lg bg-light dk r-r">
+                            <div class="clearfix">
+                                <h4 class="font-thin m-t-none m-b left" style="display: inline-block;float: left">客户数量</h4>
+                                <ul class="nav nav-tabs" style="display: inline-block;float: right;margin-top: -10px" role="tablist">
+                                    <li role="presentation" class="active"><a href="#sjsh" aria-controls="sjsh" role="tab" data-toggle="tab">随借随还</a></li>
+                                    <li role="presentation"><a href="#mdbt" aria-controls="mdbt" role="tab" data-toggle="tab">面单白条</a></li>
+                                </ul>
+                            </div>
+
+                            <div class="tab-content">
+                                <div role="tabpanel" class="tab-pane active" id="sjsh">
+                                    <div class="">
+                                        <div class="">
+                                            <span class="pull-right text-primary">{{(presonLoan.sjsh.zjPerson/sjshAll*100).toFixed(0) + '%'}}</span>
+                                            <span>在借客户</span>
+                                        </div>
+                                        <div class="progress progress-xs m-t-sm bg-white">
+                                            <div class="progress-bar bg-primary" data-toggle="tooltip" data-original-title="{{ (presonLoan.sjsh.zjPerson/sjshAll*100).toFixed(0) + '%' }}" style="width: {{ (presonLoan.sjsh.zjPerson/sjshAll*100).toFixed(0) + '%' }}"></div>
+                                        </div>
+                                        <div class="">
+                                            <span class="pull-right text-info">{{(presonLoan.sjsh.hkPerson/sjshAll*100).toFixed(0) + '%'}}</span>
+                                            <span>还款客户</span>
+                                        </div>
+                                        <div class="progress progress-xs m-t-sm bg-white">
+                                            <div class="progress-bar bg-info" data-toggle="tooltip" data-original-title="{{(presonLoan.sjsh.hkPerson/sjshAll*100).toFixed(0) + '%'}}" style="{{(presonLoan.sjsh.hkPerson/sjshAll*100).toFixed(0) + '%'}}"></div>
+                                        </div>
+                                        <div class="">
+                                            <span class="pull-right text-warning">{{(presonLoan.sjsh.wzPerson/sjshAll*100).toFixed(0) + '%'}}</span>
+                                            <span>未做客户</span>
+                                        </div>
+                                        <div class="progress progress-xs m-t-sm bg-white">
+                                            <div class="progress-bar bg-warning" data-toggle="tooltip" data-original-title="{{(presonLoan.sjsh.wzPerson/sjshAll*100).toFixed(0) + '%'}}" style="width: {{(presonLoan.sjsh.wzPerson/sjshAll*100).toFixed(0) + '%'}}"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div role="tabpanel" class="tab-pane" id="mdbt">
+                                    <div class="">
+                                        <div class="">
+                                            <span class="pull-right text-primary">{{(presonLoan.mdbt.zjPerson/mdbtAll*100).toFixed(0) + '%'}}</span>
+                                            <span>在借客户</span>
+                                        </div>
+                                        <div class="progress progress-xs m-t-sm bg-white">
+                                            <div class="progress-bar bg-primary" data-toggle="tooltip" data-original-title="{{(presonLoan.mdbt.zjPerson/mdbtAll*100).toFixed(0) + '%'}}" style="width: {{(presonLoan.mdbt.zjPerson/mdbtAll*100).toFixed(0) + '%'}}"></div>
+                                        </div>
+                                        <div class="">
+                                            <span class="pull-right text-info">{{(presonLoan.mdbt.hkPerson/mdbtAll*100).toFixed(0) + '%'}}</span>
+                                            <span>还款客户</span>
+                                        </div>
+                                        <div class="progress progress-xs m-t-sm bg-white">
+                                            <div class="progress-bar bg-info" data-toggle="tooltip" data-original-title="{{(presonLoan.mdbt.hkPerson/mdbtAll*100).toFixed(0) + '%'}}" style="width: {{(presonLoan.mdbt.hkPerson/mdbtAll*100).toFixed(0) + '%'}}"></div>
+                                        </div>
+                                        <div class="">
+                                            <span class="pull-right text-warning">{{(presonLoan.mdbt.wzPerson/mdbtAll*100).toFixed(0) + '%'}}</span>
+                                            <span>未做客户</span>
+                                        </div>
+                                        <div class="progress progress-xs m-t-sm bg-white">
+                                            <div class="progress-bar bg-warning" data-toggle="tooltip" data-original-title="{{(presonLoan.mdbt.wzPerson/mdbtAll*100).toFixed(0) + '%'}}" style="width:{{(presonLoan.mdbt.wzPerson/mdbtAll*100).toFixed(0) + '%'}}"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="text-muted" style="margin-top: 50px;">在驿贷上申请过相应产品,根据所有客户数量，计算出对应百分比.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="wrapper-md">
+            <div class="panel wrapper">
+                <label class="i-switch bg-warning pull-right" ng-init="showSpline = false">
+                    <input type="checkbox" ng-model="showSpline">
+                    <i></i>
+                </label>
+                <h4 class="font-thin m-t-none m-b text-muted">近30天借还款趋势</h4>
+                <div ui-jq="plot" ui-refresh="showSpline" ui-options="
+                             [
+                             { data: {{loanCharts}}, label:'借款', points: { show: true, radius: 1}, splines: { show: {{showSpline}}, tension: 0.4, lineWidth: 1, fill: 0.8 } },
+                             { data: {{repaymentCharts}}, label:'还款', points: { show: true, radius: 1}, splines: { show: {{showSpline}}, tension: 0.4, lineWidth: 1, fill: 0.8 } }
+                             ],
+                             {
+                             colors: ['{{app.color.info}}', '{{app.color.primary}}'],
+                             series: { shadowSize: 3 },
+                             xaxis:{ ticks: [0, 3, 6, 9, 12, 15,18,21,24,27,30], font: { color: '#a1a7ac' }, max:30 ,tickDecimals:0},
+                             yaxis:{ ticks: [0,50000,100000,150000,200000,250000,300000],font: { color: '#a1a7ac' },tickDecimals:0},
+                             grid: { hoverable: true, clickable: true, borderWidth: 0, color: '#dce5ec' },
+                             tooltip: true,
+                             tooltipOpts: { content: '第 %x.0 天 %y 元',  defaultTheme: false, shifts: { x: 10, y: -25 } },
+                             legend: { backgroundOpacity:1}
+                             }
+                             " style="height:246px" >
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</div>

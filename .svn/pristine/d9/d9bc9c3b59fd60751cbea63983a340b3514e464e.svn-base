@@ -1,0 +1,28 @@
+创建数据库finance
+
+
+
+运行spring boot初始化数据表结构
+java应用程序 liyang/src/main/java/com.liyang/Application.java
+
+
+注册第一个用户
+http://localhost/employeeApply
+扫描后注册成功
+http://test.xiaojinpingtai.com/connect#/workflowEntity/users/state/APPLY
+
+
+修改这个用户为管理员角色，状态为已审核通过有效状态
+update user set state_id=3,role_id=1 where id=1;
+
+
+
+登录到首页
+http://localhost/connect
+扫描后登录跳转
+test.xiaojinpingtai.com/login?code=021K4y4Z1u8F6Z0BQd7Z1cxk4Z1K4y4F&state=22a3eb9d-fa95-42e1-8a39-bd87b0ae0df3
+http://test.xiaojinpingtai.com/#/dashboard
+
+
+
+

@@ -1,0 +1,11 @@
+查看当前进程
+ps -ef | grep java
+
+结束对应进程
+kill -9 进程号
+比如
+kill -9 13540
+
+后台启动进程,控制台输出到 /root/nohup.out文件中
+nohup java -jar liyang-0.0.1-SNAPSHOT.jar &
+ 

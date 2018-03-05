@@ -1,0 +1,97 @@
+<div class="wrapper">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    资金产品信息
+                </div>
+                <table class="table table-striped m-b-none">
+                    <tbody>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="capitalproduct.state.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.state.label }}</td>
+                        <td class="v-middle text-right">
+                            <span translate="capitalproduct.label.label"></span>：
+                        </td>
+                        <td class="v-middle">{{ profile.label }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="capitalproduct.debtortypeCode.self.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{
+                            allEntitiesInfo.capitalproduct.debtortypeCode.values[profile.debtortypeCode].label }}
+                        </td>
+                        <td class="v-middle text-right">
+                            <span translate="capitalproduct.periodCode.self.label"></span>：
+                        </td>
+                        <td class="v-middle">{{
+                            allEntitiesInfo.capitalproduct.periodCode.values[profile.periodCode].label }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="capitalproduct.periodNumber.label"></span>：
+                        </td>
+                        <td class="v-middle b-r" colspan="3">{{ profile.periodNumber }} 期</td>
+                        <!--<td class="v-middle text-right">-->
+                        <!--<span translate="capitalproduct.repaymentMethodCode.label"></span>：-->
+                        <!--</td>-->
+                        <!--<td class="v-middle">{{ allEntitiesInfo.capitalproduct.repaymentMethodCode.values[profile.repaymentMethodCode].label }}</td>-->
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="capitalproduct.creditorAmountMin.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.creditorAmountMin }} 元</td>
+                        <td class="v-middle text-right">
+                            <span translate="capitalproduct.creditorAmountMax.label"></span>：
+                        </td>
+                        <td class="v-middle">{{ profile.creditorAmountMax }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="capitalproduct.creditorInterest.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.creditorInterest }}%</td>
+                        <td class="v-middle text-right">
+                            <span translate="capitalproduct.creditorRepaymentDay.label"></span>：
+                        </td>
+                        <td class="v-middle">{{ profile.creditorRepaymentDay }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="capitalproduct.creditorRepaymentDay.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.creditorInterest }}</td>
+                        <td class="v-middle text-right">
+                            <span translate="capitalproduct.creditorRepaymentBankcard.label"></span>：
+                        </td>
+                        <td class="v-middle">{{ profile.creditorRepaymentBankcard.accountIdentity }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="capitalproduct.overdueGraceDays.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.overdueGraceDays }} 天</td>
+                        <td class="v-middle text-right">
+                            <span translate="capitalproduct.overduePenaltyInterestRate.label"></span>：
+                        </td>
+                        <td class="v-middle">{{ profile.overduePenaltyInterestRate }}%</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="capitalproduct.description.label"></span>：
+                        </td>
+                        <td class="v-middle b-r" colspan="3">{{ profile.description }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
+        </div>
+    </div>
+</div>

@@ -1,0 +1,48 @@
+
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light">
+
+
+	<div class="col w-md ">
+
+		<div class="vbox">
+			<div class="wrapper-md b-b">
+				<div class="font-thin h4">还款列表</div>
+			</div>
+			<div class="row-row">
+				<div class="cell scrollable">
+					<div class="cell-inner">
+						<ul class="nav nav-pills nav-stacked nav-sm">
+							<li ui-sref-active="active"><a
+								ui-sref="repayments.list({status:'all'})"> &nbsp; <b
+									class="badge bg-info pull-right">312</b> <b>全部</b></a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="repayments.list({status:'coming'})"> &nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;即将到期
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="repayments.list({status:'passed'})"> &nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;已逾期
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="repayments.list({status:'uncomfirmed'})">
+									&nbsp;&nbsp;<i class="fa fa-angle-right"></i> &nbsp;&nbsp;待审核
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="repayments.list({status:'comfirmed'})">
+									&nbsp;&nbsp;<i class="fa fa-angle-right"></i> &nbsp;&nbsp;已入账
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="repayments.list({status:'finished'})"> &nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;已分配
+							</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+	<div class="col lter" ui-view></div>
+</div>
+<!-- /hbox layout -->

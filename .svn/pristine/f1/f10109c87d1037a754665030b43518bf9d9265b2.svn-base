@@ -1,0 +1,46 @@
+<script>
+
+    "use strict";
+    app.controller("powersCtrl", [
+        "$scope",
+        function ( $scope) {
+            $scope.risksList = [
+                {
+                    id: "",
+                    name: "业务团队人员权限统计表",
+                    sref: "powers.page({view_type:'team'})"
+                },
+                {
+                    id: "",
+                    name: "总部审核人员审单统计",
+                    sref: "powers.page({view_type:'review'})"
+                },
+                {
+                    id: "",
+                    name: "打款流程统计",
+                    sref: "powers.page({view_type:'payFlow'})"
+                }
+            ]
+        }
+    ]);
+</script>
+
+<div class="hbox hbox-auto-xs hbox-auto-sm bg-light" ng-controller="powersCtrl">
+    <div class="col w-md bg-light b-r bg-auto hidden-sm hidden-xs">
+        <div class="wrapper-md b-b">
+            <div class="font-thin h4">
+                权限报表
+            </div>
+        </div>
+        <div class="wrapper-md">
+            <ul class="nav nav-pills nav-stacked nav-sm">
+                <li ui-sref-active="active" ng-repeat="list in risksList">
+                    <a ui-sref="{{ list.sref }}">{{list.name}}</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="col">
+        <div class="hbox hbox-auto-xs lter" ui-view></div>
+    </div>
+</div>

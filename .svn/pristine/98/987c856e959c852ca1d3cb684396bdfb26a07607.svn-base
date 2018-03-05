@@ -1,0 +1,473 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>我的申请</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <link rel="stylesheet" href="../../css/weui.css">
+    <link rel="stylesheet" href="../../css/weui2.css">
+    <style>
+        .now_card_title_yjq{
+            padding: 0 12px;
+            background: #ccc;
+            color: white;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-top: 1px;
+        }
+        .now_card span{
+            margin-left: 5px;
+        }
+        .now_card > div{
+            padding: 10px 15px;
+        }
+        .now_card{
+            display: block;
+            background: #fff;
+            margin-top: 15px;
+            border: 1px solid #e6e5e5;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+        .now_card_content{
+             border-top: 1px solid #e6e5e5;
+             padding: 15px;
+         }
+        a:link{
+            color: #0D0D0D;
+        }
+        a:active{
+            color: #0D0D0D;
+        }
+        a{
+            color: #0D0D0D;
+        }
+        .now_card_title_whk{
+            padding: 0 12px;
+            background: #ffc425;
+            color: white;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-top: 1px;
+        }
+        .btn{
+            width: 100%;
+            height: 40px;
+            background: #ffbd00;
+            border-radius: 20px;
+            display: inline-block;
+            text-align: center;
+            line-height: 40px;
+            color: white;
+            font-size: 16px;
+        }
+        .btn:active{
+            background: #CCCCCC;
+            color: white;
+        }
+    </style>
+
+</head>
+<body>
+<div id="accountNull" style="height: 100%;width: 100%;background: #fff;display:none;">
+    <div style="background: #fff;width: calc(100% - 30px); height: 44px;padding: 0 15px;border-bottom: 1px solid #e6e6e6;" class="clearfix">
+        <div style="float: left">
+            <i class="icon icon-109 f-black" style="font-size: 25px; line-height: 44px;"></i>
+        </div>
+        <div style="float: left;width: calc(100% - 130px); padding: 0 50px; height: 44px;text-align: center;line-height: 44px;font-weight: bolder">
+            我的申请
+        </div>
+    </div>
+    <div class="page-bd-15">
+        <div style="margin: 50px auto 30px;width: 111px;">
+            <img src="../../images/null_con.png">
+        </div>
+        <p style="text-align: center;color: #666">您尚未申请产品，我的申请为空</p>
+        <p style="text-align: center;color: #666">请先申请产品~</p>
+        <a href="../loan/appli.html" class="btn" style="margin-top: 30px;color:#fff">立即申请</a>
+    </div>
+</div>
+
+<div id='body' style="padding:15px;"></div>
+</body>
+<script src="../../js/jquery-3.2.1.js"></script>
+<script src="../../js/config.js"></script>
+<script>
+if(window.location.search){
+    var href = window.location.href;
+    var state = href.split('&')[1];
+    state = state.split('=')[1];
+    var code = href.split('?')[1];
+    code = code.split('&')[0];
+    code = code.split('=')[1];
+}
+$.ajax({
+    type: 'GET',
+    url: '/wechat/wlqz/callback' ,
+    //data: {'code':code} ,
+    headers: {
+        app_code:"WULIUQIANZHUANG",
+        client:"wechat"
+    },
+    success: function (res) {
+
+        if(res.message == 'error'){
+            $.ajax({
+                type: 'GET',
+                url: '/wechatLogin' ,
+                data: {'code':code,'state':state} ,
+                headers: {
+                    app_code:"WULIUQIANZHUANG",
+                    client:"wechat"
+                },
+                success: function (res) {
+                	 if(res.ActionStatus == 'FAIL'){
+                		 $('#accountNull').show();
+                         //用户没注册
+                       
+                         var uri='http://'+window.config.location+'/wechat/wlqz/html/login.html';
+                         uri=encodeURIComponent(uri);
+                         window.location.href='https://open.weixin.qq.com/connect/oauth2/authorize?appid='+window.config.appid+'&redirect_uri='+uri+'&response_type=code&scope=snsapi_base&state='+state+'#wechat_redirect';
+                      }else{
+                    	  window.userid=res.message;
+                          isApply();
+                          sjshList();
+                          xydList();
+                          rzzlList();
+                         mdbtList();
+                      }
+                   
+                } ,
+                dataType: 'json'
+            })
+
+        }else{
+            window.userid=res.message;
+            isApply();
+            sjshList();
+            xydList();
+            rzzlList();
+            mdbtList();
+        }
+    } ,
+    dataType: 'json'
+});
+
+//是否有申请过产品
+function isApply() {
+    $.ajax({
+        type: 'GET',
+        url: '/order/query' ,
+        //data: {'code':code} ,
+        headers: {
+            app_code:"WULIUQIANZHUANG",
+            client:"wechat"
+        },
+        success: function (res) {
+            //不存在申请
+            if(res.is_order == false){
+                $('#accountNull').show();
+            }
+        } ,
+        dataType: 'json'
+    });
+}
+//渲染随借随还列表
+function sjshList(){
+	 $.ajax({
+         type: 'GET',
+         url: '/rest/orderwdsjshes/search/listOwn',
+         data: {} ,
+         headers: {
+             app_code:"WULIUQIANZHUANG",
+             client:"wechat"
+         },
+         success: function (res) {
+         	  
+                     if(res.ActionStatus == 'FAIL'){
+                     	alert(res.ErrorInfo)
+                     }else{
+								 var arr=res._embedded.orderwdsjshes;
+								 if(arr.length == 0){
+									//$('#accountNull').show();
+								 }else{
+									$.each(arr,function (key,val) {
+											console.log(val)
+											//获取状态
+											$.ajax({
+								                type: 'GET',
+								                url: '/rest/orderwdsjshes/'+val.id+'/state',
+								                data: {} ,
+								                headers: {
+								                    app_code:"WULIUQIANZHUANG",
+								                    client:"wechat"
+								                },
+								                success: function (res) {
+								                	  console.log(res.label)
+								                	if(res.stateCode == 'CREATED'){
+								                		label='待审核'
+                                                        var link = 'profileCreated.html';
+								                	}else if(res.stateCode == 'ENABLED'){
+								                		label = '终审通过'
+                                                        var link = 'profileSuccess.html';
+								                	}else if(res.stateCode == 'DISABLED'){
+								                		label = '禁用'
+								                	}else if(res.stateCode == 'DELETED'){
+								                		label = '已删除'
+								                	}else if(res.stateCode == 'DENIED'){
+								                		label = '初审未通过'
+                                                        var link = 'profileState.html';
+								                	}else if(res.stateCode == 'ADOPT'){
+								                		label = '初审通过'
+                                                        var link = 'profileState.html';
+								                	}
+//								                	else if(res.stateCode == 'SIGNED'){
+//								                		label = '用户已经签约'
+//	                                                     var link = 'profileState.html';
+//									                }
+                                                    else if(res.stateCode == 'NOTPASS'){
+								                		label = '终审未通过';
+                                                        var link = 'profileCreated.html';
+								                	}
+						                          	var time = val.createdAt.split('T')[0];
+													$('#body').append('<a href="'+link+'?id='+val.id+'&product=1" class="now_card"> <div class="clearfix"> <p class="left">我的申请<span></span></p><p class="right now_card_title_whk">'+label+'</p></div> <div class="now_card_content"> <div class="clearfix"> <p style="float: left;color: #a3a3a3;">产品</p> <p style="float: right">随借随还</p> </div> <div class="clearfix margin-top-5"> <p style="float: left;color: #a3a3a3;">申请额度</p> <p style="float: right">'+val.applyAmount+'元</p> </div> <div class="clearfix margin-top-5"> <p style="float: left;color: #a3a3a3;">申请时间</p> <p style="float: right">'+time+'</p> </div> </div> </a>')
+								                } ,
+								                dataType: 'json'
+								            });
+								
+									})
+							  }	
+							console.log(res._embedded.orderwdsjshes)
+                     	
+                     }
+         } ,
+         dataType: 'json'
+     });
+}
+
+//渲染网点信用贷列表
+function xydList(){
+    $.ajax({
+        type: 'GET',
+        url: '/rest/orderwdxyds/search/listOwn',
+        data: {} ,
+        headers: {
+            app_code:"WULIUQIANZHUANG",
+            client:"wechat"
+        },
+        success: function (res) {
+
+            if(res.ActionStatus == 'FAIL'){
+                alert(res.ErrorInfo)
+            }else{
+                var arr=res._embedded.orderwdxyds;
+                if(arr.length == 0){
+                   // $('#accountNull').show();
+                }else{
+                    $('#accountNull').hide();
+                    $.each(arr,function (key,val) {
+                        console.log(val)
+                        //获取状态
+                        $.ajax({
+                            type: 'GET',
+                            url: '/rest/orderwdxyds/'+val.id+'/state',
+                            data: {} ,
+                            headers: {
+                                app_code:"WULIUQIANZHUANG",
+                                client:"wechat"
+                            },
+                            success: function (res) {
+                                console.log(res.label)
+
+                                if(res.stateCode == 'CREATED'){
+                                    label='待审核'
+                                    var link = 'orderxyd/profileCreated.html';
+                                }else if(res.stateCode == 'ENABLED'){
+                                    label = '终审通过'
+                                    var link = 'orderxyd/profileSuccess.html';
+                                }else if(res.stateCode == 'DISABLED'){
+                                    label = '禁用'
+                                }else if(res.stateCode == 'DELETED'){
+                                    label = '已删除'
+                                }else if(res.stateCode == 'DENIED'){
+                                    label = '审核未通过'
+                                    var link = 'orderxyd/profileState.html';
+                                }else if(res.stateCode == 'ADOPT'){
+                                    label = '审核通过'
+                                    var link = 'orderxyd/profileState.html';
+                                }else if(res.stateCode == 'SIGNED'){
+                                    label = '用户已经签约'
+                                    var link = 'orderxyd/profileState.html';
+                                }else if(res.stateCode == 'NOTPASS'){
+                                    label = '终审未通过';
+                                    var link = 'orderxyd/profileCreated.html';
+                                }
+                                var time = val.createdAt.split('T')[0];
+                                $('#body').append('<a href="'+link+'?id='+val.id+'&product=1" class="now_card"> <div class="clearfix"> <p class="left">我的申请<span></span></p><p class="right now_card_title_whk">'+label+'</p></div> <div class="now_card_content"> <div class="clearfix"> <p style="float: left;color: #a3a3a3;">产品</p> <p style="float: right">网点信用贷</p> </div> <div class="clearfix margin-top-5"> <p style="float: left;color: #a3a3a3;">申请额度</p> <p style="float: right">'+val.applyAmount+'元</p> </div> <div class="clearfix margin-top-5"> <p style="float: left;color: #a3a3a3;">申请时间</p> <p style="float: right">'+time+'</p> </div> </div> </a>')
+
+                            } ,
+                            dataType: 'json'
+                        });
+
+                    })
+                }
+                console.log(res._embedded.orderwdsjshes)
+
+            }
+        } ,
+        dataType: 'json'
+    });
+}
+
+//渲染融资租赁列表
+function rzzlList(){
+    $.ajax({
+        type: 'GET',
+        url: '/rest/orderrzzls/search/listOwn',
+        data: {} ,
+        headers: {
+            app_code:"WULIUQIANZHUANG",
+            client:"wechat"
+        },
+        success: function (res) {
+
+            if(res.ActionStatus == 'FAIL'){
+                alert(res.ErrorInfo)
+            }else{
+                var arr=res._embedded.orderrzzls;
+                if(arr.length == 0){
+                   // $('#accountNull').show();
+                }else{
+                    $('#accountNull').hide();
+                    $.each(arr,function (key,val) {
+                        console.log(val)
+                        //获取状态
+                        $.ajax({
+                            type: 'GET',
+                            url: '/rest/orderrzzls/'+val.id+'/state',
+                            data: {} ,
+                            headers: {
+                                app_code:"WULIUQIANZHUANG",
+                                client:"wechat"
+                            },
+                            success: function (res) {
+                                console.log(res.label)
+                                if(res.stateCode == 'CREATED'){
+                                    label='待审核'
+                                    var link = 'orderrzzl/profileCreated.html';
+                                }else if(res.stateCode == 'ENABLED'){
+                                    label = '终审通过'
+                                    var link = 'orderrzzl/profileSuccess.html';
+                                }else if(res.stateCode == 'DISABLED'){
+                                    label = '禁用'
+                                }else if(res.stateCode == 'DELETED'){
+                                    label = '已删除'
+                                }else if(res.stateCode == 'DENIED'){
+                                    label = '审核未通过'
+                                    var link = 'orderrzzl/profileState.html';
+                                }else if(res.stateCode == 'ADOPT'){
+                                    label = '审核通过'
+                                    var link = 'orderrzzl/profileState.html';
+                                }else if(res.stateCode == 'SIGNED'){
+                                    label = '用户已经签约'
+                                    var link = 'orderrzzl/profileState.html';
+                                }else if(res.stateCode == 'NOTPASS'){
+                                    label = '终审未通过';
+                                    var link = 'orderrzzl/profileCreated.html';
+                                }
+                                var time = val.createdAt.split('T')[0];
+                                $('#body').append('<a href="'+link+'?id='+val.id+'&product=1" class="now_card"> <div class="clearfix"> <p class="left">我的申请<span></span></p><p class="right now_card_title_whk">'+label+'</p></div> <div class="now_card_content"> <div class="clearfix"> <p style="float: left;color: #a3a3a3;">产品</p> <p style="float: right">融资租赁</p> </div> <div class="clearfix margin-top-5"> <p style="float: left;color: #a3a3a3;">申请额度</p> <p style="float: right">'+val.applyAmount+'元</p> </div> <div class="clearfix margin-top-5"> <p style="float: left;color: #a3a3a3;">申请时间</p> <p style="float: right">'+time+'</p> </div> </div> </a>')
+
+                            } ,
+                            dataType: 'json'
+                        });
+
+                    })
+                }
+                console.log(res._embedded.orderrzzls)
+
+            }
+        } ,
+        dataType: 'json'
+    });
+}
+
+//渲染面白白条列表
+function mdbtList(){
+    $.ajax({
+        type: 'GET',
+        url: '/rest/ordermdbts/search/listOwn',
+        data: {} ,
+        headers: {
+            app_code:"WULIUQIANZHUANG",
+            client:"wechat"
+        },
+        success: function (res) {
+
+            if(res.ActionStatus == 'FAIL'){
+                alert(res.ErrorInfo)
+            }else{
+                var arr=res._embedded.ordermdbts;
+                if(arr.length == 0){
+                    // $('#accountNull').show();
+                }else{
+                    $('#accountNull').hide();
+                    $.each(arr,function (key,val) {
+                        console.log(val)
+                        //获取状态
+                        $.ajax({
+                            type: 'GET',
+                            url: '/rest/ordermdbts/'+val.id+'/state',
+                            data: {} ,
+                            headers: {
+                                app_code:"WULIUQIANZHUANG",
+                                client:"wechat"
+                            },
+                            success: function (res) {
+                                console.log(res.label)
+
+                                if(res.stateCode == 'CREATED'){
+                                    label='待审核'
+                                    var link = 'ordermdbt/profileCreated.html';
+                                }else if(res.stateCode == 'ENABLED'){
+                                    label = '终审通过'
+                                    var link = 'ordermdbt/profileSuccess.html';
+                                }else if(res.stateCode == 'DISABLED'){
+                                    label = '禁用'
+                                }else if(res.stateCode == 'DELETED'){
+                                    label = '已删除'
+                                }else if(res.stateCode == 'DENIED'){
+                                    label = '审核未通过'
+                                    var link = 'ordermdbt/profileState.html';
+                                }else if(res.stateCode == 'ADOPT'){
+                                    label = '审核通过'
+                                    var link = 'ordermdbt/profileState.html';
+                                }else if(res.stateCode == 'SIGNED'){
+                                    label = '用户已经签约'
+                                    var link = 'ordermdbt/profileState.html';
+                                }else if(res.stateCode == 'NOTPASS'){
+                                    label = '终审未通过';
+                                    var link = 'ordermdbt/profileCreated.html';
+                                }
+                                var time = val.createdAt.split('T')[0];
+                                $('#body').append('<a href="'+link+'?id='+val.id+'&product=1" class="now_card"> <div class="clearfix"> <p class="left">我的申请<span></span></p><p class="right now_card_title_whk">'+label+'</p></div> <div class="now_card_content"> <div class="clearfix"> <p style="float: left;color: #a3a3a3;">产品</p> <p style="float: right">网点面单白条</p> </div> <div class="clearfix margin-top-5"> <p style="float: left;color: #a3a3a3;">申请额度</p> <p style="float: right">'+val.applyAmount+'元</p> </div> <div class="clearfix margin-top-5"> <p style="float: left;color: #a3a3a3;">申请时间</p> <p style="float: right">'+time+'</p> </div> </div> </a>')
+
+                            } ,
+                            dataType: 'json'
+                        });
+
+                    })
+                }
+                console.log(res._embedded.ordermdbts)
+
+            }
+        } ,
+        dataType: 'json'
+    });
+}
+       
+</script>
+</html>

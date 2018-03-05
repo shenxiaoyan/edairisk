@@ -1,0 +1,85 @@
+<script>
+    app.controller("capitalproductHomeController",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "$state",
+            "entity",
+            function ($rootScope, $scope, $http, $stateParams, $state, entity) {
+
+                $scope.id = $stateParams.id;
+
+                $scope.profile     = {};
+                $scope.canActs     = [];
+                $scope.canFileActs = [];
+
+                $scope.getProfile = function () {
+
+                    entity.getDetail("/rest/capitalproducts/" + $scope.id, ["createdBy", "state", "creditorDepartment", "creditorRepaymentBankcard", "workflow"]).then(function (resResult) {
+
+                        $scope.profile = resResult;
+
+                        angular.forEach($scope.profile.currentUserCanActList, function (val, key) {
+                            if (val.actGroup === "UPDATE" || val.actGroup === "OPERATE" || val.actGroup === "FILE_PACKAGE") {
+                                $scope.canActs.push(val);
+                            } else if (val.actGroup === "FILE_OPERATE") {
+                                $scope.canFileActs.push(val)
+                            }
+                        });
+
+                        $scope.state_code = $scope.profile.state.stateCode;
+
+                    });
+                };
+
+                $scope.getProfile();
+
+
+                /*patch方法*/
+                $scope.patchAct = function (type, title, url, data) {
+                    swal({
+                        title: title,
+                        type: type,
+                        showCancelButton: true,
+                        cancelButtonText: "退出",
+                        confirmButtonText: "同意",
+                        closeOnConfirm: true
+                    }, function () {
+                        $http({
+                            method: "PATCH",
+                            url: url,
+                            data: data
+                        }).success(function (resResult) {
+
+                            $state.go("workflowEntity.list", {entity_key: "capitalproduct"}, {reload: true});
+
+                        });
+                    });
+                };
+
+
+                /*大方法的对象*/
+                $scope.capitalproductExcute = {
+                    "update": function () {
+                        $state.go("workflowEntity.home.profile.form", {
+                            id: $scope.id,
+                            entity_key: "capitalproduct"
+                        }, {});
+                    }
+                };
+
+            }
+        ]
+    );
+</script>
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light" ng-controller="capitalproductHomeController">
+    <!-- column -->
+    <div class="col w-md lter b-l">
+        <div class="h-full" ui-view></div>
+    </div>
+    <!-- /column -->
+</div>
+<!-- /hbox layout -->

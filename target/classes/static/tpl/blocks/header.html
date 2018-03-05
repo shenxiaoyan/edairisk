@@ -1,0 +1,112 @@
+<!-- navbar header -->
+<div class="navbar-header {{app.settings.navbarHeaderColor}}">
+    <button class="pull-right visible-xs dk" ui-toggle-class="show" data-target=".navbar-collapse">
+        <i class="glyphicon glyphicon-cog"></i>
+    </button>
+    <button class="pull-right visible-xs" ui-toggle-class="off-screen" data-target=".app-aside" ui-scroll-to="app">
+        <i class="glyphicon glyphicon-align-justify"></i>
+    </button>
+    <!-- brand -->
+    <a href="#/" class="navbar-brand text-lt">
+        <i class="fa fa-empire"></i>
+        <img src="img/logo.png" alt="." class="hide">
+        <span class="hidden-folded m-l-xs">{{app.name}}</span>
+    </a>
+    <!-- / brand -->
+</div>
+<!-- / navbar header -->
+
+<!-- navbar collapse -->
+<div class="collapse pos-rlt navbar-collapse box-shadow {{app.settings.navbarCollapseColor}}">
+    <!-- buttons -->
+    <div class="nav navbar-nav hidden-xs">
+        <a href class="btn no-shadow navbar-btn" ng-click="app.settings.asideFolded = !app.settings.asideFolded">
+            <i class="fa {{app.settings.asideFolded ? 'fa-indent' : 'fa-dedent'}} fa-fw"></i>
+        </a>
+        <!--<a href="javascript:history.go(-1);" class="btn btn-sm btn-default"><i class="fa fa-chevron-left"></i></a>-->
+        <!--<a href="javascript:history.go(1);" class="btn btn-sm btn-default"><i class="fa fa-chevron-right"></i></a>-->
+    </div>
+    <!-- / buttons -->
+
+
+    <!-- search form -->
+    <!--<form class="navbar-form navbar-form-sm navbar-left shift" ui-shift="prependTo" target=".navbar-collapse"-->
+          <!--role="search" ng-controller="TypeaheadDemoCtrl">-->
+        <!--<div class="form-group">-->
+            <!--<div class="input-group">-->
+                <!--<input type="text" ng-model="selected"-->
+                       <!--typeahead="state for state in states | filter:$viewValue | limitTo:8"-->
+                       <!--class="form-control input-sm bg-light no-border rounded padder" placeholder="Search projects...">-->
+                <!--<span class="input-group-btn">-->
+                    <!--<button type="submit" ng-click="search_submit();" class="btn btn-sm bg-light rounded"><i-->
+                            <!--class="fa fa-search"></i></button>-->
+                <!--</span>-->
+            <!--</div>-->
+        <!--</div>-->
+    <!--</form>-->
+    <!-- / search form -->
+
+    <!-- nabar right -->
+    <ul class="nav navbar-nav navbar-right">
+        <li>
+            <a>部门：{{ myinfo.department.label }}</a>
+        </li>
+        <li >
+            <a>角色：{{ myinfo.role.label }}</a>
+        </li>
+        <li>
+            <a ui-fullscreen></a>
+        </li>
+        <!--<li>-->
+            <!--<a ui-sref="notices">-->
+                <!--<i class="icon-bell fa-fw"></i>-->
+                <!--<span class="badge badge-sm up bg-danger pull-right-xs">{{ unReadNumber }}</span>-->
+            <!--</a>-->
+        <!--</li>-->
+        <li class="dropdown" dropdown>
+            <a class="dropdown-toggle clear" dropdown-toggle>
+                <span class="thumb-sm avatar pull-right m-t-n-sm m-b-n-sm m-l-sm">
+                    <img ng-src="{{myinfo.headimgurl?myinfo.headimgurl:'img/b19.jpg'}}">
+                </span>
+                <span class="hidden-sm hidden-md">{{myinfo.nickname}}</span> <b class="caret"></b>
+            </a>
+            <!-- dropdown -->
+            <ul class="dropdown-menu animated fadeInRight w">
+                <!--<li>-->
+                <!--<a href>-->
+                <!--<span class="badge bg-danger pull-right">30%</span>-->
+                <!--<span>Settings</span>-->
+                <!--</a>-->
+                <!--</li>-->
+                <!--<li>-->
+                <!--<a ui-sref="app.page.profile">Profile</a>-->
+                <!--</li>-->
+                <!--<li>-->
+                <!--<a ui-sref="app.docs">-->
+                <!--<span class="label bg-info pull-right">new</span>-->
+                <!--Help-->
+                <!--</a>-->
+                <!--</li>-->
+                <!--<li class="divider"></li>-->
+                <li class="text-center">
+                    <a ui-toggle-class="active" target=".settings">个性化</a>
+                </li>
+                <li class="text-center">
+                    <a data-target="#user_update_modal" data-toggle="modal">修改资料</a>
+                </li>
+                <li class="text-center">
+                    <a data-target="#headimg_update_modal" data-toggle="modal">修改头像</a>
+                </li>
+                <li class="text-center">
+                    <a data-target="#reset_password_modal" data-toggle="modal">修改密码</a>
+                </li>
+                <li class="text-center">
+                    <a href="/logout">退出</a>
+                </li>
+            </ul>
+            <!-- / dropdown -->
+        </li>
+    </ul>
+    <!-- / navbar right -->
+</div>
+<!-- / navbar collapse -->

@@ -1,0 +1,123 @@
+<div class="wrapper">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    申请信息
+                </div>
+                <table class="table table-striped m-b-none">
+                    <tbody>
+                    <tr>
+                        <td class="v-middle text-right w-sm">姓名：</td>
+                        <td class="v-middle w-xl">{{ profile.realName }}</td>
+                        <td class="v-middle text-right w-sm">手机号码：</td>
+                        <td class="v-middle w-xl">{{ profile.applyMobile }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right w-sm">身份证号：</td>
+                        <td class="v-middle w-xl">{{ profile.applyIdentityNo }}</td>
+                        <td class="v-middle text-right w-sm">办公地址：</td>
+                        <td class="v-middle w-xl">{{ profile.applyEnterpriseAddress }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right w-sm">申请额度：</td>
+                        <td class="v-middle w-xl">{{ profile.applyAmount }}</td>
+                        <td class="v-middle text-right w-sm">借款期限：</td>
+                        <td class="v-middle w-xl">{{ profile.applyPeriodNumber }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">日平均收件量：</td>
+                        <td class="v-middle">{{ profile.applyDayPatchExpress }}</td>
+                        <td class="v-middle text-right">日平均派件量：</td>
+                        <td class="v-middle">{{ profile.applyDayPickExpress }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">快递网点名称：</td>
+                        <td class="v-middle">{{ profile.applyEnterpriseName }}</td>
+                        <td class="v-middle text-right">经营区域：</td>
+                        <td class="v-middle">
+                            {{ profile.applyEnterpriseProvince }}
+                            {{ profile.applyEnterpriseCity }}
+                            {{ profile.applyEnterpriseDistrict }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">推荐人：</td>
+                        <td class="v-middle">{{ profile.applyReferrerRealName?profile.applyReferrerRealName:"无" }}</td>
+                        <td class="v-middle text-right">创建时间：</td>
+                        <td class="v-middle">{{ profile.createdAt | datetime }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="clearfix m-b-md" ng-if="accountShow">
+                <div class="pull-left m-r" style="width: 410px;">
+                    <div class="wrapper-md bg-white" style="border: 1px solid #E7EBED;">
+                        <div class="bg-info text-center"
+                             style="width: 80px;height: 50px; line-height: 50px;border-radius: 5px;">
+                            <span class="text-white font-bold">小金银行</span>
+                        </div>
+                        <div class="m-t-md m-b-md text-muted font-thin h4">
+                            1234 4321 3214 3241
+                        </div>
+                        <div class="clearfix">
+                            <div class="pull-left clearfix">
+                                <span class="pull-left font-bold">过期时间：</span>
+                                <span class="pull-left">20/09</span>
+                            </div>
+                            <div class="pull-right clearfix">
+                                <span class="pull-left font-bold">持卡人：</span>
+                                <span class="pull-left">力饼</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="pull-left w-xl">
+                    <button class="btn btn-sm btn-success btn-addon"
+                            ui-sref="workflowEntity.home.profile.info({entity_key:'account',state_code:accountList.state_code,id:accountList.id})">
+                        <i class="fa fa-credit-card"></i> 账户详情
+                    </button>
+                    <div class="line line-dashed b-b"></div>
+                    <div>创建时间：{{ accountList.createdAt | datetime }}</div>
+                    <div class="line line-dashed b-b"></div>
+                    <div>提示：{{ accountList.notice }}</div>
+                    <div class="line line-dashed b-b"></div>
+                    <div>账号：{{ accountList.account }}</div>
+                    <div class="line line-dashed b-b m-b-n"></div>
+                </div>
+            </div>
+            <!--<div class="panel panel-success" ng-if="accountShow">-->
+            <!--<div class="panel-heading">-->
+            <!--信用卡信息-->
+            <!--</div>-->
+            <!--<div class="clearfix" style="background: #FAFBFC;">-->
+            <!--<div class="wrapper-sm pull-left" style="width: 410px;">-->
+            <!--<div class="wrapper-md bg-white" style="border: 1px solid #E7EBED;">-->
+            <!--<div class="bg-info text-center" style="width: 80px;height: 50px; line-height: 50px;border-radius: 5px;">-->
+            <!--<span class="text-white font-bold">小金银行</span>-->
+            <!--</div>-->
+            <!--<div class="m-t-md m-b-md text-muted font-thin h4">-->
+            <!--1234 4321 3214 3241-->
+            <!--</div>-->
+            <!--<div class="clearfix">-->
+            <!--<div class="pull-left clearfix">-->
+            <!--<span class="pull-left font-bold">过期时间：</span>-->
+            <!--<span class="pull-left">20/09</span>-->
+            <!--</div>-->
+            <!--<div class="pull-right clearfix">-->
+            <!--<span class="pull-left font-bold">持卡人：</span>-->
+            <!--<span class="pull-left">力饼</span>-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--<div class="wrapper-sm pull-left">-->
+            <!--<div class="m-b-sm">创建时间：{{ accountList.createdAt | datetime }}</div>-->
+            <!--<div class="m-b-sm">提示：{{ accountList.notice }}</div>-->
+            <!--<div class="m-b-sm">账号：{{ accountList.account }}</div>-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--</div>-->
+        </div>
+    </div>
+</div>

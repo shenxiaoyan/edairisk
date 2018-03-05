@@ -1,0 +1,88 @@
+<script>
+    app.controller("loanHomeController",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "$state",
+            "entity",
+            function ($rootScope, $scope, $http, $stateParams, $state, entity) {
+
+                $scope.id = $stateParams.id;
+
+                $scope.profile = {};
+                $scope.canActs = [];
+
+                entity.getDetail("/rest/loans/" + $scope.id, ["createdBy","state", "workflow","ordercdd"]).then(function (resResult) {
+                        console.log(resResult);
+                    
+                    $scope.profile = resResult;
+
+                    $scope.information =  JSON.parse($scope.profile.information)
+                    $scope.information.loanStartDate =$scope.formatDate(JSON.parse($scope.profile.information).loanStartDate);
+                    $scope.information.loanEndDate =$scope.formatDate(JSON.parse($scope.profile.information).loanEndDate);
+
+                    console.log($scope.profile)
+                    
+                    $scope.canActs     = [];
+                    $scope.canFileActs = [];
+
+                    angular.forEach($scope.profile.currentUserCanActList, function (val, key) {
+                        if (val.actGroup === "UPDATE" || val.actGroup === "OPERATE" || val.actGroup === "FILE_PACKAGE") {
+                            $scope.canActs.push(val);
+                        } else if (val.actGroup === "FILE_OPERATE") {
+                            $scope.canFileActs.push(val)
+                        }
+                    });
+
+                    $scope.state_code = $scope.profile.state.stateCode;
+
+                });
+
+                /*patch方法*/
+                $scope.patchAct = function (type, title, url, data) {
+                    swal({
+                        title: title,
+                        type: type,
+                        showCancelButton: true,
+                        cancelButtonText: "退出",
+                        confirmButtonText: "同意",
+                        closeOnConfirm: true
+                    }, function () {
+                        $http({
+                            method: "PATCH",
+                            url: url,
+                            data: data
+                        }).success(function (resResult) {
+                            $state.go("workflowEntity.list", {entity_key: "loan"}, {reload: true});
+                        });
+                    });
+                };
+
+
+                /*大方法的对象*/
+                $scope.loanExcute = {
+                    /*放款*/
+                    "loan": function () {
+                        $scope.patchAct("success", "这条贷款是否放款", "/rest/loans/" + $scope.id, {act: "loan",loanType:"ORDERCDD"});
+                    },
+
+                };
+                $scope.formatDate = function (date) {
+                    return date.substring(0,4)+'-'+date.substring(4,6)+'-'+date.substring(6,8);
+                };
+
+            }
+        ]
+    );
+</script>
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light" ng-controller="loanHomeController">
+    <!-- column -->
+    <div class="col w-md lter b-l">
+        <div class="h-full" ui-view></div>
+    </div>
+    <!-- /column -->
+</div>
+<!-- /hbox layout -->

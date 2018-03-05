@@ -1,0 +1,172 @@
+<script>
+    "use strict";
+    app.controller("departmenttypeFormController",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "$state",
+            "entity",
+            function ($rootScope, $scope, $http, $stateParams, $state, entity) {
+
+                //新建部门
+                if ($stateParams.id) {
+
+                    //存储id便于跳转回详情页
+                    $scope.id = $stateParams.id;
+
+                    //load数据
+                    entity.getDetail("rest/departmenttypes/" + $stateParams.id).then(function (resResult) {
+                        $scope.form = resResult;
+                    });
+
+                } else {//修改部门
+
+                    //数据为空
+                    $scope.form = {};
+
+                }
+
+                /*
+                 * 保存部门类型
+                 * @author  金杭
+                 * @param   无
+                 * @return  无
+                 * */
+                $scope.saveDepartmenttype = function () {
+
+                    //修改时的请求
+                    if ($scope.form._links) {
+
+                        //加入行为code
+                        $scope.form.act = "update";
+
+                        $http({
+                            method: "PATCH",
+                            url: $scope.form._links.self.href,
+                            data: $scope.form
+                        }).success(function (resResult) {
+                            $state.go("auditEntity.home.profile.info", {
+                                id: resResult.id,
+                                entity_key: "departmenttype"
+                            }, {reload: true});
+                            $rootScope.toasterSuccess("修改成功！", "部门类型修改成功！");
+                        });
+
+                    } else {//新建时的保存
+
+                        //加入行为code
+                        $scope.form.act = "create";
+
+                        $http({
+                            method: "POST",
+                            url: "rest/departmenttypes",
+                            data: $scope.form
+                        }).success(function (resResult) {
+                            $state.go("auditEntity.list", {entity_key: "departmenttype"}, {reload: true});
+                            $rootScope.toasterSuccess("保存成功！", "部门类型保存成功！");
+                        });
+
+                    }
+
+                };
+
+            }
+        ]
+    )
+</script>
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs" ng-controller="departmenttypeFormController">
+    <!-- column -->
+    <div class="col">
+        <div class="vbox">
+            <div class="wrapper b-b" ng-if="!form._links">
+                <div class="font-thin h4">
+                    <span translate="departmenttype.self.label"></span>新建
+                </div>
+            </div>
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner">
+                        <div class="wrapper">
+                            <form name="departmenttype_form" class="form-horizontal">
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">
+                                        <span class="text-danger">*</span>
+                                        <span translate="departmenttype.label.label"></span>
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="label"
+                                               ng-model="form.label"
+                                               required>
+                                        <span class="help-block text-danger"
+                                              ng-show="departmenttype_form.label.$dirty && departmenttype_form.label.$invalid">
+                                            <i class="fa fa-exclamation-circle text-danger"></i>&ensp;部门类型名称为必填
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">
+                                        <span class="text-danger">*</span>
+                                        <span>code</span>
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="code"
+                                               ng-model="form.code"
+                                               required>
+                                        <span class="help-block text-danger"
+                                              ng-show="departmenttype_form.code.$dirty && departmenttype_form.code.$invalid">
+                                            <i class="fa fa-exclamation-circle text-danger"></i>&ensp;code为必填
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">
+                                        <span class="text-danger">*</span>
+                                        <span translate="departmenttype.departmenttypeCode.label"></span>
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="departmenttypeCode"
+                                               ng-model="form.departmenttypeCode"
+                                               required>
+                                        <span class="help-block text-danger"
+                                              ng-show="departmenttype_form.departmenttypeCode.$dirty && departmenttype_form.departmenttypeCode.$invalid">
+                                            <i class="fa fa-exclamation-circle text-danger"></i>&ensp;类型码为必填，可与code一致
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-4 col-sm-offset-2">
+                                        <button ng-if="form._links"
+                                                ui-sref="auditEntity.home.profile.info({id:id,entity_key:'departmenttype'})"
+                                                class="btn btn-default">返回
+                                        </button>
+                                        <button ng-if="!form._links"
+                                                ui-sref="auditEntity.list({entity_key:'departmenttype'})"
+                                                class="btn btn-default">返回
+                                        </button>
+                                        <button type="button"
+                                                class="btn btn-primary"
+                                                ng-disabled="departmenttype_form.$invalid"
+                                                ng-click="saveDepartmenttype()">
+                                            保存
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /column -->
+</div>
+<!-- /hbox layout -->

@@ -1,0 +1,80 @@
+<script>
+    app.controller("roleHomeController",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "$state",
+            "entity",
+            function ($rootScope, $scope, $http, $stateParams, $state, entity) {
+
+                $scope.id = $stateParams.id;
+
+                $scope.profile     = {};
+                $scope.canActs     = [];
+                $scope.canFileActs = [];
+
+                entity.getDetail("/rest/roles/" + $scope.id, ["createdBy", "departmenttype", "state"]).then(function (resResult) {
+
+                    $scope.profile = resResult;
+
+                    angular.forEach($scope.profile.currentUserCanActList, function (val, key) {
+                        if (val.actGroup === "UPDATE" || val.actGroup === "OPERATE" || val.actGroup === "FILE_PACKAGE") {
+                            $scope.canActs.push(val);
+                        } else if (val.actGroup === "FILE_OPERATE") {
+                            $scope.canFileActs.push(val)
+                        }
+                    });
+
+                    $scope.state_code = $scope.profile.state.stateCode;
+
+                });
+
+
+                /*patch方法*/
+                $scope.patchAct = function (type, title, url, data) {
+                    swal({
+                        title: title,
+                        type: type,
+                        showCancelButton: true,
+                        cancelButtonText: "退出",
+                        confirmButtonText: "同意",
+                        closeOnConfirm: true
+                    }, function () {
+                        $http({
+                            method: "PATCH",
+                            url: url,
+                            data: data
+                        }).success(function (resResult) {
+
+                            $state.go("auditEntity.list", {entity_key: "role"}, {reload: true});
+
+                        });
+                    });
+                };
+
+
+                /*大方法的对象*/
+                $scope.roleExcute = {
+                    "update": function () {
+                        $state.go("auditEntity.home.profile.form", {
+                            id: $scope.id,
+                            entity_key: "role"
+                        }, {reload: false});
+                    }
+                };
+
+            }
+        ]
+    );
+</script>
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light" ng-controller="roleHomeController">
+    <!-- column -->
+    <div class="col w-md lter b-l">
+        <div class="h-full" ui-view></div>
+    </div>
+    <!-- /column -->
+</div>
+<!-- /hbox layout -->

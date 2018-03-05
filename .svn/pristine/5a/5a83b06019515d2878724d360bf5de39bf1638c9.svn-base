@@ -1,0 +1,352 @@
+<script>
+    "use strict";
+    app.controller("borrowingListController",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "entity",
+            "$state",
+            function ($rootScope, $scope, $http, $stateParams, entity, $state) {
+
+                $scope.productid=[
+                    {'val':'请选择','id':''},
+                    {'val':'随借随还','id':'1'},
+                    {'val':'面单白条','id':'4'}
+                ]
+
+                $scope.searchForm= {
+                    productid:'',
+                    name:'',
+                    telephone:'',
+                    identity:''
+                }
+
+                $scope.searchList = function(page) {
+                    //# % & 号键会注释掉后面的内容
+                    $scope.searchForm.name= $scope.searchForm.name.replace(/#/g,'').replace(/%/g,'').replace(/&/g,'').replace(/\^/g,'')
+                    $scope.searchForm.telephone=$scope.searchForm.telephone.replace(/#/g,'').replace(/%/g,'').replace(/&/g,'').replace(/\^/g,'')
+                    $scope.searchForm.identity=$scope.searchForm.identity.replace(/#/g,'').replace(/%/g,'').replace(/&/g,'').replace(/\^/g,'')
+
+                    $http({
+                        method: "GET",
+                        url:"/person/getcreditcardloan?name="+$scope.searchForm.name+"&telephone="+$scope.searchForm.telephone+"&identity="+$scope.searchForm.identity+"&productid="+$scope.searchForm.productid+"&page="+page+"&size=10&sort=id,desc"
+                    }).success(function (resResult) {
+
+                        console.log(resResult)
+                        $scope.list = resResult.data.content;
+
+                        //搜索的返回格式和 rest/search不一样
+                        $scope.pageList = {
+                            size: resResult.data.size,
+                            total_elements: resResult.data.totalElements,
+                            current_page: resResult.data.number,
+                            num_page: resResult.data.totalPages,
+                            total_page: resResult.data.totalPages
+                        };
+
+                        if ($scope.list.length > 0) {
+                            $("#borrowing_list_paginator").show();
+                            $rootScope.setPaginator("#borrowing_list_paginator", $scope.pageList, $scope.searchList);
+                        }else{
+                            $("#borrowing_list_paginator").hide();
+                        }
+
+                    });
+                }
+
+                //搜索按钮
+                $scope.searchFormBtn=function () {
+                    $scope.searchList(0)
+
+                }
+
+                //重置按钮
+                $scope.resetSearchFormBtn=function () {
+                    $scope.searchForm= {
+                        productid:'',
+                        name:'',
+                        telephone:'',
+                        identity:''
+                    }
+                    $scope.searchList(0)
+                }
+
+
+                $scope.pageList = {
+                    size: 0,
+                    total_elements: 0,
+                    current_page: 0,
+                    num_page: 1,
+                    total_page: 1
+                };
+
+                $scope.list = [];
+
+                /*默认读取列表*/
+
+                $scope.getList = function (page) {
+
+                    $scope.loading = true;
+
+                    $scope.list = [];
+
+                    var link = "/person/getcreditcardloan?name="+$scope.searchForm.name+"&telephone="+$scope.searchForm.telephone+"&identity="+$scope.searchForm.identity+"&productid=&page="+page+"&size=10&sort=id,desc"
+
+                    entity.getList(link).then(function (resResult) {
+
+                        $scope.loading = false;
+                        console.log(resResult)
+
+                        $scope.list = resResult.data.content;
+
+                        $scope.pageList = {
+                            size: resResult.data.size,
+                            total_elements: resResult.data.totalElements,
+                            current_page: resResult.data.number,
+                            num_page: resResult.data.totalPages,
+                            total_page: resResult.data.totalPages
+                        };
+
+                        if ($scope.list.length > 0) {
+                            $("#borrowing_list_paginator").show();
+                            $rootScope.setPaginator("#borrowing_list_paginator", $scope.pageList, $scope.getList);
+                        }else{
+                            $("#borrowing_list_paginator").hide();
+                        }
+
+                    });
+                };
+//
+//                $scope.stateSelect = function ($event, stateCode) {
+//                    if ($event.target.nodeName === "INPUT") {
+//                        $scope.state_code = stateCode;
+//                        $scope.getList(0);
+//                    }
+//                };
+
+                $scope.getList(0);
+
+                //跳转到详细页
+                $scope.toInfo=function (id,infoObj) {
+                    $rootScope.borrowingInfo=infoObj;
+                    $state.go("auditEntity.home.profile.info", {entity_key: "borrowingcustomers",id:id}, {reload: true});
+                }
+
+
+
+
+            }
+        ]
+    );
+</script>
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light" ng-controller="borrowingListController">
+    <!-- column -->
+    <div class="col w-md lter b-l">
+        <div class="vbox">
+            <!--<div class="wrapper b-b clearfix">-->
+                <!--<div class="inline pull-left">-->
+                    <!--逾期状态：-->
+                <!--</div>-->
+                <!--&lt;!&ndash;<div class="inline pull-left m-r">&ndash;&gt;-->
+                <!--&lt;!&ndash;<label class="i-checks pull-left m-n" ng-click="stateSelect($event,'')">&ndash;&gt;-->
+                <!--&lt;!&ndash;<input type="radio" name="state" checked><i></i>  全部&ndash;&gt;-->
+                <!--&lt;!&ndash;</label>&ndash;&gt;-->
+                <!--&lt;!&ndash;</div>&ndash;&gt;-->
+                <!--<div class="inline pull-left m-r" ng-repeat="state in states">-->
+                    <!--<label class="i-checks pull-left m-n" ng-click="stateSelect($event,state.stateCode)">-->
+                        <!--<input type="radio" value="{{state.stateCode}}" ng-model="state_code" name="state"><i></i> {{-->
+                        <!--state.label }}-->
+                    <!--</label>-->
+                <!--</div>-->
+            <!--</div>-->
+            <div class="wrapper b-b clearfix ">
+                <form class="form-inline" name="search_form">
+                    <div class="form-group m-r">
+                        <label for="">产品类型: </label>
+                        <select class="form-control" ng-model="searchForm.productid">
+                            <option ng-repeat=" option in productid" value="{{option.id}}">{{option.val}}</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group m-r">
+                        <label for="">借款人: </label>
+                        <input ng-model="searchForm.name" class="form-control" type="text" pattern="^\s*[\u4E00-\u9FA5]+\s*$" name="name">
+                        <span class="help-block text-danger"
+                              ng-show="search_form.name.$dirty && search_form.name.$invalid">
+                            <i class="fa fa-exclamation-circle text-danger"></i>姓名必须为中文
+                        </span>
+                    </div>
+                    <div class="form-group m-r">
+                        <label for="">客户联系方式: </label>
+                        <input ng-model="searchForm.telephone" class="form-control" type="tel" pattern="^\s*\d+\s*$" name="telephone">
+                        <span class="help-block text-danger"
+                              ng-show="search_form.telephone.$dirty && search_form.telephone.$invalid">
+                            <i class="fa fa-exclamation-circle text-danger"></i>手机号必须为数字
+                        </span>
+                    </div>
+                     <div class="form-group m-r">
+                        <label for="">身份证: </label>
+                        <input ng-model="searchForm.identity" class="form-control" type="text" name="identity" pattern="^[1-9]\d{5}(18|19|([23]\d))\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$">
+                        <span class="help-block text-danger"
+                              ng-show="search_form.identity.$dirty && search_form.identity.$invalid">
+                            <i class="fa fa-exclamation-circle text-danger"></i>请输入正确身份证
+                        </span>
+                    </div>
+                    <button class="btn btn-primary m-r" ng-click="searchFormBtn()" ng-disabled="search_form.$invalid">
+                        <i class="fa fa-search"></i>查询
+                    </button>
+                    <button class="btn btn-default m-r" ng-click="resetSearchFormBtn()">
+                        <i class="fa fa-refresh"></i>重置
+                    </button>
+                </form>
+            </div>
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner">
+                        <div class="wrapper" style="width: 1850px;">
+                            <div class="panel panel-default">
+                                <div class="panel-heading" ng-if="!loading && list.length > 0">
+                                    查询结果
+                                </div>
+                                <div ng-if="loading"
+                                     style="position: fixed;top: 50%;right: 50%;margin-left: -15px;margin-top: -15px;">
+                                    <div class="sk-spinner sk-spinner-cube-grid">
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                    </div>
+                                    <div class="text-center m-t">加载中请稍后</div>
+                                </div>
+                                <div class="panel-heading" ng-if="!loading && list.length < 1">
+                                    暂无数据！
+                                </div>
+                                <div ng-if="!loading && list.length > 0">
+                                    <table class="table table-responsive table-hover b-t b-light">
+                                        <thead>
+                                        <tr>
+                                            <th>操作</th>
+                                            <th>借款人</th>
+                                            <th>网点名称</th>
+                                            <th>客户联系方式</th>
+                                            <th>快递品牌</th>
+                                            <th>经营区域</th>
+                                            <th>身份证号</th>
+                                            <th>日均收件量</th>
+                                            <th>日均派件量</th>
+                                            <th>产品类型</th>
+                                            <th>授信额度(元)</th>
+                                            <th>已用额度(元)</th>
+                                            <th>剩余额度(元)</th>
+                                            <th>保证金(元)</th>
+                                            <th>业务员</th>
+
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr ng-repeat="item in list">
+
+                                            <td class="v-middle">
+                                                 <button ng-click="toInfo(item.id,item)" class="pull-left btn btn-xs btn-success m-r">详情</button>
+                                                <!--<button ng-if="state_code == 0" ng-click="toOver(item.overdueId)" class="pull-left btn btn-sm btn-primary m-r">结清</button>-->
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.name }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.branchesName }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.telephone }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.agentBrand }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.businessArea }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.identity }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.applyDayPickExpress }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.applyDayPatchExpress }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.productLabel }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.creditGrant }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.creditLoan }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.creditBalance }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.margin }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.serviceName ? item.serviceName : '未分配业务员'}}
+                                            </td>
+
+
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="wrapper b-t b-light clearfix">
+                <ul id="borrowing_list_paginator" style="margin:2px 0;float: right;"></ul>
+                <small class="m-l-md pull-right text-muted inline m-t-sm m-b-sm m-r">共 {{pageList.total_elements}} 条，本页共 {{ list.length }}
+                    条
+                </small>
+            </div>
+        </div>
+    </div>
+    <!-- /column -->
+</div>
+<!-- /hbox layout -->
+
+<div class="modal fade" id="quota_failed" tabindex="-1" role="dialog">
+    <div class="modal-xs modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"
+                        aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title">请填写未通过理由</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group clearfix">
+                    <label class="col-lg-2 text-right">理由</label>
+                    <div class="col-lg-10">
+                                <textarea class="form-control" ng-model="failedVla" cols="9" style="height: 250px">
+                                </textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer text-center">
+                <button id="model_fail" type="button" class="btn btn-success w-lg">
+                    提交
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

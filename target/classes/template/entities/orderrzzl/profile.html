@@ -1,0 +1,298 @@
+<script>
+    "use strict";
+    app.controller("orderrzzlProfileController",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "entity",
+            function ($rootScope, $scope, $http, entity) {
+
+                $scope.userList   = {};
+                $scope.getLogList = function () {
+                    entity.getList('rest/orderrzzlLogs/search/latestNoticeUser?act_id=8').then(function (resResult) {
+                        if (resResult._embeddedItems) {
+                            angular.forEach(resResult._embeddedItems, function (val, key) {
+                                $scope.userList[val.id] = val
+                            })
+                        }
+
+                    });
+                };
+
+                $scope.getLogList();
+
+                $scope.getList = function () {
+                    $http.get('/linkman').success(function (resResult) {
+                        angular.forEach(resResult, function (val, key) {
+                            $scope.userList[val.id] = val
+                        })
+                    });
+                };
+
+                $scope.distributionSelect = "0";
+                $scope.distributionShow   = function (val) {
+                    if (val === "0") {
+                        $scope.userList = {};
+                        $scope.getLogList();
+                    } else {
+                        $scope.userList = {};
+                        $scope.getList();
+                    }
+                };
+
+
+                /*获得所有授权给门店的销售产品*/
+
+                $scope.productList = {};
+
+
+                $scope.getProductList = function () {
+                    var link = "/rest/departments/" + window.myinfo.department.id + "/products";
+
+                    entity.getList(link).then(function (resResult) {
+//                        $scope.list = resResult._embeddedItems;
+                        console.log(resResult);
+                        angular.forEach(resResult._embeddedItems, function (val, key) {
+                            $scope.productList[val.id] = val
+                        })
+                    });
+                };
+
+                $scope.getProductList();
+
+            }
+        ]
+    );
+</script>
+<div class="vbox bg-white" ng-controller="orderrzzlProfileController">
+    <div class="bg-white b-b clearfix" style="padding:19px 20px">
+        <button ng-if="profile.workflow.id" class="pull-left btn btn-sm btn-primary btn-addon"
+                ui-sref="workflowEntity.list({entity_key:'orderrzzl',workflow_id:profile.workflow.id})"
+                >
+            <i class="fa fa-arrow-left"></i>
+            返回
+        </button>
+        <ul class="nav nav-pills nav-sm pull-right">
+            <li ui-sref-active="active">
+                <a ui-sref="workflowEntity.home.profile.info">主页</a>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="workflowEntity.home.profile.page({entity_key:'orderrzzl',view_type:'file'})">申请文件</a>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="workflowEntity.home.profile.page({entity_key:'orderrzzl',view_type:'log'})">操作记录</a>
+            </li>
+        </ul>
+    </div>
+    <div class="wrapper b-b b-light clearfix">
+        <button ng-class="act.btnClass"
+                ng-click="orderrzzlExcute[act.actCode]()"
+                tooltip="{{act.help}}"
+                tooltip-placement="bottom"
+                ng-repeat="act in canActs">
+            <i ng-class="act.iconClass"></i> {{act.label}}
+        </button>
+        <div class="modal fade" id="{{ profile.id }}_failed" tabindex="-1" role="dialog">
+            <div class="modal-xs modal-dialog" role="document">
+                <div class="modal-content">
+                    <form name="comment_form">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"
+                                aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                        <h4 class="modal-title">请填写未通过理由</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group clearfix">
+                            <label class="col-lg-2 text-right">理由</label>
+                            <div class="col-lg-10">
+
+                                    <textarea class="form-control" ng-model="failedVla" cols="9" style="height: 250px" pattern="((?!<(/)?script>).)*" name="failedVla" required>
+                                    </textarea>
+                                    <span class="help-block text-danger"
+                                          ng-show="comment_form.failedVla.$dirty && comment_form.failedVla.$invalid && !comment_form.failedVla.$error.required">
+                                    <i class="fa fa-exclamation-circle text-danger"></i>请勿输入非法字符
+                                    </span>
+                                    <span class="help-block text-danger"
+                                          ng-show="comment_form.failedVla.$dirty && comment_form.failedVla.$error.required">
+                                    <i class="fa fa-exclamation-circle text-danger"></i>未通过理由为必填
+                                    </span>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer text-center">
+                        <button type="button" class="btn btn-success w-lg"
+                                ng-click="orderrzzlExcute.failedSave(failedVla)"
+                                ng-disabled="comment_form.$invalid">
+                            提交
+                        </button>
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="{{ profile.id }}_distribution" tabindex="-1" role="dialog">
+            <div class="modal-xs modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"
+                                aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                        <h4 class="modal-title">分配专属业务员</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group clearfix">
+                            <label class="col-lg-2 " style="margin-top: 8px"></label>
+                            <div class="col-lg-10">
+                                <select ng-model="distributionSelect" class="form-control"
+                                        ng-change="distributionShow(distributionSelect)">
+                                    <option value="0">常用</option>
+                                    <option value="1">全部</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group clearfix">
+
+                            <label class="col-lg-2 " style="margin-top: 8px">业务员</label>
+                            <div class="col-lg-10">
+                                <!--<button>全部</button>-->
+                                <select ng-model="distributionVal" class="form-control"
+                                        ng-options="y.nickname for (x,y) in userList">
+                                    <option value="">--请选择业务员--</option>
+                                </select>
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <div class="modal-footer text-center">
+                        <button type="button" class="btn btn-success w-lg"
+                                ng-click="orderrzzlExcute.distributionSave(distributionVal)">
+                            提交
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="{{ profile.id }}_matching" tabindex="-1" role="dialog">
+            <div class="modal-xs modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"
+                                aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                        <h4 class="modal-title">匹配销售产品</h4>
+                    </div>
+                    <div class="modal-body">
+
+                        <div class="form-group clearfix">
+                            <label class="col-lg-2 " style="margin-top: 8px">销售产品</label>
+                            <div class="col-lg-10">
+                                <select ng-model="productVal" class="form-control"
+                                        ng-options="y.label for (x,y) in productList">
+                                    <option value="">--请销售产品--</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer text-center">
+                        <button type="button" class="btn btn-success w-lg"
+                                ng-click="orderrzzlExcute.matchingSave(productVal)">
+                            提交
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="{{ profile.id }}_modifyApplyAmount" tabindex="-1" role="dialog">
+            <div class="modal-xs modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"
+                                aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                        <h4 class="modal-title">请输入修改额度</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group clearfix">
+                            <label class="col-lg-4 control-label text-right">当前额度(元)：</label>
+                            <div class="col-lg-8">
+                                <span>{{ profile.applyAmount }}</span>
+                            </div>
+                        </div>
+                        <div class="form-group clearfix">
+                            <form name="ApplyAmount_form">
+                                <label class="col-lg-4 control-label text-right">额度(元)：</label>
+                                <div class="col-lg-8">
+                                    <input type="text" class="form-control" ng-model="modifyApplyAmountVal" pattern="^\s*\d+\s*$" name="modifyApplyAmountVal" required>
+                                    <span class="help-block text-danger"
+                                          ng-show="ApplyAmount_form.modifyApplyAmountVal.$dirty && ApplyAmount_form.modifyApplyAmountVal.$invalid && !ApplyAmount_form.modifyApplyAmountVal.$error.required">
+                                        <i class="fa fa-exclamation-circle text-danger"></i>额度必须为数字
+                                        </span>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="modal-footer text-center">
+                        <button type="button" class="btn btn-success w-lg"
+                                ng-click="orderrzzlExcute.modifyApplyAmountSave(modifyApplyAmountVal)"
+                                ng-disabled="ApplyAmount_form.$invalid || profile.applyAmount==modifyApplyAmountVal">
+                            提交
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="{{ profile.id }}_changeID" tabindex="-1" role="dialog">
+            <div class="modal-xs modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"
+                                aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                        <h4 class="modal-title">请输入修改身份证号</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group clearfix">
+                            <label class="col-lg-4 control-label text-right">当前身份证：</label>
+                            <div class="col-lg-8">
+                                <span>{{ profile.applyIdentityNo }}</span>
+                            </div>
+                        </div>
+                        <div class="form-group clearfix">
+                            <form name="identity_form">
+                                <label class="col-lg-4 control-label text-right">修改为：</label>
+                                <div class="col-lg-8">
+                                    <input type="text" class="form-control" ng-model="changeIDVal" pattern="^\s*\d+(x|X)?\s*$" name="changeIDVal" required>
+                                    <span class="help-block text-danger"
+                                          ng-show="identity_form.changeIDVal.$dirty && identity_form.changeIDVal.$invalid && !identity_form.changeIDVal.$error.required">
+                                    <i class="fa fa-exclamation-circle text-danger"></i>输入字符有误
+                                    </span>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="modal-footer text-center">
+                        <button type="button" class="btn btn-success w-lg"
+                                ng-click="orderrzzlExcute.changeIDSave(changeIDVal)"
+                                ng-disabled="identity_form.$invalid || profile.applyIdentityNo==changeIDVal">
+                            提交
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner" ui-view=""></div>
+        </div>
+    </div>
+</div>

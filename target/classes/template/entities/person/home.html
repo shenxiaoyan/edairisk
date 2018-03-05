@@ -1,0 +1,53 @@
+<script>
+    app.controller("personHomeController",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "$state",
+            "entity",
+            function ($rootScope, $scope, $http, $stateParams, $state, entity) {
+
+                $scope.id = $stateParams.id;
+
+                $scope.profile     = {};
+                $scope.canActs     = [];
+                $scope.canFileActs = [];
+
+                entity.getDetail("/rest/persons/" + $scope.id, ["state", "createdBy", "createdByDepartment", "lastModifiedBy", "workflow"]).then(function (resResult) {
+
+                    $scope.profile = resResult;
+
+                    angular.forEach($scope.profile.currentUserCanActList, function (val, key) {
+                        if (val.actGroup == "UPDATE") {
+                            $scope.canActs.push(val);
+                        } else if (val.actGroup == "FILE_OPERATE") {
+                            $scope.canFileActs.push(val)
+                        }
+                    });
+
+                });
+
+                /*大方法的对象*/
+                $scope.personExcute = {
+                    "update": function () {
+                        $state.go("workflowEntity.home.profile.form", {
+                            id: $scope.id,
+                            entity_key: "person"
+                        }, {reload: false});
+                    }
+                };
+            }
+        ]
+    );
+</script>
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light" ng-controller="personHomeController">
+    <!-- column -->
+    <div class="col w-md lter b-l">
+        <div class="h-full" ui-view></div>
+    </div>
+    <!-- /column -->
+</div>
+<!-- /hbox layout -->

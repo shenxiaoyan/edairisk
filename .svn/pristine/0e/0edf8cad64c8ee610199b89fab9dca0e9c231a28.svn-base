@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>申请成功</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+
+  <style>
+    [class*=" weui_icon_"]:before, [class^=weui_icon_]:before{
+        font-family: weui;
+        font-style: normal;
+        font-weight: 400;
+        speak: none;
+        display: inline-block;
+        vertical-align: middle;
+        text-decoration: inherit;
+        width: 1em;
+/*        margin-right: .2em;*/
+        text-align: center;
+        font-variant: normal;
+        text-transform: none;
+        line-height: 1em;
+        /*margin-left: .2em;*/
+    }
+    .btn{
+        width: 100%;
+        height: 40px;
+        background: #169BD5;
+        border-radius: 20px;
+        display: inline-block;
+        text-align: center;
+        line-height: 40px;
+        color: white;
+        font-size: 16px;
+    }
+    .btn:active{
+        background: #CCCCCC;
+        color: white;
+    }
+  </style>
+    <link rel="stylesheet" href="../../css/weui.css">
+    <link rel="stylesheet" href="../../css/weui2.css">
+    <link rel="stylesheet" href="../../css/icon.css">
+</head>
+
+<body ontouchstart style="background-color: #f8f8f8;">
+  <div class="weui_msg" id="msg1">
+      <div class="weui_icon_area" style="margin-bottom: 0"><img src="../../images/Choice@3x.png" style="width: 80px; height: 80px;"/></div>
+      <div class="weui_text_area">
+          <h2 class="weui_msg_title" style="color: #169BD5;">提交成功!</h2>
+          <h2 class="weui_msg_title" style="color:#169BD5 ">正在审核中...</h2>
+          <p class="weui_msg_desc">请尽快在【我的资料】中完成资料上传，3个工作日内会有工作人员与您联系，请保持电话畅通。</p>
+          <!--<div class="weui_opr_area">-->
+              <!--<p class="weui_btn_area">-->
+                  <!--<a href="javascript:;" class="weui_btn weui_btn_primary">我的资料</a>-->
+              <!--</p>-->
+          <!--</div>-->
+          <a href="../my/myProfile.html" class="btn" style="margin-top: 30px;">我的资料</a>
+    </div>
+  </div>
+</body>
+<script>
+    setTimeout(function () {
+        window.location.href='../my/myProfile.html'
+    },5000)
+</script>
+</html>

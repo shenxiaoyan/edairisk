@@ -1,0 +1,689 @@
+<div class="wrapper b-b b-light clearfix">
+    <button ng-class="act.btnClass"
+            ng-click="orderwdsjshExcute[act.actCode]()"
+            tooltip="{{act.help}}"
+            tooltip-placement="bottom"
+            ng-repeat="act in canActs">
+        <i ng-class="act.iconClass"></i> {{act.label}}
+    </button>
+    <div class="modal fade" id="{{ profile.id }}_disable" tabindex="-1" role="dialog">
+        <div class="modal-xs modal-dialog" role="document">
+            <div class="modal-content">
+                <form name="disable_form">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"
+                                aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                        <h4 class="modal-title">请填写关闭理由</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group clearfix">
+                            <label class="col-lg-2 text-right">理由</label>
+                            <div class="col-lg-10">
+
+                                    <textarea class="form-control" ng-model="disableVla" cols="9" style="height: 250px" pattern="((?!<(/)?script>).)*" name="disableVla" required>
+                                    </textarea>
+                                <span class="help-block text-danger"
+                                      ng-show="disable_form.disableVla.$dirty && disable_form.disableVla.$invalid && !disable_form.disableVla.$error.required">
+                                    <i class="fa fa-exclamation-circle text-danger"></i>请勿输入非法字符
+                                    </span>
+                                <span class="help-block text-danger"
+                                      ng-show="disable_form.disableVla.$dirty && disable_form.disableVla.$error.required">
+                                    <i class="fa fa-exclamation-circle text-danger"></i>关闭理由为必填
+                                    </span>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer text-center">
+                        <button type="button" class="btn btn-success w-lg"
+                                ng-click="orderwdsjshExcute.disableSave(disableVla)"
+                                ng-disabled="disable_form.$invalid">
+                            提交
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="{{ profile.id }}_failed" tabindex="-1" role="dialog">
+        <div class="modal-xs modal-dialog" role="document">
+            <div class="modal-content">
+                <form name="comment_form">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                    <h4 class="modal-title">请填写未通过理由</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group clearfix">
+                        <label class="col-lg-2 text-right">理由</label>
+                        <div class="col-lg-10">
+
+                                    <textarea class="form-control" ng-model="failedVla" cols="9" style="height: 250px" pattern="((?!<(/)?script>).)*" name="failedVla" required>
+                                    </textarea>
+                                <span class="help-block text-danger"
+                                      ng-show="comment_form.failedVla.$dirty && comment_form.failedVla.$invalid && !comment_form.failedVla.$error.required">
+                                    <i class="fa fa-exclamation-circle text-danger"></i>请勿输入非法字符
+                                    </span>
+                                <span class="help-block text-danger"
+                                      ng-show="comment_form.failedVla.$dirty && comment_form.failedVla.$error.required">
+                                    <i class="fa fa-exclamation-circle text-danger"></i>未通过理由为必填
+                                    </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer text-center">
+                    <button type="button" class="btn btn-success w-lg"
+                            ng-click="orderwdsjshExcute.failedSave(failedVla)"
+                            ng-disabled="comment_form.$invalid">
+                        提交
+                    </button>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="{{ profile.id }}_upload">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" ng-click="uploader.clearQueue();setUploadDone();"
+                            data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                    <!--上传审核通过的文件-->
+                    {{ headerInformation }}
+                </div>
+                <div class="modal-body">
+                    <div class="hbox hbox-auto-xs hbox-auto-sm" nv-file-drop="" uploader="uploader"
+                         filters="queueLimit, customFilter">
+                        <div class="col w-lg bg-light b-r bg-auto">
+                            <div class="wrapper-md dker b-b">
+                                <h4 class="m-n font-thin">选择文件</h4>
+                            </div>
+                            <div class="wrapper-md">
+                                <div ng-show="uploader.isHTML5" class="m-b-md">
+                                    <!-- 3. nv-file-over uploader="link" over-class="className" -->
+                                    <div class="b-a b-2x b-dashed wrapper-lg bg-white text-center m-b"
+                                         nv-file-over="" over-class="b-info" uploader="uploader">
+                                        拖动文件放到此处
+                                    </div>
+                                </div>
+                                <input id="audit_zip_file_input" class="w" type="file" nv-file-select=""
+                                       uploader="uploader"/>
+                            </div>
+                        </div>
+                        <div class="col bg-light bg-auto">
+                            <div class="wrapper-md bg-light dk b-b">
+                                <span class="pull-right">文件数：
+                                    <b class="badge bg-info">{{ uploader.queue.length }}</b>
+                                </span>
+                                <h4 class="m-n font-thin text-danger ">{{promptInformation}}</h4>
+                            </div>
+                            <div class="wrapper-md">
+                                <table class="table bg-white-only b-a">
+                                    <thead>
+                                    <tr>
+                                        <th>文件名</th>
+                                        <th ng-show="uploader.isHTML5">大小</th>
+                                        <th>状态</th>
+                                        <th>操作</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="item in uploader.queue">
+                                        <td>
+                                            <div class="text-ellipsis w-sm">{{ item.file.name }}</div>
+                                        </td>
+                                        <td ng-show="uploader.isHTML5" nowrap>{{ item.file.size/1024/1024|number:2
+                                            }} MB
+                                        </td>
+                                        <td class="text-center">
+                                                <span ng-show="item.isSuccess" class="text-success">
+                                                    <i class="fa fa-check"></i>
+                                                </span>
+                                            <span ng-show="item.isCancel" class="text-warning">
+                                                    <i class="fa fa-ban"></i>
+                                                </span>
+                                            <span ng-show="item.isError" class="text-danger">
+                                                    <i class="fa fa-cancel"></i>
+                                                </span>
+                                        </td>
+                                        <td nowrap>
+                                            <button type="button" class="btn btn-default btn-xs"
+                                                    ng-click="item.upload()"
+                                                    ng-disabled="item.isReady || item.isUploading || item.isSuccess">
+                                                上传
+                                            </button>
+                                            <button type="button" class="btn btn-default btn-xs"
+                                                    ng-click="item.remove();setUploadDone();">
+                                                清除
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <div>
+                                    <div>
+                                        <p>进度</p>
+                                        <div class="progress bg-light dker" style="">
+                                            <div class="progress-bar progress-bar-striped bg-info"
+                                                 role="progressbar"
+                                                 ng-style="{ 'width': uploader.progress + '%' }"></div>
+                                        </div>
+                                        <div class="m-t m-b font-bold h4 text-danger"
+                                             ng-if="uploader.progress === 100 && !uploadDone">服务器正在处理中，请稍等。。。
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-addon btn-success"
+                                            ng-click="uploader.uploadAll()"
+                                            ng-disabled="!uploader.getNotUploadedItems().length">
+                                        <i class="fa fa-arrow-circle-o-up"></i> 上传
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="{{ profile.id }}_distribution" tabindex="-1" role="dialog">
+        <div class="modal-xs modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                    <h4 class="modal-title">分配专属业务员</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group clearfix">
+                        <label class="col-lg-2 " style="margin-top: 8px"></label>
+                        <div class="col-lg-10">
+                            <select ng-model="distributionSelect" class="form-control"
+                                    ng-change="distributionShow(distributionSelect)">
+                                <option value="0">常用</option>
+                                <option value="1">全部</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group clearfix">
+
+                        <label class="col-lg-2 " style="margin-top: 8px">业务员</label>
+                        <div class="col-lg-10">
+                            <!--<button>全部</button>-->
+                            <select ng-model="distributionVal" class="form-control"
+                                    ng-options="y.nickname for (x,y) in userList">
+                                <option value="">--请选择业务员--</option>
+                            </select>
+                        </div>
+                    </div>
+
+
+                </div>
+                <div class="modal-footer text-center">
+                    <button type="button" class="btn btn-success w-lg"
+                            ng-click="orderwdsjshExcute.distributionSave(distributionVal)">
+                        提交
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="{{ profile.id }}_modifyApplyAmount" tabindex="-1" role="dialog">
+        <div class="modal-xs modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                    <h4 class="modal-title">请输入修改额度</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group clearfix">
+                        <label class="col-lg-4 control-label text-right">当前额度(元)：</label>
+                        <div class="col-lg-8">
+                            <span>{{ profile.applyAmount }}</span>
+                        </div>
+                    </div>
+                    <div class="form-group clearfix">
+                        <form name="ApplyAmount_form">
+                            <label class="col-lg-4 control-label text-right">额度(元)：</label>
+                            <div class="col-lg-8">
+                                <input type="text" class="form-control" ng-model="modifyApplyAmountVal" pattern="^\s*\d+\s*$" name="modifyApplyAmountVal" required>
+                                <span class="help-block text-danger"
+                                      ng-show="ApplyAmount_form.modifyApplyAmountVal.$dirty && ApplyAmount_form.modifyApplyAmountVal.$invalid && !ApplyAmount_form.modifyApplyAmountVal.$error.required">
+                                        <i class="fa fa-exclamation-circle text-danger"></i>额度必须为数字
+                                        </span>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="modal-footer text-center">
+                    <button type="button" class="btn btn-success w-lg"
+                            ng-click="orderwdsjshExcute.modifyApplyAmountSave(modifyApplyAmountVal)"
+                            ng-disabled="ApplyAmount_form.$invalid || profile.applyAmount==modifyApplyAmountVal">
+                        提交
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="{{ profile.id }}_changeID" tabindex="-1" role="dialog">
+        <div class="modal-xs modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                    <h4 class="modal-title">请输入修改身份证号</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group clearfix">
+                        <label class="col-lg-4 control-label text-right">当前身份证：</label>
+                        <div class="col-lg-8">
+                            <span>{{ profile.applyIdentityNo }}</span>
+                        </div>
+                    </div>
+                    <div class="form-group clearfix">
+                        <form name="identity_form">
+                            <label class="col-lg-4 control-label text-right">修改为：</label>
+                            <div class="col-lg-8">
+                                <input type="text" class="form-control" ng-model="changeIDVal" pattern="^\s*\d+(x|X)?\s*$" name="changeIDVal" placeholder="请输入18位身份证号码" required>
+                                <span class="help-block text-danger"
+                                      ng-show="identity_form.changeIDVal.$dirty && identity_form.changeIDVal.$invalid && !identity_form.changeIDVal.$error.required">
+                                    <i class="fa fa-exclamation-circle text-danger"></i>输入字符有误
+                                    </span>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="modal-footer text-center">
+                    <button type="button" class="btn btn-success w-lg"
+                            ng-click="orderwdsjshExcute.changeIDSave(changeIDVal)"
+                            ng-disabled="identity_form.$invalid || profile.applyIdentityNo==changeIDVal || changeIDVal.length!=18">
+                        提交
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="wrapper">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="panel panel-danger" ng-show="state_code=='DISABLED'">
+                <div class="panel-heading">
+                    关闭理由
+                </div>
+                <div class="m-l m-r m-b-sm m-t-sm">
+                    {{ profile.disabledRemark?profile.disabledRemark:'未填写'}}
+                </div>
+            </div>
+            <div class="panel panel-warning" ng-show="state_code=='DENIED'">
+                <div class="panel-heading">
+                    未通过理由
+                </div>
+                <div class="m-l m-r m-b-sm m-t-sm">
+                    {{ profile.comment?profile.comment:'未填写'}}
+                </div>
+            </div>
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    申请信息
+                </div>
+                <table class="table table-striped m-b-none">
+                    <tbody>
+                    <tr>
+                        <td class="v-middle text-right w-sm">业务类型：</td>
+                        <td class="v-middle w-xl">随借随还</td>
+                        <td class="v-middle text-right w-sm">代理品牌：</td>
+                        <td class="v-middle w-xl">{{ profile.agentBrand }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right w-sm">姓名：</td>
+                        <td class="v-middle w-xl">{{ profile.realName }}</td>
+                        <td class="v-middle text-right w-sm">手机号码：</td>
+                        <td class="v-middle w-xl">{{ profile.applyMobile }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right w-sm">身份证号：</td>
+                        <td class="v-middle w-xl">{{ profile.applyIdentityNo }}</td>
+                        <td class="v-middle text-right w-sm">办公地址：</td>
+                        <td class="v-middle w-xl">{{ profile.applyEnterpriseAddress }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right w-sm">申请额度：</td>
+                        <td class="v-middle w-xl">{{ profile.applyAmount }}</td>
+                        <td class="v-middle text-right w-sm">借款期限：</td>
+                        <td class="v-middle w-xl">{{ profile.applyPeriodNumber == 3 ? '授信期限1年，3个月随借随还' : '3' }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">日平均收件量：</td>
+                        <td class="v-middle">{{ profile.applyDayPatchExpress }}</td>
+                        <td class="v-middle text-right">日平均派件量：</td>
+                        <td class="v-middle">{{ profile.applyDayPickExpress }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">快递网点名称：</td>
+                        <td class="v-middle">{{ profile.applyEnterpriseName }}</td>
+                        <td class="v-middle text-right">经营区域：</td>
+                        <td class="v-middle">
+                            {{ profile.applyEnterpriseProvince }}
+                            {{ profile.applyEnterpriseCity }}
+                            {{ profile.applyEnterpriseDistrict }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">推荐人：</td>
+                        <td class="v-middle">{{ profile.applyReferrerRealName?profile.applyReferrerRealName:"无" }}</td>
+                        <td class="v-middle text-right">创建时间：</td>
+                        <td class="v-middle">{{ profile.createdAt | datetime }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="clearfix m-b-md" ng-if="accountShow">
+                <!--<div class="pull-left m-r" style="width: 410px;">-->
+                    <!--<div class="wrapper-md bg-white" style="border: 1px solid #E7EBED;">-->
+                        <!--<div class="bg-info text-center"-->
+                             <!--style="width: 80px;height: 50px; line-height: 50px;border-radius: 5px;">-->
+                            <!--<span class="text-white font-bold">小金银行</span>-->
+                        <!--</div>-->
+                        <!--<div class="m-t-md m-b-md text-muted font-thin h4">-->
+                            <!--1234 4321 3214 3241-->
+                        <!--</div>-->
+                        <!--<div class="clearfix">-->
+                            <!--<div class="pull-left clearfix">-->
+                                <!--<span class="pull-left font-bold">过期时间：</span>-->
+                                <!--<span class="pull-left">20/09</span>-->
+                            <!--</div>-->
+                            <!--<div class="pull-right clearfix">-->
+                                <!--<span class="pull-left font-bold">持卡人：</span>-->
+                                <!--<span class="pull-left">力饼</span>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+                <div class="pull-left w-xl">
+                    <button class="btn btn-sm btn-success btn-addon"
+                            ui-sref="workflowEntity.home.profile.info({entity_key:'account',state_code:accountList.state_code,id:accountList.id})">
+                        <i class="fa fa-credit-card"></i> 账户详情
+                    </button>
+                    <div class="line line-dashed b-b"></div>
+                    <div>创建时间：{{ accountList.createdAt | datetime }}</div>
+                    <div class="line line-dashed b-b"></div>
+                    <div>提示：{{ accountList.notice }}</div>
+                    <div class="line line-dashed b-b"></div>
+                    <div>账号：{{ accountList.account }}</div>
+                    <div class="line line-dashed b-b m-b-n"></div>
+                </div>
+            </div>
+            <!--<div class="panel panel-success" ng-if="accountShow">-->
+            <!--<div class="panel-heading">-->
+            <!--信用卡信息-->
+            <!--</div>-->
+            <!--<div class="clearfix" style="background: #FAFBFC;">-->
+            <!--<div class="wrapper-sm pull-left" style="width: 410px;">-->
+            <!--<div class="wrapper-md bg-white" style="border: 1px solid #E7EBED;">-->
+            <!--<div class="bg-info text-center" style="width: 80px;height: 50px; line-height: 50px;border-radius: 5px;">-->
+            <!--<span class="text-white font-bold">小金银行</span>-->
+            <!--</div>-->
+            <!--<div class="m-t-md m-b-md text-muted font-thin h4">-->
+            <!--1234 4321 3214 3241-->
+            <!--</div>-->
+            <!--<div class="clearfix">-->
+            <!--<div class="pull-left clearfix">-->
+            <!--<span class="pull-left font-bold">过期时间：</span>-->
+            <!--<span class="pull-left">20/09</span>-->
+            <!--</div>-->
+            <!--<div class="pull-right clearfix">-->
+            <!--<span class="pull-left font-bold">持卡人：</span>-->
+            <!--<span class="pull-left">力饼</span>-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--<div class="wrapper-sm pull-left">-->
+            <!--<div class="m-b-sm">创建时间：{{ accountList.createdAt | datetime }}</div>-->
+            <!--<div class="m-b-sm">提示：{{ accountList.notice }}</div>-->
+            <!--<div class="m-b-sm">账号：{{ accountList.account }}</div>-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--</div>-->
+        </div>
+    </div>
+    <!--文件夹-->
+    <div ng-controller="workflowEntityFileController">
+        <!--<div class="m-b clearfix" ng-if="canFileActs.length > 0">-->
+            <!--<button ng-class="act.btnClass"-->
+                    <!--ng-click="orderwdsjshExcute[act.actCode]()"-->
+                    <!--tooltip="{{act.help}}"-->
+                    <!--tooltip-placement="bottom"-->
+                    <!--ng-repeat="act in canFileActs">-->
+                <!--<i ng-class="act.iconClass"></i> {{act.label}}-->
+            <!--</button>-->
+        <!--</div>-->
+        <div class="m-b-md clearfix" ng-if="!firstFolder.opened">
+        <span class="pull-left" ng-click="backFolder()">
+            <span class="text-info file_back_btn">上一级</span>&ensp;|&ensp;
+        </span>
+            <span class="pull-left">{{ firstFolder.folderName }}&ensp;</span>
+            <span class="pull-left" ng-if="secondFolder.folderName">>&ensp;{{ secondFolder.folderName }}</span>
+        </div>
+
+        <div class="m-b-md" ng-if="firstFolder.opened">
+            全部文件夹
+        </div>
+        <div class="m-b-md" ng-if="!fileTree">
+            暂无文件
+        </div>
+
+        <div class="clearfix" ng-if="firstFolder.opened">
+            <div ng-repeat="(key,level1) in fileTree"
+                 ng-click="jumpToLevel2(key,level1)"
+                 class="pull-left panel b-a inline m-r-sm m-b-sm bg-light">
+                <div class="wrapper-xs b-b text-center">
+                    <i class="fa fa-paperclip"></i> {{ key }}
+                </div>
+                <div class="wrapper-xs w-sm lt">
+                    <img class="img-full" src="img/open-folder-full.png">
+                </div>
+            </div>
+        </div>
+
+        <div class="clearfix" ng-if="secondFolder.opened">
+            <div ng-repeat="(key,level2) in level2Tree"
+                 ng-click="jumpToLevel3(key)"
+                 class="pull-left panel b-a inline m-r-sm m-b-sm bg-light">
+                <div class="wrapper-xs b-b text-center">
+                    <i class="fa fa-paperclip"></i> {{ key }}
+                </div>
+                <div class="wrapper-xs w-sm lt">
+                    <img class="img-full" src="img/open-folder-full.png">
+                </div>
+            </div>
+        </div>
+
+        <div ng-if="thirdFolder.opened">
+            <div class="panel panel-default">
+                <!--<span class="inline upload-photo-img m-r-xs m-t-xs"-->
+                <!--ng-repeat="(index,level3) in level3Tree"-->
+                <!--ng-click="uploadOnePhoto(level3)">-->
+                <!--<img class="upload-img "-->
+                <!--ng-src="http://files.xiaojinpingtai.com/{{  level3.newFileName }}"-->
+                <!--alt="">-->
+                <!--</span>-->
+
+
+                <table class="table table-striped m-b-none">
+                    <thead>
+                    <tr>
+                        <th>文件名</th>
+                        <th>大小</th>
+                        <th>创建日期</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="(index,level3) in level3Tree">
+                        <td class="list-hover-a pionter">
+                            <!--<a class="file_icon_container text-ellipsis" ng-class="'file_' + level3.fileType"-->
+                            <!--href="http://files.xiaojinpingtai.com/{{ level3.newFileName }}" target="_blank">{{-->
+                            <!--level3.newFileName }}</a>-->
+                            <a class="file_icon_container text-ellipsis" ng-class="'file_' + level3.fileType"
+                               ng-click="openFileCarousel(index)">{{
+                                level3.newFileName }}</a>
+                        </td>
+                        <td>
+                            {{ level3.fileSize/1024/1024 | number:2 }} MB
+                        </td>
+                        <td>
+                            {{ level3.createdAt | datetime }}
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+        <div class="modal fade" id="upload_file_modal">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" ng-click="uploader.clearQueue();" data-dismiss="modal">
+                            <span>&times;</span>
+                        </button>
+                        上传{{ subcategory }}
+                    </div>
+                    <div class="modal-body">
+                        <div class="hbox hbox-auto-xs hbox-auto-sm" nv-file-drop="" uploader="uploader"
+                             filters="queueLimit, customFilter">
+                            <div class="col w-lg bg-light b-r bg-auto">
+                                <div class="wrapper-md dker b-b">
+                                    <h4 class="m-n font-thin">选择文件（可多选）</h4>
+                                </div>
+                                <div class="wrapper-md">
+                                    <div ng-show="uploader.isHTML5" class="m-b-md">
+                                        <!-- 3. nv-file-over uploader="link" over-class="className" -->
+                                        <div class="b-a b-2x b-dashed wrapper-lg bg-white text-center m-b"
+                                             nv-file-over="" over-class="b-info" uploader="uploader">
+                                            拖动文件放到此处
+                                        </div>
+                                    </div>
+                                    <input type="file" nv-file-select="" uploader="uploader" multiple/>
+                                </div>
+                            </div>
+                            <div class="col bg-light bg-auto">
+                                <div class="wrapper-md bg-light dk b-b">
+                                    <span class="pull-right">文件数：<b
+                                            class="badge bg-info">{{ uploader.queue.length }}</b></span>
+                                    <h4 class="m-n font-thin">上传队列</h4>
+                                </div>
+                                <div class="wrapper-md">
+                                    <table class="table bg-white-only b-a">
+                                        <thead>
+                                        <tr>
+                                            <th>文件名</th>
+                                            <th ng-show="uploader.isHTML5">大小</th>
+                                            <th ng-show="uploader.isHTML5">进度</th>
+                                            <th>状态</th>
+                                            <th>操作</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr ng-repeat="item in uploader.queue">
+                                            <td>
+                                                <div class="text-ellipsis w-sm">{{ item.file.name }}</div>
+                                            </td>
+                                            <td ng-show="uploader.isHTML5" nowrap>{{ item.file.size/1024/1024|number:2
+                                                }} MB
+                                            </td>
+                                            <td ng-show="uploader.isHTML5">
+                                                <div class="progress progress-sm m-b-none m-t-xs">
+                                                    <div class="progress-bar bg-info" role="progressbar"
+                                                         ng-style="{ 'width': item.progress + '%' }"></div>
+                                                </div>
+                                            </td>
+                                            <td class="text-center">
+                                                <span ng-show="item.isSuccess" class="text-success">
+                                                    <i class="fa fa-check"></i>
+                                                </span>
+                                                <span ng-show="item.isCancel" class="text-warning">
+                                                    <i class="fa fa-ban"></i>
+                                                </span>
+                                                <span ng-show="item.isError" class="text-danger">
+                                                    <i class="fa fa-cancel"></i>
+                                                </span>
+                                            </td>
+                                            <td nowrap>
+                                                <button type="button" class="btn btn-default btn-xs"
+                                                        ng-click="item.upload()"
+                                                        ng-disabled="item.isReady || item.isUploading || item.isSuccess">
+                                                    上传
+                                                </button>
+                                                <button type="button" class="btn btn-default btn-xs"
+                                                        ng-click="item.remove()">
+                                                    清除
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                    <div>
+                                        <div>
+                                            <p>总进度</p>
+                                            <div class="progress bg-light dker" style="">
+                                                <div class="progress-bar progress-bar-striped bg-info"
+                                                     role="progressbar"
+                                                     ng-style="{ 'width': uploader.progress + '%' }"></div>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn btn-addon btn-success"
+                                                ng-click="uploader.uploadAll()"
+                                                ng-disabled="!uploader.getNotUploadedItems().length">
+                                            <i class="fa fa-arrow-circle-o-up"></i> 上传全部
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="carousel_file_modal">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span>&times;</span>
+                        </button>
+                        <div>{{ firstFolder.folderName }}>&ensp;{{ secondFolder.folderName }}>&ensp;图片或文件</div>
+                        <div class="m-t-sm">下载请右键链接/图片另存为</div>
+                    </div>
+                    <div class="modal-body">
+                        <div>
+                            <img ng-if="isImage(currentFile)" id="carousel_current_img" style="max-height: 100%;max-width: 100%;" ng-src="http://files.xiaojinpingtai.com/{{ currentFile.newFileName }}">
+                            <a class="text-info" ng-if="!isImage(currentFile)" href="http://files.xiaojinpingtai.com/{{ currentFile.newFileName }}" target="_blank">{{ currentFile.newFileName }}</a>
+                        </div>
+                        <div class="m-t text-center">
+                            <div class="btn-group" ng-if="!(level3Tree.length < 2)">
+                                <button type="button" class="btn btn-info" ng-disabled="level3Tree.length < 2" ng-click="prevFile()">上一张</button>
+                                <button type="button" class="btn btn-info" ng-disabled="level3Tree.length < 2" ng-click="nextFile()">下一张</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

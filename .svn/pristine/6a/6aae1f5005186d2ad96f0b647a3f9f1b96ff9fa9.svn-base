@@ -1,0 +1,74 @@
+server.port=80
+
+spring.datasource.url = jdbc:mysql://116.62.114.31/bytest?characterEncoding=UTF8&useSSL=false
+
+spring.datasource.username = root
+spring.datasource.password = root
+server.tomcat.maxHttpHeaderSize=90000
+server.tomcat.accesslog.directory=C:\\access_logs
+server.tomcat.accesslog.enabled=true
+server.tomcat.accesslog.pattern=common
+#server.debug=true
+
+# Specify the DBMS
+
+# Show or not log for each sql query
+spring.jpa.show-sql = true
+# Hibernate ddl auto (create, create-drop, update)
+#spring.jpa.hibernate.ddl-auto = update
+
+spring.wechat.appid=wx65703f53cf2219af
+spring.wechat.scope=snsapi_login
+spring.wechat.redirect_uri=http://test.edairisk.com/wechatLogin
+spring.wechat.secret=c371c6bd169c655ecf4216ef2a2206c5
+
+spring.oss.endpoint=oss-cn-hangzhou.aliyuncs.com
+spring.oss.accessKeyId=LTAIWocdZFbk1EUy
+spring.oss.accessKeySecret=GQ3JbFHQhHYm64GNOTbfx08hIioPlg
+spring.oss.bucketName=xiaojinpingtai
+
+
+spring.wlqz.wechat.grant_type=client_credential
+spring.wlqz.wechat.appid=wx2c7242fa52dfd7bc
+spring.wlqz.wechat.secret=312139b1e2a4214927828efdc2a2b454
+spring.wlqz.wechat.urlTokenTemplate=https://api.weixin.qq.com/cgi-bin/token?grant_type=%s&appid=%s&secret=%s
+spring.wlqz.wechat.WE_MESSAGE_URL=https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=
+spring.wlqz.wechat.MESSAGE_TEMPLATE_OPEN_ACC=4wV3wSnbnN2pLxiW3_YTQ4RO-vZv99psWgsT3sQ_0Jc
+spring.wlqz.wechat.MESSAGE_TEMPLATE_ADD_QUOTA=vD6EOMtb77rm6op-YiN0cCU9AZMI37Pf7FO6BeeaAAY
+spring.wlqz.wechat.FIRST_KEY=first
+spring.wlqz.wechat.OPEN_ACC_FIRST_VALUE=\u5C0A\u656C\u7684&\u4F60\u597D\uFF0C\u60A8\u7684\u5F00\u6237\u7533\u8BF7\u66F4\u65B0\u4E86\u65B0\u8FDB\u5EA6
+spring.wlqz.wechat.ONE_KEY=keyword1
+spring.wlqz.wechat.TWO_KEY=keyword2
+spring.wlqz.wechat.THREE_KEY=keyword3
+spring.wlqz.wechat.FOUR_KEY=keyword4
+spring.wlqz.wechat.FIVE_KEY=keyword5
+spring.wlqz.wechat.REMARK_KEY=remark
+spring.wlqz.wechat.OPEN_ACC_REMARK_VALUE=\u611F\u8C22\u60A8\u7684\u4F7F\u7528\u3002
+
+spring.wlqz.wechat.TEMPLATE_JUMP_URL=http://test.edairisk.com/wechat/wlqz/html/
+spring.wlqz.wechat.OPEN_ACC_SUCCESS=http://test.edairisk.com/wechat/wlqz/html/account/myLoanLogin.html
+spring.wlqz.wechat.OPEN_ACC_APPLY=http://test.edairisk.com/wechat/wlqz/html/my/myProfileLogin.html
+spring.wlqz.wechat.MESSAGE_TEMPLATE_LOAN=vPs-LlLfZogrtxNRPSAJk_wwu2VdW6RG8zjFdxRO6dQ
+spring.wlqz.wechat.MESSAGE_TEMPLATE_REPAYMENT=rzOFRcobwQSmLni6fcObfTZb3FNMHQrQHdt3F_hKjik
+spring.wlqz.wechat.MESSAGE_TEMPLATE_REPAYMENT_REMIND=zTMtiqysFWHkv4sT7tpeBFjwGNdRO2ItlTtpwGD8AaA
+spring.wlqz.wechat.MESSAGE_TEMPLATE_LOANOVERDUE=igJC0hIbaZlmaHlA6tfuvldm1SoYqN1LKVq2l_3HUhg
+spring.wlqz.wechat.URL=http://test.edairisk.com/wechat/wlqz
+
+spring.xinge.android.ACCESS_ID=2100272873
+spring.xinge.android.SECRET_KEY=71d5bbc06dd577ea90bf9c940c05f26b
+
+spring.xinge.ios.ACCESS_ID=2200272859
+spring.xinge.ios.SECRET_KEY=867a38fb95013394a944be3a327f941a
+
+
+# Enable template caching.
+spring.thymeleaf.cache=false
+
+spring.resources.cachePeriod=0
+
+login.title=\u5c0f\u91d1\u5e73\u53f0
+
+spring.aliyun.sms.accessKey=LTAIJOFuLghJhcw7
+spring.aliyun.sms.accessSecret=z6EuO2STrMKzXc9PKhnCUoyQzwFvQK
+spring.aliyun.sms.signName=\u9a7f\u8d37\u7f51\u7edc
+#spring.enableSmsCode=true

@@ -1,0 +1,51 @@
+<div class="wrapper">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    申请信息
+                </div>
+                <table class="table table-striped m-b-none">
+                    <tbody>
+                    <tr>
+                        <td class="v-middle text-right w-sm">流水号：</td>
+                        <td class="v-middle w-xl">{{ profile.id }}</td>
+                        <td class="v-middle text-right w-sm">订单号：</td>
+                        <td class="v-middle w-xl">{{ profile.orderSn }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right w-sm">借款单号：</td>
+                        <td class="v-middle w-xl">{{ profile.loanSn }}</td>
+                        <td class="v-middle text-right w-sm">还款计划单号：</td>
+                        <td class="v-middle w-xl">{{ profile.planSn }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right w-sm">预计还款时间：</td>
+                        <td class="v-middle w-xl">{{ profile.creditorRepaymentDate }}</td>
+                        <td class="v-middle text-right w-sm">还款金额：</td>
+                        <td class="v-middle w-xl">{{ profile.principal }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right w-sm">逾期天数：</td>
+                        <td class="v-middle w-xl">{{ profile.overdueDays }}</td>
+                        <td class="v-middle text-right w-sm">逾期罚息：</td>
+                        <td class="v-middle w-xl">暂无</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right w-sm">逾期金额：</td>
+                        <td class="v-middle w-xl">{{ profile.overdueAmount }}</td>
+                        <td class="v-middle text-right w-sm">提前结清：</td>
+                        <td class="v-middle w-xl">{{ profile.accountSettle }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right w-sm">剩下还款：</td>
+                        <td class="v-middle w-xl">{{ profile.leftAmount }}</td>
+                        <td class="v-middle text-right w-sm">总应还金额：</td>
+                        <td class="v-middle w-xl">{{ profile.fees }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

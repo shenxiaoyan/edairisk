@@ -1,0 +1,71 @@
+package com.liyang.service;
+
+import java.util.Date;
+
+import javax.transaction.Transactional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+import com.jpa.query.expression.QueryExpSpecificationBuilder;
+import com.jpa.query.expression.generic.GenericQueryExpSpecification;
+import com.liyang.Enum.OrderTypeEnum;
+import com.liyang.domain.approveloan.ApproveLoan;
+import com.liyang.domain.approveloan.ApproveLoanRepository;
+import com.liyang.domain.approveloan.ApproveLoanStateRepository;
+import com.liyang.util.ProductUtil;
+
+
+@Service
+public class ApproveLoanService {
+	
+	@Autowired
+    private ApproveLoanRepository approveLoanRepository;
+	@Autowired
+	private ApproveLoanStateRepository approveLoanStateRepository;
+	
+	@Transactional
+	public ApproveLoan addApproveLoan(ApproveLoan approveLoan){
+		ApproveLoan loan = new ApproveLoan();
+		String orderNo = ProductUtil.modify("网点随借随还", OrderTypeEnum.ABNORMALLOAN);
+		approveLoan.setOrderNo(orderNo);
+		loan = approveLoanRepository.save(approveLoan);		
+		return loan;
+	}
+	
+	@Transactional
+	public ApproveLoan adopt(Integer approveLoanId){		
+		ApproveLoan approveLoan  = approveLoanRepository.findOne(approveLoanId);
+		approveLoan.setApproveLoanState(approveLoanStateRepository.findByStateCode("ADOPT"));
+		approveLoan.setPassDate(new Date());
+		approveLoanRepository.save(approveLoan);
+		return approveLoan;
+	}
+	
+	@Transactional
+	public ApproveLoan notAdopt(Integer approveLoanId){		
+		ApproveLoan approveLoan  = approveLoanRepository.findOne(approveLoanId);
+		approveLoan.setApproveLoanState(approveLoanStateRepository.findByStateCode("DENIED"));
+		approveLoan.setPassDate(new Date());
+		approveLoanRepository.save(approveLoan);
+		return approveLoan;
+	}
+
+	
+    //根据条件动态查询并分页
+    public Page<ApproveLoan> getApproveLoanList(String stateCode,String mobile,String personName,String orderNo,Pageable pageable){ 
+    	
+	    GenericQueryExpSpecification<ApproveLoan> queryExpression = new GenericQueryExpSpecification<ApproveLoan>();
+	    queryExpression.add(QueryExpSpecificationBuilder.eq("approveLoanState.stateCode", stateCode, true));
+	    queryExpression.add(QueryExpSpecificationBuilder.eq("mobile", mobile, true));
+	    queryExpression.add(QueryExpSpecificationBuilder.eq("person.name", personName, true));
+	    queryExpression.add(QueryExpSpecificationBuilder.eq("orderNo", orderNo, true));
+		return approveLoanRepository.findAll(queryExpression,pageable);	
+		
+    }
+   
+    
+    
+}

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <link rel="stylesheet" href="../../../css/weui.css">
+    <link rel="stylesheet" href="../../../css/weui2.css">
+    <link rel="stylesheet" href="../../../css/jquery.mloading.css">
+    <link rel="stylesheet" href="../../../css/animate.css">
+    <link rel="stylesheet" href="../../../css/global.css">
+    <link rel="stylesheet" href="../../../css/loading.css">
+    <title>公司所有借款记录</title>
+    <style>
+        .now_card{
+            display: block;
+            background: #fff;
+            margin-top: 15px;
+            border: 1px solid #e6e5e5;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+        a:link{
+            color: #0D0D0D;
+        }
+        a:active{
+            color: #0D0D0D;
+        }
+        a{
+            color: #0D0D0D;
+        }
+        .now_card span{
+            margin-left: 5px;
+        }
+        .now_card > div{
+            padding: 10px 15px;
+        }
+        .now_card_title_whk{
+            padding: 3px 12px;
+            background: #169BD5;
+            color: white;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-top: 1px;
+        }
+        .now_card_title_wjq{
+            padding: 0 12px;
+            background: #14c7a7;
+            color: white;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-top: 1px;
+        }
+        .now_card_title_yq{
+            padding: 0 12px;
+            background: #f96c70;
+            color: white;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-top: 1px;
+        }
+        .now_card_title_yjq{
+            padding: 0 12px;
+            background: #ccc;
+            color: white;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-top: 1px;
+        }
+        .now_card_content{
+            border-top: 1px solid #e6e5e5;
+            padding: 15px;
+        }
+        .margin-top-5{
+            margin-top: 5px;
+        }
+        .text-linear{
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-bd-15" id="warp">
+
+    </div>
+
+</body>
+<script src="../../../js/config.js"></script>
+<script src="../../../js/jquery-3.2.1.js"></script>
+<script src="../../../js/zepto.min.js"></script>
+<script>
+    if(window.location.search){
+        var href = window.location.href;
+        var companyId = href.split('companyId')[1];
+        companyId = companyId.split('=')[1];
+    }
+
+    $.ajax({
+        type: 'get',
+        url: '/rest/loans/search/findByCompanyId?&size=10000000&page=0&sort=id,desc&companyId='+companyId,
+        headers: {
+            app_code:"WULIUQIANZHUANG",
+            client:"wechat",
+        },
+        data:{},
+        success: function (res) {
+            if(res._embedded.loans.length > 0){
+                var newArr =res._embedded.loans;
+
+                var times =0;
+                $.each(newArr,function (key,val) {
+                    times += 1;
+                    $.ajax({
+                        type: 'GET',
+                        async: false,
+                        url:'/rest/loans/'+val.id+'/state',
+                        data: {} ,
+                        headers: {
+                            app_code:"WULIUQIANZHUANG",
+                            client:"wechat"
+                        },
+                        success: function (res) {
+                            val.stateCode = res.stateCode;
+                            val.label = res.label;
+                        } ,error:function (res) {
+                            console.log(res)
+                        },
+                        dataType: 'json'
+                    });
+
+                    if(times == newArr.length){
+                        var arr = newArr
+                        console.log(arr)
+                        $.each(arr,function (key,val) {
+                            //ios 不支持2017-12-21 格式 只能使用2017/12/21
+                            var stringTime = (val.useDate).replace(/-/g, '/');
+                            var timestamp = new Date(stringTime);
+                            var date2 = new Date(timestamp);
+                            var interest = (parseFloat(val.totalInterest)/3).toFixed(2)
+                            date2.setDate(timestamp.getDate() + 89);
+                            var month2 =date2.getMonth() + 1;
+                            if(month2<10){
+                                month2 = '0'+month2
+                            }
+                            var day2 = date2.getDate()
+                            if(day2<10){
+                                day2 = '0'+day2
+                            }
+                            var nextTime = date2.getFullYear() + "-" + month2 + "-" + day2;
+                            var str ='<a class="now_card"><div class="clearfix"><p class="left" style="font-size:14px">借款单号:'+val.orderNo+'</p><p class="right now_card_title_whk">'+val.label+'</p></div><div class="now_card_content"><div class="clearfix"><p style="float: left;color: #a3a3a3;">借款金额</p><p style="float: right">'+val.principal+'</p></div><div class="clearfix margin-top-5"><p style="float: left;color: #a3a3a3;">每月付息</p><p style="float: right">'+interest+'</p></div><div class="clearfix margin-top-5"><p style="float: left;color: #a3a3a3;">借款日期</p><p style="float: right">'+(val.useDate).split(' ')[0]+'</p></div><div class="clearfix margin-top-5"><p style="float: left;color: #a3a3a3;">借款期限</p><p style="float: right">'+nextTime+'</p></div><div class="clearfix margin-top-5"><p style="float: left;color: #a3a3a3;">操作人</p><p style="float: right">'+val.debtorName+'</p></div></div></a>'
+                            $('#warp').append(str);
+                        })
+                    }
+
+                })
+
+            }else {
+                var str ='<div style="text-align: center">该公司尚未有借款记录</div>'
+                $('#warp').append(str);
+            }
+        },error:function(res){
+            alert(res.responseJSON.message)
+            console.log(res)
+        },
+        dataType: 'json'
+    });
+
+</script>
+</html>

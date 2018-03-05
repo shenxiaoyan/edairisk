@@ -1,0 +1,53 @@
+<script>
+
+    "use strict";
+    app.controller("riskspersonCtrl", [
+        "$scope",
+        function ( $scope) {
+            $scope.risksList = [
+                {
+                    id: "",
+                    name: "全国贷款报表",
+                    sref: "loanReports.page({view_type:'countryRegion'})"
+                },
+                {
+                    id: "",
+                    name: "公司贷款报表",
+                    sref: "loanReports.page({view_type:'companyRegion'})"
+                },
+                {
+                    id: "",
+                    name: "商户贷款报表",
+                    sref: "loanReports.page({view_type:'merchantRegion'})"
+
+                },
+                {
+                    id: "",
+                    name: "代理商贷款报表",
+                    sref: "loanReports.page({view_type:'agentRegion'})"
+
+                }
+            ]
+        }
+    ]);
+</script>
+
+<div class="hbox hbox-auto-xs hbox-auto-sm bg-light" ng-controller="riskspersonCtrl">
+    <div class="col w-md bg-light b-r bg-auto hidden-sm hidden-xs">
+        <div class="wrapper-md b-b">
+            <div class="font-thin h4">
+                贷款统计报表
+            </div>
+        </div>
+        <div class="wrapper-md">
+            <ul class="nav nav-pills nav-stacked nav-sm">
+                <li ui-sref-active="active" ng-repeat="list in risksList">
+                    <a ui-sref="{{ list.sref }}">{{list.name}}</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="col">
+        <div class="hbox hbox-auto-xs lter" ui-view></div>
+    </div>
+</div>

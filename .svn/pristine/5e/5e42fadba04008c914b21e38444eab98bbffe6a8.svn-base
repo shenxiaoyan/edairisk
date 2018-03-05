@@ -1,0 +1,252 @@
+<script>
+    "use strict";
+    app.controller("notdoListController",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "entity",
+            "$state",
+            function ($rootScope, $scope, $http, $stateParams, entity, $state) {
+
+                $scope.productid=[
+                    {'val':'未选择','id':''},
+                    {'val':'网点随借随还','id':'1'},
+                    {'val':'网点信用贷','id':'2'},
+                    {'val':'融资租赁','id':'3'},
+                    {'val':'面单白条','id':'4'}
+                ]
+
+                $scope.searchForm= {
+                    productid:'',
+                    name:'',
+                    telephone:'',
+                    identity:''
+                }
+
+                //搜索按钮
+                $scope.searchFormBtn=function () {
+                    $scope.getList(0)
+
+                }
+
+                //重置按钮
+                $scope.resetSearchFormBtn=function () {
+                    $scope.searchForm= {
+                        productid:'',
+                        name:'',
+                        telephone:'',
+                        identity:''
+                    }
+                    $scope.getList(0)
+                }
+
+
+                $scope.pageList = {
+                    size: 0,
+                    total_elements: 0,
+                    current_page: 0,
+                    num_page: 1,
+                    total_page: 1
+                };
+
+                $scope.list = [];
+
+                /*默认读取列表*/
+
+                $scope.getList = function (page) {
+
+                    $scope.loading = true;
+
+                    $scope.list = [];
+
+                    var link = "/person/getnopassperson?name="+$scope.searchForm.name+"&telephone="+$scope.searchForm.telephone+"&identity="+$scope.searchForm.identity+"&productid="+$scope.searchForm.productid+"&page="+page+"&size=10&sort=id,desc"
+
+                    entity.getList(link).then(function (resResult) {
+
+                        $scope.loading = false;
+                        console.log(resResult)
+
+                        $scope.list = resResult.data.content;
+
+                        $scope.pageList = {
+                            size: resResult.data.size,
+                            total_elements: resResult.data.totalElements,
+                            current_page: resResult.data.number,
+                            num_page: resResult.data.totalPages,
+                            total_page: resResult.data.totalPages
+                        };
+
+                        if ($scope.list.length > 0) {
+                            $("#notdo_list_paginator").show();
+                            $rootScope.setPaginator("#notdo_list_paginator", $scope.pageList, $scope.getList);
+                        }else{
+                            $("#notdo_list_paginator").hide();
+                        }
+
+                    });
+                };
+                $scope.getList(0);
+            }
+        ]
+    );
+</script>
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light" ng-controller="notdoListController">
+    <!-- column -->
+    <div class="col w-md lter b-l">
+        <div class="vbox">
+            <div class="wrapper b-b clearfix ">
+                <form class="form-inline" name="search_form">
+                    <div class="form-group m-r">
+                        <label for="">产品类型: </label>
+                            <select class="form-control" ng-model="searchForm.productid">
+                                <option ng-repeat=" option in productid" value="{{option.id}}">{{option.val}}</option>
+                            </select>
+                    </div>
+
+                    <div class="form-group m-r">
+                        <label for="">客户姓名: </label>
+                        <input ng-model="searchForm.name" class="form-control" type="text" pattern="^\s*[\u4E00-\u9FA5]+\s*$" name="name">
+                        <span class="help-block text-danger"
+                              ng-show="search_form.name.$dirty && search_form.name.$invalid">
+                            <i class="fa fa-exclamation-circle text-danger"></i>不符合姓名格式
+                        </span>
+                    </div>
+                    <div class="form-group m-r">
+                        <label for="">联系方式: </label>
+                        <input ng-model="searchForm.telephone" class="form-control" type="tel" pattern="^\s*\d+\s*$" name="telephone">
+                        <span class="help-block text-danger"
+                              ng-show="search_form.telephone.$dirty && search_form.telephone.$invalid">
+                            <i class="fa fa-exclamation-circle text-danger"></i>手机号必须为数字
+                        </span>
+                    </div>
+                     <div class="form-group m-r">
+                        <label for="">身份证: </label>
+                        <input ng-model="searchForm.identity" class="form-control" type="text" pattern="^\s*\d+(x|X)?\s*$" name="identity">
+                         <span class="help-block text-danger"
+                               ng-show="search_form.identity.$dirty && search_form.identity.$invalid">
+                            <i class="fa fa-exclamation-circle text-danger"></i>输入字符有误
+                        </span>
+                    </div>
+                    <button class="btn btn-primary m-r" ng-click="searchFormBtn()" ng-disabled="search_form.$invalid">
+                        <i class="fa fa-search"></i>查询
+                    </button>
+                    <button class="btn btn-default m-r" ng-click="resetSearchFormBtn()">
+                        <i class="fa fa-refresh"></i>重置
+                    </button>
+                </form>
+            </div>
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner">
+                        <div class="wrapper" style="width: 1800px;">
+                            <div class="panel panel-default">
+                                <div class="panel-heading" ng-if="!loading && list.length > 0">
+                                    查询结果
+                                </div>
+                                <div ng-if="loading"
+                                     style="position: fixed;top: 50%;right: 50%;margin-left: -15px;margin-top: -15px;">
+                                    <div class="sk-spinner sk-spinner-cube-grid">
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                    </div>
+                                    <div class="text-center m-t">加载中请稍后</div>
+                                </div>
+                                <div class="panel-heading" ng-if="!loading && list.length < 1">
+                                    暂无数据！
+                                </div>
+                                <div ng-if="!loading && list.length > 0">
+                                    <table class="table table-responsive table-hover b-t b-light">
+                                        <thead>
+                                        <tr>
+                                            <!--<th>操作</th>-->
+
+                                            <th>网点名称</th>
+                                            <th>客户姓名</th>
+                                            <th>联系方式</th>
+                                            <th>快递品牌</th>
+                                            <th>经营区域</th>
+                                            <th>身份证号</th>
+                                            <th>日均收件量</th>
+                                            <th>日均派件量</th>
+                                            <th>申请产品</th>
+                                            <th>申请金额(元)</th>
+                                            <th>未做原因</th>
+                                            <th>业务负责人</th>
+
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr ng-repeat="item in list">
+
+                                            <!--<td>-->
+                                                <!--<button ui-sref="auditEntity.home.profile.info({id:item.id})"-->
+                                                        <!--class="pull-left btn btn-xs btn-success m-r">详情-->
+                                                <!--</button>-->
+                                            <!--</td>-->
+                                            <td class="v-middle">
+                                                {{ item.branchesName }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.name }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.telephone }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.agentBrand }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.businessArea }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.identity }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.applyDayPickExpress }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.applyDayPatchExpress }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.productLabel }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.applyAmount }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.reason }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.serviceName ? item.serviceName : '未分配'}}
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="wrapper b-t b-light clearfix">
+                <ul id="notdo_list_paginator" style="margin:2px 0;float: right;"></ul>
+                <small class="m-l-md pull-right text-muted inline m-t-sm m-b-sm m-r">共 {{pageList.total_elements}} 条，本页共 {{ list.length }}
+                    条
+                </small>
+            </div>
+        </div>
+    </div>
+    <!-- /column -->
+</div>
+<!-- /hbox layout -->
+

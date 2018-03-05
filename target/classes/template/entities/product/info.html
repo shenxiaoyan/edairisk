@@ -1,0 +1,171 @@
+<div class="wrapper">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    销售产品基础信息
+                </div>
+                <table class="table table-striped m-b-none" ng-if="profile.id!==4">
+                    <tbody>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="product.state.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.state.label }}</td>
+                        <td class="v-middle text-right">
+                            <span translate="product.label.label"></span>：
+                        </td>
+                        <td class="v-middle">{{ profile.label }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="product.storeInterest.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.storeInterest }}%</td>
+                        <td class="v-middle text-right">
+                            <span translate="product.debtorInterest.label"></span>：
+                        </td>
+                        <td class="v-middle">{{ profile.debtorInterest }}%</td>
+                    </tr>
+
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="product.storeAmountMin.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.capitalproduct.creditorAmountMin }}</td>
+                        <td class="v-middle text-right">
+                            <span translate="product.storeAmountMax.label"></span>：
+                        </td>
+                        <td class="v-middle">{{ profile.capitalproduct.creditorAmountMax }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="product.capitalproduct.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.capitalproduct.label }}</td>
+                        <td class="v-middle text-right">
+                            <span translate="product.repaymentAccount.label"></span>：
+                        </td>
+                        <td class="v-middle">{{ profile.repaymentAccount }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="product.description.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">暂无</td>
+                        <td class="v-middle text-right">
+                            <span>分期数</span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.capitalproduct.periodNumber }}</td>
+
+                    </tr>
+                    </tbody>
+                </table>
+                <table class="table table-striped m-b-none" ng-if="profile.id===4">
+                    <tbody>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="product.state.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.state.label }}</td>
+                        <td class="v-middle text-right">
+                            <span translate="product.label.label"></span>：
+                        </td>
+                        <td class="v-middle">{{ profile.label }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="product.capitalName.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.capitalName }}</td>
+                        <td class="v-middle text-right">
+                            <span translate="product.loanRate.label"></span>：
+                        </td>
+                        <td class="v-middle">{{ profile.loanRate }}%</td>
+                    </tr>
+
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="product.monthLoanPercent.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.monthLoanPercent }}%</td>
+                        <td class="v-middle text-right">
+                            <span translate="product.activeLoanPercent.label"></span>：
+                        </td>
+                        <td class="v-middle">{{ profile.activeLoanPercent }}%</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="product.activeMonth.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.activeMonth }}</td>
+                    </tr>
+
+                    </tbody>
+                </table>
+            </div>
+            <!--<div class="panel panel-success">
+                <div class="panel-heading">
+                    收费项目
+                </div>
+                <table class="table table-striped m-b-none">
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th>收费项目名称</th>
+                        <th>分期数</th>
+                        <th>按比例收费(优先)</th>
+                        <th>固定收费</th>
+                        <th>描述</th>
+                        <th>说明</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="fee in feetypes">
+                        <td class="v-middle">
+
+                        </td>
+                        <td class="v-middle">
+                            {{ fee.label }}
+                        </td>
+                        <td class="v-middle">
+                            &lt;!&ndash;<input type="text"&ndash;&gt;
+                            &lt;!&ndash;ng-model="forms[fee.feetypeCode].periodNumber"&ndash;&gt;
+                            &lt;!&ndash;class="form-control"&ndash;&gt;
+                            &lt;!&ndash;required>&ndash;&gt;
+                            {{ forms[fee.feetypeCode].periodNumber }}
+                        </td>
+                        <td class="v-middle">
+                            &lt;!&ndash;<input type="text" ng-model="forms[fee.feetypeCode].feeRate"&ndash;&gt;
+                            &lt;!&ndash;class="form-control"&ndash;&gt;
+                            &lt;!&ndash;required>&ndash;&gt;
+                            {{ forms[fee.feetypeCode].feeRate }}
+                        </td>
+                        <td class="v-middle">
+                            &lt;!&ndash;<input type="text" ng-model="forms[fee.feetypeCode].feeAmount"&ndash;&gt;
+                            &lt;!&ndash;class="form-control"&ndash;&gt;
+                            &lt;!&ndash;required>&ndash;&gt;
+                            {{ forms[fee.feetypeCode].feeAmount }}
+                        </td>
+                        <td class="v-middle">
+                            &lt;!&ndash;<input type="text" ng-model="forms[fee.feetypeCode].description"&ndash;&gt;
+                            &lt;!&ndash;class="form-control"&ndash;&gt;
+                            &lt;!&ndash;required>&ndash;&gt;
+                            {{ forms[fee.feetypeCode].description }}
+                        </td>
+                        <td class="v-middle">
+                            &lt;!&ndash;<input type="text" ng-model="forms[fee.feetypeCode].comment"&ndash;&gt;
+                            &lt;!&ndash;class="form-control"&ndash;&gt;
+                            &lt;!&ndash;required>&ndash;&gt;
+                            {{ forms[fee.feetypeCode].comment }}
+                        </td>
+
+                    </tr>
+                    </tbody>
+                </table>
+            </div>-->
+
+
+        </div>
+    </div>
+</div>

@@ -1,0 +1,68 @@
+spring.profiles.active=dev
+
+server.session.timeout=100000
+server.tomcat.maxHttpHeaderSize=90000
+
+server.compression.enabled=true
+server.compression.mime-types=application/json,application/xml,text/html,text/xml,text/plain,application/javascript,text/css
+#spring.resources.static-locations=classpath:/static
+#spring.resources.chain.cache=true
+#spring.resources.chain.gzipped=true
+#spring.resources.cachePeriod=600000
+
+
+
+spring.datasource.driverClassName = com.mysql.jdbc.Driver
+spring.datasource.type=com.alibaba.druid.pool.DruidDataSource
+
+spring.http.encoding.charset=UTF-8
+spring.http.encoding.enabled=true
+spring.http.multipart.maxFileSize=100MB
+spring.http.multipart.maxRequestSize=100MB
+
+spring.jpa.database = MYSQL
+spring.jpa.hibernate.naming-strategy = org.hibernate.cfg.ImprovedNamingStrategy
+
+# stripped before adding them to the entity manager)
+spring.jpa.properties.hibernate.dialect = org.hibernate.dialect.MySQL5InnoDBDialect
+spring.jpa.properties.hibernate.enable_lazy_load_no_trans=true
+#spring.jpa.properties.hibernate.cache.use_second_level_cache=true
+#spring.jpa.properties.hibernate.cache.use_query_cache=true
+
+# Naming strategy
+logging.config=classpath:log4j2.xml
+
+spring.datasource.initialSize=10
+spring.datasource.minIdle=10
+spring.datasource.maxActive=100
+spring.datasource.maxWait=60000
+spring.datasource.timeBetweenEvictionRunsMillis=60000
+
+# Enable MVC Thymeleaf view resolution.
+spring.thymeleaf.enabled=true
+# Check that the templates location exists.
+spring.thymeleaf.check-template-location=true
+# Content-Type value.
+spring.thymeleaf.content-type=text/html
+# Template encoding.
+spring.thymeleaf.encoding=UTF-8
+# Comma-separated list of view names that should be excluded from resolution.
+spring.thymeleaf.excluded-view-names=
+# Template mode to be applied to templates. See also StandardTemplateModeHandlers.
+spring.thymeleaf.mode=LEGACYHTML5
+#spring.thymeleaf.mode=HTML5
+# Prefix that gets prepended to view names when building a URL.
+spring.thymeleaf.prefix=classpath:/template/
+# Suffix that gets appended to view names when building a URL.
+spring.thymeleaf.suffix=.html
+#spring.thymeleaf.template-resolver-order=
+
+
+spring.data.rest.base-path=rest
+
+aliyun.file.url=http://files.xiaojinpingtai.com/
+
+
+
+
+

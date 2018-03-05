@@ -1,0 +1,118 @@
+
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light">
+	<div class="col w-md b-r ">
+
+		<div class="vbox">
+			<div class="wrapper-md b-b">
+				<div class="font-thin h4">费用</div>
+			</div>
+			<div class="wrapper b-b">
+				<div class="btn-group pos-stc">
+					<div class="btn-group dropdown">
+						<a ui-sref="stores.create"
+							class="pull-right btn btn-sm btn-danger w-auto-xs dropdown-toggle"
+							tooltip="新增费用" tooltip-placement="bottom"><i
+							class="fa fa-fw fa-tag"></i> 新增 </a>
+					</div>
+				</div>
+			</div>
+			<div class="row-row">
+				<div class="cell scrollable">
+					<div class="cell-inner">
+
+						<ul class="nav nav-pills nav-stacked nav-sm">
+							<li ui-sref-active="active"><a
+								ui-sref="fees.fee({fee_id:1})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;平台管理费
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="fees.fee({fee_id:2})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;信息费
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="fees.fee({fee_id:3})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;业务服务费（销售员）
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="fees.fee({fee_id:4})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;家访费
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="fees.fee({fee_id:5})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;GPS押金
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="fees.fee({fee_id:16})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;GPS购买
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="fees.fee({fee_id:17})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;GPS租用
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="fees.fee({fee_id:18})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;GPS安装费
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="fees.fee({fee_id:91})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;停车费
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="fees.fee({fee_id:11})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;增信服务费
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="fees.fee({fee_id:21})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;增信保证金
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="fees.fee({fee_id:31})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;履约保证金
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="fees.fee({fee_id:41})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;还款违约金
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="fees.fee({fee_id:51})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;逾期罚息
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="fees.fee({fee_id:5251})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;保险押金
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="fees.fee({fee_id:5361})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;抵押登记费
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="fees.fee({fee_id:531})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;履约险保费
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="fees.fee({fee_id:5131})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;盗抢险保费
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="fees.fee({fee_id:5931})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;借意险保费
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="fees.fee({fee_id:5731})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;年检押金
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="fees.fee({fee_id:5631})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;其他押金
+							</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+	<div class="col lter" ui-view></div>
+</div>
+<!-- /hbox layout -->

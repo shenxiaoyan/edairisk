@@ -1,0 +1,399 @@
+<script>
+    "use strict";
+    app.controller("enterpriseFormController",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "$state",
+            "entity",
+            function ($rootScope, $scope, $http, $stateParams, $state, entity) {
+
+                $scope.allStates   = null;
+                $scope.state       = null;
+                $scope.workflow_id = $stateParams.workflow_id;
+
+                //获取所有企业状态
+                entity.getList("rest/enterpriseStates").then(function (statesResResult) {
+
+                    $scope.allStates = statesResResult._embeddedItems;
+
+                    //判断是否新建
+                    if ($stateParams.id) {
+
+                        $scope.id = $stateParams.id;
+
+                        //更新时获取实体信息
+                        entity.getDetail("rest/enterprises/" + $stateParams.id, ["state", "workflow"]).then(function (enterpriseResResult) {
+                            $scope.form  = enterpriseResResult;
+                            //获取当前状态
+                            $scope.state = entity.getSelectedMyOwn($scope.allStates, $scope.form.state);
+                        });
+
+                    } else {
+                        //新建
+                        $scope.form = {};
+                    }
+
+                });
+
+                /*
+                 * 保存更新函数
+                 * @author  金杭
+                 * @param   无
+                 * @return  无
+                 * */
+                $scope.saveEnterprise = function () {
+
+                    //总授信额度需要数字
+                    $scope.form.creditGrant = parseFloat($scope.form.creditGrant);
+                    //先把状态变成资源
+                    $scope.form.state       = $scope.state ? $scope.state._links.self.href : null;
+                    $scope.form.workflow    = "/rest/enterpriseWorkflows/" + $stateParams.workflow_id;
+
+                    //判断是新建还是更新
+                    if ($scope.form._links) {
+
+                        //加入行为code
+                        $scope.form.act = "update";
+
+                        $http({
+                            method: "PATCH",
+                            url: $scope.form._links.self.href,
+                            data: $scope.form
+                        }).success(function (resResult) {
+                            $state.go("workflowEntity.home.profile.info", {
+                                id: resResult.id,
+                                entity_key: "enterprise"
+                            }, {reload: true});
+                            $rootScope.toasterSuccess("修改成功！", "企业修改成功！");
+                        });
+
+                    } else {
+
+                        //加入行为code
+                        $scope.form.act = "create";
+
+                        $http({
+                            method: "POST",
+                            url: "rest/enterprises",
+                            data: $scope.form
+                        }).success(function (resResult) {
+                            $state.go("workflowEntity.list", {
+                                entity_key: "enterprise",
+                                workflow_id: $stateParams.workflow_id
+                            }, {reload: true});
+                            $rootScope.toasterSuccess("保存成功！", "企业保存成功！");
+                        });
+
+                    }
+
+                };
+
+            }
+        ]
+    )
+</script>
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs" ng-controller="enterpriseFormController">
+    <!-- column -->
+    <div class="col">
+        <div class="vbox">
+            <div class="wrapper b-b" ng-if="!form._links">
+                <div class="font-thin h4">
+                    <span translate="enterprise.self.label"></span>新建
+                </div>
+            </div>
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner">
+                        <div class="wrapper">
+                            <form name="enterprise_form" class="form-horizontal">
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">
+                                        <span class="text-danger">*</span>
+                                        <span translate="enterprise.label.label"></span>
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="label"
+                                               ng-model="form.label"
+                                               required>
+                                        <span class="help-block text-danger"
+                                              ng-show="enterprise_form.label.$dirty && enterprise_form.label.$invalid">
+                                            <i class="fa fa-exclamation-circle text-danger"></i>&ensp;企业名称为必填
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label" translate="enterprise.alias.label"></label>
+                                    <div class="col-sm-8">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="alias"
+                                               ng-model="form.alias">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"
+                                           translate="enterprise.bussinessContent.label"></label>
+                                    <div class="col-sm-8">
+                                        <textarea class="form-control" cols="30" rows="7"
+                                                  ng-model="form.bussinessContent"></textarea>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">
+                                        <span class="text-danger">*</span>
+                                        <span translate="enterprise.creditGrant.label"></span>
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <div class="input-group">
+                                            <input type="text"
+                                                   class="form-control"
+                                                   name="creditGrant"
+                                                   ng-model="form.creditGrant"
+                                                   required
+                                                   pattern="^[0-9]+.?[0-9]*$">
+                                            <span class="input-group-addon">元</span>
+                                        </div>
+                                        <div>
+                                            <span class="help-block text-danger"
+                                                  ng-show="enterprise_form.creditGrant.$dirty && enterprise_form.creditGrant.$invalid">
+                                                <i class="fa fa-exclamation-circle text-danger"></i>&ensp;总授信为数字，且必填
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"
+                                           translate="enterprise.description.label"></label>
+                                    <div class="col-sm-8">
+                                        <textarea class="form-control" cols="30" rows="7"
+                                                  ng-model="form.description"></textarea>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"
+                                           translate="enterprise.email.label"></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" ng-model="form.email" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">
+                                        <span class="text-danger">*</span>
+                                        <span translate="enterprise.identity.label"></span>
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="identity"
+                                               ng-model="form.identity"
+                                               required>
+                                        <span class="help-block text-danger"
+                                              ng-show="enterprise_form.identity.$dirty && enterprise_form.identity.$invalid">
+                                            <i class="fa fa-exclamation-circle text-danger"></i>&ensp;营业执照号码为必填
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">
+                                        <span class="text-danger">*</span>
+                                        <span translate="enterprise.registerAddress.label"></span>
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="registerAddress"
+                                               ng-model="form.registerAddress"
+                                               required>
+                                        <span class="help-block text-danger"
+                                              ng-show="enterprise_form.registerAddress.$dirty && enterprise_form.registerAddress.$invalid">
+                                            <i class="fa fa-exclamation-circle text-danger"></i>&ensp;注册地址为必填
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">
+                                        <span class="text-danger">*</span>
+                                        <span translate="enterprise.registerDate.label"></span>
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="registerDate"
+                                               placeholder="例如1949-10-01"
+                                               ng-model="form.registerDate"
+                                               required
+                                               pattern="^(?:(?!0000)[0-9]{4}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1[0-9]|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[0-9]{2}(?:0[48]|[2468][048]|[13579][26])|(?:0[48]|[2468][048]|[13579][26])00)-02-29)$">
+                                        <span class="help-block text-danger"
+                                              ng-show="enterprise_form.registerDate.$dirty && enterprise_form.registerDate.$invalid">
+                                            <i class="fa fa-exclamation-circle text-danger"></i>&ensp;注册日期为必填，请输入正确的格式如1949-10-01
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">
+                                        <span class="text-danger">*</span>
+                                        <span translate="enterprise.representativeName.label"></span>
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="representativeName"
+                                               ng-model="form.representativeName"
+                                               required>
+                                        <span class="help-block text-danger"
+                                              ng-show="enterprise_form.representativeName.$dirty && enterprise_form.representativeName.$invalid">
+                                            <i class="fa fa-exclamation-circle text-danger"></i>&ensp;法人代表名称为必填
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">
+                                        <span class="text-danger">*</span>
+                                        <span translate="enterprise.sort.label"></span>
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="sort"
+                                               ng-model="form.sort"
+                                               required
+                                               pattern="^[0-9]{1,}$">
+                                        <span class="help-block text-danger"
+                                              ng-show="enterprise_form.sort.$dirty && enterprise_form.sort.$invalid">
+                                            <i class="fa fa-exclamation-circle text-danger"></i>&ensp;排序为必填，且为数字
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">
+                                        <span class="text-danger">*</span>
+                                        <span translate="enterprise.taxIdentity.label"></span>
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="taxIdentity"
+                                               ng-model="form.taxIdentity"
+                                               required>
+                                        <span class="help-block text-danger"
+                                              ng-show="enterprise_form.taxIdentity.$dirty && enterprise_form.taxIdentity.$invalid">
+                                            <i class="fa fa-exclamation-circle text-danger"></i>&ensp;税务证号码为必填
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">
+                                        <span class="text-danger">*</span>
+                                        <span translate="enterprise.telephone1.label"></span>
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="telephone1"
+                                               ng-model="form.telephone1"
+                                               required
+                                               pattern="(^([0\+]\d{2,3})\d{3,4}\-\d{3,8}$)|(^([0\+]\d{2,3})\d{3,4}\d{3,8}$)|(^([0\+]\d{2,3}){0,1}13\d{9}$)|(^\d{3,4}\d{3,8}$)|(^\d{3,4}\-\d{3,8}$)">
+                                        <span class="help-block text-danger"
+                                              ng-show="enterprise_form.telephone1.$dirty && enterprise_form.telephone1.$invalid">
+                                            <i class="fa fa-exclamation-circle text-danger"></i>&ensp;请填写正确格式的联系电话或手机，主联系方式为必填
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"
+                                           translate="enterprise.telephone2.label"></label>
+                                    <div class="col-sm-8">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="telephone2"
+                                               ng-model="form.telephone2"
+                                               pattern="(^([0\+]\d{2,3})\d{3,4}\-\d{3,8}$)|(^([0\+]\d{2,3})\d{3,4}\d{3,8}$)|(^([0\+]\d{2,3}){0,1}13\d{9}$)|(^\d{3,4}\d{3,8}$)|(^\d{3,4}\-\d{3,8}$)">
+                                        <span class="help-block text-danger"
+                                              ng-show="enterprise_form.telephone2.$dirty && enterprise_form.telephone2.$invalid">
+                                            <i class="fa fa-exclamation-circle text-danger"></i>&ensp;请填写正确格式的联系电话或手机
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">
+                                        <span class="text-danger">*</span>
+                                        <span translate="enterprise.vakudutyPeriod.label"></span>
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <div class="input-group">
+                                            <input type="text"
+                                                   class="form-control"
+                                                   name="vakudutyPeriod"
+                                                   ng-model="form.vakudutyPeriod"
+                                                   required
+                                                   pattern="^[0-9]+.?[0-9]*$">
+                                            <span class="input-group-addon">年</span>
+                                        </div>
+                                        <div>
+                                            <span class="help-block text-danger"
+                                                  ng-show="enterprise_form.vakudutyPeriod.$dirty && enterprise_form.vakudutyPeriod.$invalid">
+                                                <i class="fa fa-exclamation-circle text-danger"></i>&ensp;经营期限为必填，且为数字
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"
+                                           translate="enterprise.website.label"></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" ng-model="form.website" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">
+                                        <span class="text-danger">*</span>
+                                        <span translate="enterprise.state.label"></span>
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control"
+                                                name="state"
+                                                ng-model="state"
+                                                ng-options="state.label for state in allStates"
+                                                required></select>
+                                        <span class="help-block text-danger"
+                                              ng-show="enterprise_form.state.$dirty && enterprise_form.state.$invalid">
+                                            <i class="fa fa-exclamation-circle text-danger"></i>&ensp;状态为必填
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-4 col-sm-offset-2">
+                                        <button ng-if="form._links"
+                                                ui-sref="workflowEntity.home.profile.info({id:id,entity_key:'enterprise'})"
+                                                class="btn btn-default">
+                                            返回
+                                        </button>
+                                        <button ng-if="!form._links"
+                                                ui-sref="workflowEntity.list({entity_key:'enterprise',workflow_id:workflow_id})"
+                                                class="btn btn-default">
+                                            返回
+                                        </button>
+                                        <button type="button"
+                                                class="btn btn-primary"
+                                                ng-disabled="enterprise_form.$invalid"
+                                                ng-click="saveEnterprise()">
+                                            保存
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /column -->
+</div>
+<!-- /hbox layout -->

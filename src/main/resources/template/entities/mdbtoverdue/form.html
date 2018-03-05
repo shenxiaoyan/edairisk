@@ -1,0 +1,126 @@
+<script>
+    "use strict";
+    app.controller("mdbtoverdueFormController",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "$state",
+            "entity",
+            function ($rootScope, $scope, $http, $stateParams, $state, entity) {
+
+                $scope.overdueUserInfo = $rootScope.mdbtItem
+                $scope.id = $stateParams.id
+
+                entity.getDetail("/rest/loanoverdues/" + $scope.id,['loan']).then(function (resResult) {
+
+                    console.log(resResult)
+                    $scope.profile = resResult;
+
+
+                });
+
+                $scope.save=function () {
+                    $http({
+                        method: "PATCH",
+                        url: "/rest/loanoverdues/" + $scope.id,
+                        data: {
+                            overdueAmount: $scope.profile.overdueAmount,
+                            overdueDays: $scope.profile.overdueDays,
+                            penalSum: $scope.profile.penalSum,
+                            historyAmount: $scope.profile.historyAmount,
+
+                        }
+                    }).success(function (resResult) {
+                        if (resResult) {
+                            $state.go("auditEntity.home.profile.info", {entity_key: "mdbtoverdue",id: $scope.id}, {reload: true});
+                            $rootScope.toasterSuccess("成功", "修改成功！");
+                        }
+                    });
+                }
+            }
+        ]
+    )
+</script>
+<!-- hbox layout -->
+<div class="wrapper-md" ng-controller="mdbtoverdueFormController">
+    <div class="row">
+        <div class="col-xs-12 col-sm-10">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    逾期信息
+                </div>
+                <table class="table table-striped m-b-none">
+                    <tbody>
+                    <tr>
+                        <td class="v-middle text-right w-sm">借款单号:</td>
+                        <td class="v-middle w-xl">
+                            <input disabled type="text" ng-model="profile.loan.orderNo" class="form-control">
+                        </td>
+                        <td class="v-middle text-right w-sm">姓名:</td>
+                        <td class="v-middle w-xl">
+                            <input disabled type="text" ng-model="overdueUserInfo.name" class="form-control">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right w-sm">手机号:</td>
+                        <td class="v-middle w-xl">
+                            <input type="text" ng-model="overdueUserInfo.phone" disabled class="form-control">
+                        </td>
+                        <td class="v-middle text-right w-sm">本金(元):</td>
+                        <td class="v-middle w-xl">
+                            <input disabled type="text" ng-model="overdueUserInfo.principal"
+                                   class="form-control">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right w-sm">逾期金额(元):</td>
+                        <td class="v-middle w-xl">
+                            <input type="text" ng-model="profile.overdueAmount"  class="form-control">
+                        </td>
+                        <td class="v-middle text-right w-sm">逾期天数:</td>
+                        <td class="v-middle w-xl">
+                            <input type="text" ng-model="profile.overdueDays"  class="form-control">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">逾期罚金(元):</td>
+                        <td class="v-middle">
+                            <input type="text" ng-model="profile.penalSum" class="form-control">
+                        </td>
+                        <td class="v-middle text-right">逾期累加金额(元)</td>
+                        <td class="v-middle">
+                            <input type="text" ng-model="profile.historyAmount" class="form-control">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">逾期时间:</td>
+                        <td class="v-middle">
+                            <input disabled type="text" ng-model="profile.createdAt" class="form-control">
+                        </td>
+                        <td class="v-middle text-right">结清时间</td>
+                        <td class="v-middle">
+                            <input disabled type="text" ng-model="profile.finishAt" class="form-control">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right"></td>
+                        <td class="v-middle">
+                        </td>
+                        <td class="v-middle text-right"></td>
+                        <td class="v-middle">
+                            <button class="btn btn-default" ui-sref="auditEntity.home.profile.info({entity_key:'mdbtoverdue',id:id})">
+                                返回
+                            </button>
+                            <button class="btn btn-primary" ng-click="save()">
+                                保存
+                            </button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

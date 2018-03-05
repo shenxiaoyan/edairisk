@@ -1,0 +1,28 @@
+<div class="wrapper">
+    <div class="panel panel-default">
+        <table class="table table-striped m-b-none">
+            <tbody>
+            <tr>
+                <td class="v-middle text-right" style="width: 130px;">用户角色：</td>
+                <td class="v-middle">{{ profile.role.label }}</td>
+            </tr>
+            <tr>
+                <td class="v-middle text-right">用户所属部门：</td>
+                <td class="v-middle">{{ profile.department.label }}</td>
+            </tr>
+            <tr>
+                <td class="v-middle text-right">创建人：</td>
+                <td class="v-middle">{{ profile.createdBy.nickname }}</td>
+            </tr>
+            <tr>
+                <td class="v-middle text-right">创建部门：</td>
+                <td class="v-middle">{{ profile.createdByDepartment.label }}</td>
+            </tr>
+            <tr>
+                <td class="v-middle text-right">最后操作人：</td>
+                <td class="v-middle">{{ profile.lastModifiedBy.nickname }}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

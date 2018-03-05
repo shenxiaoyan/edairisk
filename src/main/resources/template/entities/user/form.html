@@ -1,0 +1,206 @@
+<script>
+    "use strict";
+    app.controller("userFormController",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "$state",
+            "entity",
+            function ($rootScope, $scope, $http, $stateParams, $state, entity) {
+
+                $scope.id = $stateParams.id;
+
+                $scope.allStates  = null;
+                $scope.state      = null;
+                $scope.role       = null;
+                $scope.department = null;
+
+                //更新时获取实体信息
+                entity.getDetail("rest/users/" + $stateParams.id, ["state", "role", "department", "workflow"]).then(function (resResult) {
+
+                    $scope.form = resResult;
+
+                    //获取所有用户状态
+                    entity.getList("rest/userStates").then(function (resResult) {
+                        $scope.allStates = resResult._embeddedItems;
+                        //获取当前状态
+                        $scope.state     = entity.getSelectedMyOwn($scope.allStates, $scope.form.state);
+                    });
+
+                    //获取所有角色
+                    entity.getList("rest/roles?size=10000").then(function (resResult) {
+                        $scope.allRoles = resResult._embeddedItems;
+                        //获取当前角色
+                        $scope.role     = entity.getSelectedMyOwn($scope.allRoles, $scope.form.role);
+                    });
+
+                });
+
+                /*
+                 * 更新函数
+                 * @author  金杭
+                 * @param   无
+                 * @return  无
+                 * */
+                $scope.saveUser = function () {
+
+                    $http({
+                        method: "PATCH",
+                        url: $scope.form._links.self.href,
+                        data: {
+                            act: "update",
+                            nickname: $scope.form.nickname,
+                            sex: Number($scope.form.sex),
+                            state: $scope.state ? $scope.state._links.self.href : null,
+                            role: $scope.role ? $scope.role._links.self.href : null,
+                            country: $scope.form.country,
+                            province: $scope.form.province,
+                            city: $scope.form.city,
+                            workflow: "/rest/userWorkflows/" + $stateParams.workflow_id
+                        }
+                    }).success(function (resResult) {
+                        $state.go("workflowEntity.home.profile.info", {
+                            id: resResult.id,
+                            entity_key: "user"
+                        }, {reload: true});
+                        $rootScope.toasterSuccess("修改成功！", "用户修改成功！");
+                    });
+
+                };
+
+            }
+        ]
+    )
+</script>
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs" ng-controller="userFormController">
+    <!-- column -->
+    <div class="col w-md lter b-l">
+        <div class="vbox">
+            <div class="wrapper b-b" ng-if="!form._links">
+                <div class="font-thin h4">
+                    <span translate="user.self.label"></span>新建
+                </div>
+            </div>
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner">
+                        <div class="wrapper">
+                            <form name="user_form" class="form-horizontal">
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">
+                                        <span class="text-danger">*</span>
+                                        <span translate="user.nickname.label"></span>
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="nickname"
+                                               ng-model="form.nickname"
+                                               required>
+                                        <span class="help-block text-danger"
+                                              ng-show="user_form.nickname.$dirty && user_form.nickname.$invalid">
+                                            <i class="fa fa-exclamation-circle text-danger"></i>&ensp;名称为必填
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label" translate="user.sex.label"></label>
+                                    <div class="col-sm-8">
+                                        <label class="checkbox-inline i-checks">
+                                            <input type="radio" name="sex" value="1" ng-model="form.sex"><i></i> 男
+                                        </label>
+                                        <label class="checkbox-inline i-checks">
+                                            <input type="radio" name="sex" value="2" ng-model="form.sex"><i></i> 女
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">
+                                        <span class="text-danger">*</span>
+                                        <span translate="user.role.label"></span>
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control"
+                                                name="role"
+                                                ng-model="role"
+                                                ng-options="role.label for role in allRoles"
+                                                required>
+                                        </select>
+                                        <span class="help-block text-danger"
+                                              ng-show="user_form.role.$dirty && user_form.role.$invalid">
+                                            <i class="fa fa-exclamation-circle text-danger"></i>&ensp;角色为必填
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label" translate="user.department.label"></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" ng-model="form.department.label" class="form-control"
+                                               disabled>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">地址</label>
+                                    <div class="col-sm-8 clearfix">
+                                        <div class="pull-left inline m-r" style="width:calc( 33.3% - 15px);">
+                                            <input type="text" ng-model="form.country" class="form-control"
+                                                   placeholder="国">
+                                        </div>
+                                        <div class="pull-left inline m-r" style="width:calc( 33.3% - 15px);">
+                                            <input type="text" ng-model="form.province" class="form-control"
+                                                   placeholder="省">
+                                        </div>
+                                        <div class="pull-left inline" style="width:calc( 33.3%);">
+                                            <input type="text" ng-model="form.city" class="form-control"
+                                                   placeholder="市">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">
+                                        <span class="text-danger">*</span>
+                                        <span translate="user.state.label"></span>
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control"
+                                                ng-model="state"
+                                                name="state"
+                                                ng-options="state.label for state in allStates"
+                                                required></select>
+                                        <span class="help-block text-danger"
+                                              ng-show="user_form.state.$dirty && user_form.state.$invalid">
+                                            <i class="fa fa-exclamation-circle text-danger"></i>&ensp;状态为必填
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-4 col-sm-offset-2">
+                                        <button ng-if="form._links"
+                                                ui-sref="workflowEntity.home.profile.info({id:id,entity_key:'user'})"
+                                                class="btn btn-default">返回
+                                        </button>
+                                        <button ng-if="!form._links"
+                                                ui-sref="workflowEntity.list({entity_key:'user',workflow_id:form.workflow.id})"
+                                                class="btn btn-default">返回
+                                        </button>
+                                        <button type="button"
+                                                class="btn btn-primary"
+                                                ng-disabled="user_form.$invalid"
+                                                ng-click="saveUser()">
+                                            保存
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /column -->
+</div>
+<!-- /hbox layout -->

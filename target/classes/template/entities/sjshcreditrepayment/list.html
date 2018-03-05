@@ -1,0 +1,593 @@
+<script>
+    "use strict";
+    app.controller("sjshcreditrepaymentListController",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "entity",
+            '$state',
+            function ($rootScope, $scope, $http, $stateParams, entity, $state) {
+
+                $scope.states = [];
+                //$scope.products =[];
+                $scope.searchForm={
+                    realname:'',
+                    telephone:'',
+                    productid:'1'
+                };
+
+                console.log($stateParams.workflow_id)
+                entity.getList("/rest/creditrepaymentWorkflows/"+ $stateParams.workflow_id +"/states").then(function (resResult) {
+                    $scope.states = resResult._embeddedItems;
+                    //$scope.states.push({stateCode:'',sort:0,label:'全部'});
+                    if ($scope.states.length > 0) {
+
+                        $scope.states = $scope.states.sort(function (a, b) {
+                            return a.sort - b.sort;
+                        });
+
+                        $scope.state_code = $scope.states[2].stateCode;
+                        console.log($scope.state_code)
+                        $scope.getList(0);
+                    }
+                });
+
+
+
+
+
+                $scope.searchList = function(page) {
+                    //# % & 号键会注释掉后面的内容
+                    $scope.searchForm.realname= $scope.searchForm.realname.replace(/[#%&\^\\]/g,'')
+                    $scope.searchForm.telephone=$scope.searchForm.telephone.replace(/[#%&\^\\]/g,'')
+                    $http({
+                        method: "GET",
+                        url: "/repayment/searchrepaymentrecord?stateCode="+$scope.state_code+"&realname="+$scope.searchForm.realname+"&telephone="+$scope.searchForm.telephone+"&productid="+$scope.searchForm.productid+"&page="+page+"&size=10&sort=id,desc"
+                    }).success(function (resResult) {
+
+
+
+                        console.log(resResult)
+                        $scope.list = resResult.data.content;
+
+                        angular.forEach($scope.list,function (val,key) {
+                            if(val.information){
+                                val.sn=JSON.parse(val.information).id
+                                val.mobile=JSON.parse(val.information).mobile
+                                val.payAmount=JSON.parse(val.information).payAmount
+                                val.payDate=$scope.formatDate((JSON.parse(val.information).payDate).substring(0,8))
+                                val.payPlans=(JSON.parse(val.information).payPlans).pop()
+                                val.personName = val.name
+                                val.product = val.label
+                                val.remainAmount=JSON.parse(val.information).remainAmount
+                            }
+                        })
+
+                        //搜索的返回格式和 rest/search不一样
+                        $scope.pageList = {
+                            size: resResult.data.size,
+                            total_elements: resResult.data.totalElements,
+                            current_page: resResult.data.number,
+                            num_page: resResult.data.totalPages,
+                            total_page: resResult.data.totalPages
+                        };
+
+                        if ($scope.list.length > 0) {
+                            $("#sjshcreditrepayment_list_paginator").show();
+                            $rootScope.setPaginator("#sjshcreditrepayment_list_paginator", $scope.pageList, $scope.searchList);
+                        }else{
+                            $("#sjshcreditrepayment_list_paginator").hide();
+                        }
+
+                    });
+                }
+
+                //搜索按钮
+                $scope.searchFormBtn=function () {
+                    console.log( $scope.state_code)
+                    $scope.searchList(0)
+
+                }
+
+                //重置按钮
+                $scope.resetSearchFormBtn=function () {
+                    $scope.searchForm={
+                        realname:'',
+                        telephone:'',
+                        productid:'1'
+                    };
+                    $scope.searchList(0)
+                }
+
+
+
+                $scope.pageList = {
+                    size: 0,
+                    total_elements: 0,
+                    current_page: 0,
+                    num_page: 1,
+                    total_page: 1
+                };
+
+                $scope.list = [];
+
+
+                $scope.getList = function (page) {
+                    $scope.loading = true;
+                    $scope.list = [];
+
+                    //var link = "/rest/creditrepayments/listOwnDepartmentAndChildren?size=20&page=" + page;
+
+                    //if($scope.state_code){
+                    //var link = "/rest/creditrepayments?sort=id,desc&stateCode=" + $scope.state_code + "&size=20&page=" + page;
+                    var link = "/repayment/searchrepaymentrecord?stateCode="+$scope.state_code+"&realname=&telephone=&productid=1&page="+page+"&size=10&sort=id,desc"
+                    //var link = "/rest/creditrepayments/search/listOwnDepartmentAndChildren?sort=id,desc&stateCode=" + $scope.state_code + "&size=20&page=" + page;
+                    //}
+
+
+
+                    entity.getList(link).then(function (resResult) {
+                        $scope.loading = false;
+                        $scope.list = resResult.data.content;
+
+                        angular.forEach($scope.list,function (val,key) {
+                            val.sn=JSON.parse(val.information).id
+                            val.mobile=JSON.parse(val.information).mobile
+                            val.payAmount=JSON.parse(val.information).payAmount
+                            val.payDate=$scope.formatDate((JSON.parse(val.information).payDate).substring(0,8))
+                            val.payPlans=(JSON.parse(val.information).payPlans).pop()
+                            val.personName = val.name
+                            val.product = val.label
+                            val.remainAmount=JSON.parse(val.information).remainAmount
+                        })
+
+                        //搜索的返回格式和 rest/search不一样
+                        $scope.pageList = {
+                            size: resResult.data.size,
+                            total_elements: resResult.data.totalElements,
+                            current_page: resResult.data.number,
+                            num_page: resResult.data.totalPages,
+                            total_page: resResult.data.totalPages
+                        };
+
+                        if ($scope.list.length > 0) {
+                            $("#sjshcreditrepayment_list_paginator").show();
+                            $rootScope.setPaginator("#sjshcreditrepayment_list_paginator", $scope.pageList, $scope.getList);
+                        }else{
+                            $("#sjshcreditrepayment_list_paginator").hide();
+                        }
+
+                    });
+                };
+
+                $scope.stateSelect = function ($event, stateCode) {
+                    if ($event.target.nodeName === "INPUT") {
+                        $scope.state_code = stateCode;
+                        $scope.searchForm= {
+                            realname:'',
+                            telephone:'',
+                            productid:'1'
+                        }
+                        $scope.getList(0);
+                    }
+                };
+
+
+                $scope.repaymentForm = {};
+
+                $scope.repaymentBtn = function () {
+                    $("#save_model").modal("show");
+                };
+
+
+                $scope.savaRepayment = function () {
+
+                    $http.post("rest/creditrepayplan", $scope.repaymentForm).success(function (resResult) {
+
+                    });
+
+                    $("#save_model").modal("hide");
+                }
+                $scope.formatDate = function (date) {
+                    return date.substring(0,4)+'-'+date.substring(4,6)+'-'+date.substring(6,8);
+                };
+
+
+            }
+        ]
+    );
+</script>
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light" ng-controller="sjshcreditrepaymentListController">
+    <!-- column -->
+    <div class="col w-md lter b-l">
+        <div class="vbox">
+            <!--<div class="wrapper b-b b-light clearfix">-->
+            <!--<div class="pull-left m-r w inline">-->
+            <!--<label class="sr-only" for=""></label>-->
+            <!--<input type="text" class="form-control" id="">-->
+            <!--</div>-->
+            <!--<div class="pull-left m-r w inline">-->
+            <!--<label class="sr-only" for=""></label>-->
+            <!--<input type="text" class="form-control" id="">-->
+            <!--</div>-->
+            <!--<div class="pull-left m-r w inline">-->
+            <!--<label class="sr-only" for=""></label>-->
+            <!--<input type="text" class="form-control" id="">-->
+            <!--</div>-->
+            <!--<div class="pull-left m-r inline">-->
+            <!--<button class="btn btn-primary btn-addon">-->
+            <!--<i class="fa fa-search"></i>-->
+            <!--查询-->
+            <!--</button>-->
+            <!--</div>-->
+            <!--</div>-->
+
+            <div class="wrapper b-b  clearfix">
+
+                <div class="inline pull-left">
+                    随借随还还款列表状态：
+                    <!--<span translate="creditrepayment.self.label"></span>状态：-->
+                </div>
+                <!--<div class="inline pull-left m-r">-->
+                <!--<label class="i-checks pull-left m-n" ng-click="stateSelect($event,'')">-->
+                <!--<input type="radio" name="state" checked><i></i>  全部-->
+                <!--</label>-->
+                <!--</div>-->
+
+                <div class="inline pull-left m-r" ng-repeat="state in states">
+                    <label class="i-checks pull-left m-n" ng-click="stateSelect($event,state.stateCode)">
+                        <input type="radio" value="{{state.stateCode}}" ng-model="state_code" name="state"><i></i> {{
+                        state.label }}
+                    </label>
+                </div>
+                <!--<button class="pull-right btn btn-success" ng-click="repaymentBtn()">还款</button>-->
+            </div>
+
+            <div class="wrapper b-b clearfix ">
+                <form class="form-inline" name="search_form">
+                    <div class="form-group m-r">
+                        <label for="">客户姓名: </label>
+                        <input ng-model="searchForm.realname" class="form-control" type="text" pattern="^\s*[\u4e00-\u9fa5]+(·[\u4e00-\u9fa5]+)*\s*$" name="realname">
+                        <span class="help-block text-danger"
+                              ng-show="search_form.realname.$dirty && search_form.realname.$invalid">
+                            <i class="fa fa-exclamation-circle text-danger"></i>不符合姓名格式
+                        </span>
+                    </div>
+                    <div class="form-group m-r">
+                        <label for="">手机号: </label>
+                        <input ng-model="searchForm.telephone" class="form-control" type="tel" pattern="^\s*\d+\s*$" name="telephone">
+                        <span class="help-block text-danger"
+                              ng-show="search_form.telephone.$dirty && search_form.telephone.$invalid">
+                            <i class="fa fa-exclamation-circle text-danger"></i>手机号必须为数字
+                        </span>
+                    </div>
+                    <button class="btn btn-primary m-r" ng-click="searchFormBtn()" ng-disabled="search_form.$invalid">
+                        <i class="fa fa-search"></i>查询
+                    </button>
+                    <button class="btn btn-default m-r" ng-click="resetSearchFormBtn()">
+                        <i class="fa fa-refresh"></i>重置
+                    </button>
+                </form>
+            </div>
+
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner" style="overflow: scroll;">
+                        <div class="wrapper">
+                            <div class="panel panel-default">
+                                <div class="panel-heading" ng-if="!loading && list.length > 0">
+                                    查询结果
+                                </div>
+                                <div ng-if="loading"
+                                     style="position: fixed;top: 50%;right: 50%;margin-left: -15px;margin-top: -15px;">
+                                    <div class="sk-spinner sk-spinner-cube-grid">
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                    </div>
+                                    <div class="text-center m-t">加载中请稍后</div>
+                                </div>
+                                <div class="panel-heading" ng-if="!loading && list.length < 1">
+                                    暂无数据！
+                                </div>
+                                <div class="table-responsive" ng-if="!loading && list.length > 0">
+                                    <table ng-if="!mdbtTabel" class="table table-hover b-light ">
+                                        <thead>
+                                        <tr>
+                                            <th>流水号</th>
+                                            <th>客户名</th>
+                                            <th>手机号</th>
+                                            <!--<th>产品线</th>-->
+                                            <th>还款金额(元)</th>
+                                            <th>剩余本金(元)</th>
+                                            <th>是否逾期</th>
+                                            <th>本金(元)</th>
+                                            <th>罚息(元)</th>
+                                            <th>利息+手续费(元)</th>
+                                            <th>还款时间</th>
+                                            <!--<th>操作</th>-->
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr ng-repeat="item in list">
+                                            <td class="v-middle" style="width: 355px">
+                                                {{item.sn}}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.personName }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.mobile }}
+                                            </td>
+                                            <!--<td class="v-middle">-->
+                                                <!--{{ item.product }}-->
+                                            <!--</td>-->
+                                            <td class="v-middle">
+                                                {{ item.payAmount }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.remainAmount }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.payPlans.isOverdue == 0 ? '否' : '逾期'  }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.payPlans.planCorpus }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.payPlans.penatly }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.payPlans.planInterest }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.payDate }}
+                                            </td>
+                                            <!--<td class="v-middle clearfix">-->
+                                            <!--<button ui-sref="workflowEntity.home.profile.info({id:item.id})"-->
+                                            <!--class="pull-left btn btn-sm btn-info m-r">详情-->
+                                            <!--</button>-->
+                                            <!--</td>-->
+                                        </tr>
+                                        </tbody>
+                                    </table>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="wrapper b-t b-light clearfix">
+                <ul id="sjshcreditrepayment_list_paginator" style="margin:2px 0;float: right;"></ul>
+                <small class="m-l-md pull-right text-muted inline m-t-sm m-b-sm m-r">共 {{pageList.total_elements}} 条，本页共 {{ list.length }}
+                    条
+                </small>
+            </div>
+        </div>
+    </div>
+    <!-- /column -->
+
+    <!--模态框-->
+    <div class="modal" id="save_model">
+        <div class="modal-dialog" style="width:1300px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button class="close" data-dismiss="modal">
+                        <span class="glyphicon glyphicon-remove"></span>
+                    </button>
+                    <h3 class="modal-title">还款</h3>
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">提前结清:</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" ng-model="repaymentForm.accountSettle">
+                            </div>
+                        </div>
+                        <!--<div class="form-group">-->
+                        <!--<label class="col-sm-2 control-label">创建时间:</label>-->
+                        <!--<div class="col-sm-10">-->
+                        <!--<input type="text" class="form-control" ng-model="repaymentForm.createdAt">-->
+                        <!--</div>-->
+                        <!--</div>-->
+                        <!--<div class="form-group">-->
+                        <!--<label class="col-sm-2 control-label">创建人:</label>-->
+                        <!--<div class="col-sm-10">-->
+                        <!--<input type="text" class="form-control" ng-model="repaymentForm.createdBy">-->
+                        <!--</div>-->
+                        <!--</div>-->
+                        <!--<div class="form-group">-->
+                        <!--<label class="col-sm-2 control-label">创建部门:</label>-->
+                        <!--<div class="col-sm-10">-->
+                        <!--<input type="text" class="form-control" ng-model="repaymentForm.createdByDepartment">-->
+                        <!--</div>-->
+                        <!--</div>-->
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">creditcard:</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" ng-model="repaymentForm.creditcard">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">贷方还款借款日期:</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" ng-model="repaymentForm.creditorRepaymentDate">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">creditrepayment:</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" ng-model="repaymentForm.creditrepayment">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">借方宽限还款日期:</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control"
+                                       ng-model="repaymentForm.debtorExtentedRepaymentDate">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">借方正常还款日期:</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" ng-model="repaymentForm.debtorRepaymentDate">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">各种费用总和:</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" ng-model="repaymentForm.fees">
+                            </div>
+                        </div>
+                        <!--<div class="form-group">-->
+                        <!--<label class="col-sm-2 control-label">files:</label>-->
+                        <!--<div class="col-sm-10">-->
+                        <!--<input type="text" class="form-control" ng-model="repaymentForm.files">-->
+                        <!--</div>-->
+                        <!--</div>-->
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">其它相关信息:</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" ng-model="repaymentForm.information">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">利息:</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" ng-model="repaymentForm.interest">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">isOverdue:</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" ng-model="repaymentForm.isOverdue">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">名称:</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" ng-model="repaymentForm.label">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">lastAct:</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" ng-model="repaymentForm.lastAct">
+                            </div>
+                        </div>
+                        <!--<div class="form-group">-->
+                        <!--<label class="col-sm-2 control-label">最后更新时间:</label>-->
+                        <!--<div class="col-sm-10">-->
+                        <!--<input type="text" class="form-control" ng-model="repaymentForm.lastModifiedAt">-->
+                        <!--</div>-->
+                        <!--</div>-->
+                        <!--<div class="form-group">-->
+                        <!--<label class="col-sm-2 control-label">最后更新人:</label>-->
+                        <!--<div class="col-sm-10">-->
+                        <!--<input type="text" class="form-control" ng-model="repaymentForm.lastModifiedBy">-->
+                        <!--</div>-->
+                        <!--</div>-->
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">剩下还款:</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" ng-model="repaymentForm.leftAmount">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">loan:</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" ng-model="repaymentForm.loan">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">借款单号:</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" ng-model="repaymentForm.loanSn">
+                            </div>
+                        </div>
+                        <!--<div class="form-group">-->
+                        <!--<label class="col-sm-2 control-label">logs:</label>-->
+                        <!--<div class="col-sm-10">-->
+                        <!--<input type="text" class="form-control" ng-model="repaymentForm.logs">-->
+                        <!--</div>-->
+                        <!--</div>-->
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">订单号:</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" ng-model="repaymentForm.orderSn">
+                            </div>
+                        </div>
+                        <!--<div class="form-group">-->
+                        <!--<label class="col-sm-2 control-label">逾期金额:</label>-->
+                        <!--<div class="col-sm-10">-->
+                        <!--<input type="text" class="form-control" ng-model="repaymentForm.overdueAmount">-->
+                        <!--</div>-->
+                        <!--</div>-->
+                        <!--<div class="form-group">-->
+                        <!--<label class="col-sm-2 control-label">逾期天数:</label>-->
+                        <!--<div class="col-sm-10">-->
+                        <!--<input type="text" class="form-control" ng-model="repaymentForm.overdueDays">-->
+                        <!--</div>-->
+                        <!--</div>-->
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">还款计划的单号:</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" ng-model="repaymentForm.planSn">
+                            </div>
+                        </div>
+                        <!--<div class="form-group">-->
+                        <!--<label class="col-sm-2 control-label">本金:</label>-->
+                        <!--<div class="col-sm-10">-->
+                        <!--<input type="text" class="form-control" ng-model="repaymentForm.principal">-->
+                        <!--</div>-->
+                        <!--</div>-->
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">信用卡还款计划:</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" ng-model="repaymentForm.self">
+                            </div>
+                        </div>
+                        <!--<div class="form-group">-->
+                        <!--<label class="col-sm-2 control-label">业务员id:</label>-->
+                        <!--<div class="col-sm-10">-->
+                        <!--<input type="text" class="form-control" ng-model="repaymentForm.serviceUser">-->
+                        <!--</div>-->
+                        <!--</div>-->
+                        <!--<div class="form-group">-->
+                        <!--<label class="col-sm-2 control-label">状态:</label>-->
+                        <!--<div class="col-sm-10">-->
+                        <!--<input type="text" class="form-control" ng-model="repaymentForm.state">-->
+                        <!--</div>-->
+                        <!--</div>-->
+                        <!--<div class="form-group">-->
+                        <!--<label class="col-sm-2 control-label">workflow:</label>-->
+                        <!--<div class="col-sm-10">-->
+                        <!--<input type="text" class="form-control" ng-model="repaymentForm.workflow">-->
+                        <!--</div>-->
+                        <!--</div>-->
+                    </form>
+                </div>
+                <div class="panel-footer clearfix">
+                    <button class="pull-right btn btn-sm btn-success" ng-click="savaRepayment()">保存</button>
+                </div>
+                <!--</div>-->
+                <!--</div>-->
+            </div>
+        </div>
+    </div>
+    <!--模态框-->
+</div>
+<!-- /hbox layout -->
+

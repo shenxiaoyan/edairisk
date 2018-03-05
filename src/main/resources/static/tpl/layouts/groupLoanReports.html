@@ -1,0 +1,47 @@
+<script>
+
+    "use strict";
+    app.controller("groupLoanReportCtrl", [
+        "$scope",
+        function ( $scope) {
+            $scope.groupList = [
+                {
+                    id: "",
+                    name: "公司贷款报表",
+                    sref: "groupLoanReport.page({view_type:'loan'})"
+                },
+                {
+                    id: "",
+                    name: "公司还款报表",
+                    sref: "groupLoanReport.page({view_type:'repayment'})"
+                },
+                {
+                    id: "",
+                    name: "公司逾期报表",
+                    sref: "groupLoanReport.page({view_type:'overdue'})"
+                }
+            ]
+        }
+    ]);
+</script>
+
+<div class="hbox hbox-auto-xs hbox-auto-sm" ng-controller="groupLoanReportCtrl">
+    <div class="col w-md bg-light dk b-r bg-auto hidden-sm hidden-xs">
+        <div class="wrapper-md b-b bg-light">
+            <div class="font-thin h4">
+                集团报表
+            </div>
+        </div>
+        <div class="wrapper-md">
+            <ul class="nav nav-pills nav-stacked nav-sm">
+                <li ui-sref-active="active"
+                	ng-repeat="list in groupList">
+                    <a ui-sref="{{ list.sref }}">{{list.name}}</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="col">
+        <div class="hbox hbox-auto-xs bg-light" ui-view></div>
+    </div>
+</div>

@@ -1,0 +1,392 @@
+<script>
+    app.controller("capitalproductFormController",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "$state",
+            "entity",
+            function ($rootScope, $scope, $http, $stateParams, $state, entity) {
+
+
+                $scope.form_id = $stateParams.id;
+
+                $scope.workflow_id = $stateParams.workflow_id;
+
+                $scope.form = {};
+
+                $scope.debtortypeCodeVal      = null;
+                $scope.periodCodeVal          = null;
+                $scope.repaymentMethodCodeVal = null;
+                $scope.departmentVal          = null;
+                $scope.bankcardVal            = null;
+
+                /*
+                 * state
+                 * */
+                $scope.allStates = [];
+                $scope.state     = null;
+
+                entity.getList("getEntityInfo").then(function (response) {
+
+                    $rootScope.allEntitiesInfo = response;
+
+                    if ($scope.form_id) {
+                        entity.getDetail("rest/capitalproducts/" + $stateParams.id, ["creditorDepartment", "state", "creditorRepaymentBankcard", "workflow"]).then(function (resResult) {
+
+                            $scope.form = resResult;
+
+                            /*个人（自然人）或企业（法人）*/
+                            $scope.debtortypeCode = $rootScope.allEntitiesInfo.capitalproduct.debtortypeCode.values;
+                            /*贷款分期时间单位*/
+                            $scope.periodCode = $rootScope.allEntitiesInfo.capitalproduct.periodCode.values;
+                            /*还款规则*/
+                            $scope.repaymentMethodCode = $rootScope.allEntitiesInfo.capitalproduct.repaymentMethodCode.values;
+
+                            $scope.debtortypeCodeVal      = $scope.debtortypeCode[$scope.form.debtortypeCode];
+                            $scope.periodCodeVal          = $scope.periodCode[$scope.form.periodCode];
+                            $scope.repaymentMethodCodeVal = $scope.repaymentMethodCode[$scope.form.repaymentMethodCode];
+
+                            //获取所有部门
+                            entity.getList("rest/departments/search/listOwnDepartmentAndChildren?size=10000").then(function (departmentResResult) {
+                                $scope.department    = departmentResResult._embeddedItems;
+                                //获取关联的企业
+                                $scope.departmentVal = entity.getSelectedMyOwn($scope.department, $scope.form.creditorDepartment);
+                            });
+
+                            //获取所有状态
+                            entity.getList("rest/capitalproductStates").then(function (resResult) {
+                                $scope.allStates = resResult._embeddedItems;
+                                $scope.state     = entity.getSelectedMyOwn($scope.allStates, $scope.form.state);
+                            });
+
+                            //获取所有自己创建的银行卡
+                            entity.getList("rest/bankcards/search/listStateOwnDepartmentAndChildren?stateCode=ENABLED&sort=lastModifiedAt,desc&size=9999&page=0").then(function (resResult) {
+                                $scope.bankcard    = resResult._embeddedItems;
+                                $scope.bankcardVal = entity.getSelectedMyOwn($scope.bankcard, $scope.form.creditorRepaymentBankcard);
+                            });
+
+                        });
+                    } else {
+                        entity.getList("rest/capitalproductStates").then(function (resResult) {
+                            $scope.allStates = resResult._embeddedItems;
+                            $scope.state     = $scope.allStates[0];
+                        });
+
+                        //获取所有自己创建的银行卡
+                        entity.getList("rest/bankcards/search/listStateOwnDepartmentAndChildren?stateCode=ENABLED&sort=lastModifiedAt,desc&size=9999&page=0").then(function (resResult) {
+                            $scope.bankcard    = resResult._embeddedItems;
+                            $scope.bankcardVal = $scope.bankcard[0];
+                        });
+
+                        //获取所有部门
+                        entity.getList("rest/departments/search/listOwnDepartmentAndChildren?size=10000").then(function (departmentResResult) {
+                            $scope.department    = departmentResResult._embeddedItems;
+                            $scope.departmentVal = $scope.department[0];
+                        });
+
+                        /*个人（自然人）或企业（法人）*/
+                        $scope.debtortypeCode = $rootScope.allEntitiesInfo.capitalproduct.debtortypeCode.values;
+                        /*贷款分期时间单位*/
+                        $scope.periodCode = $rootScope.allEntitiesInfo.capitalproduct.periodCode.values;
+                        /*还款规则*/
+                        $scope.repaymentMethodCode = $rootScope.allEntitiesInfo.capitalproduct.repaymentMethodCode.values;
+
+                        $scope.form = {};
+                    }
+
+                });
+
+                $scope.changeState = function (state) {
+                    $scope.state = state;
+                };
+
+                $scope.capitalproductSave = function () {
+
+
+                    $scope.form.debtortypeCode  = $scope.debtortypeCodeVal ? $scope.debtortypeCodeVal.secret : null;
+                    $scope.form.periodCode      = $scope.periodCodeVal ? $scope.periodCodeVal.secret : null;
+                    $scope.form.repaymentMethod = $scope.repaymentMethodCodeVal ? $scope.repaymentMethodCodeVal.secret : null;
+
+                    /*关联部门*/
+                    $scope.form.creditorDepartment = $scope.departmentVal ? $scope.departmentVal._links.self.href : null;
+                    /*关联收款账户*/
+                    $scope.form.creditorRepaymentBankcard = $scope.bankcardVal ? $scope.bankcardVal._links.self.href : null;
+                    $scope.form.state                     = $scope.state ? $scope.state._links.self.href : null;
+                    $scope.form.workflow                  = "/rest/capitalproductWorkflows/" + $stateParams.workflow_id;
+
+                    if ($scope.form._links) {
+                        $scope.form.act = "update";
+                        $http({
+                            url: $scope.form._links.self.href,
+                            method: "PATCH",
+                            data: $scope.form
+                        }).success(function (resResult) {
+                            $state.go("workflowEntity.home.profile.info", {
+                                id: resResult.id,
+                                entity_key: "capitalproduct"
+                            }, {reload: true});
+                            $rootScope.toasterSuccess("成功！", "修改成功！");
+                        });
+                    } else {
+                        $scope.form.act = "create";
+                        $http.post("rest/capitalproducts", $scope.form).success(function (resResult) {
+                            $state.go("workflowEntity.list", {
+                                entity_key: "capitalproduct",
+                                workflow_id: $stateParams.workflow_id
+                            }, {reload: true});
+                            $rootScope.toasterSuccess("成功！", "新建成功！");
+                        });
+                    }
+                }
+            }
+        ]
+    );
+</script>
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs" ng-controller="capitalproductFormController">
+    <!-- column -->
+    <div class="col">
+        <div class="vbox">
+            <div class="wrapper b-b b-light" ng-if="!form._links">
+                <div class="font-thin h4">
+                    <span translate="capitalproduct.self.label"></span>新建
+                </div>
+            </div>
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner">
+                        <div class="wrapper">
+                            <form name="capitalproduct-form" class="form-horizontal">
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"
+                                           translate="capitalproduct.label.label"></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" ng-model="form.label" class="form-control" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"
+                                           translate="capitalproduct.debtortypeCode.self.label"></label>
+                                    <div class="col-sm-8">
+                                        <select ng-model="debtortypeCodeVal"
+                                                class="form-control m-b"
+                                                ng-options=" y.label for (x,y) in debtortypeCode">
+                                            <option value="">不选择</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"
+                                           translate="capitalproduct.periodCode.self.label"></label>
+                                    <div class="col-sm-8">
+                                        <select ng-model="periodCodeVal"
+                                                class="form-control m-b"
+                                                ng-options=" y.label for (x,y) in periodCode">
+                                            <option value="">不选择</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"
+                                           translate="capitalproduct.periodNumber.label"></label>
+                                    <div class="col-sm-8">
+                                        <div class="input-group">
+                                            <!--<input type="text" ng-model="form.periodNumber" class="form-control"-->
+                                            <!--required>-->
+                                            <select ng-model="form.periodNumber"
+                                                    class="form-control m-b">
+                                                <option value="">不选择</option>
+                                                <option value="1" ng-selected="form.periodNumber==1?1:0">1</option>
+                                                <option value="3" ng-selected="form.periodNumber==3?1:0">3</option>
+                                                <option value="6" ng-selected="form.periodNumber==6?1:0">6</option>
+                                                <option value="9" ng-selected="form.periodNumber==9?1:0">6</option>
+                                            </select>
+                                            <span class="input-group-addon">期</span>
+                                        </div>
+                                        <span class="help-block m-b-none"
+                                              translate="capitalproduct.periodNumber.placeholder"></span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"
+                                           translate="capitalproduct.creditorAmountMin.label"></label>
+                                    <div class="col-sm-8">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" ng-model="form.creditorAmountMin">
+                                            <span class="input-group-addon">元</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"
+                                           translate="capitalproduct.creditorAmountMax.label"></label>
+                                    <!--<label class="col-sm-2 control-label">最大放款金额（元）</label>-->
+                                    <div class="col-sm-8">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" ng-model="form.creditorAmountMax">
+                                            <span class="input-group-addon">元</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"
+                                           translate="capitalproduct.repaymentMethodCode.self.label"></label>
+                                    <!--<label class="col-sm-2 control-label">还款规则</label>-->
+                                    <div class="col-sm-8">
+                                        <select ng-model="repaymentMethodCodeVal"
+                                                class="form-control m-b"
+                                                ng-options="y.label for (x,y) in repaymentMethodCode">
+                                            <option value="">不选择</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"
+                                           translate="capitalproduct.creditorInterest.label"></label>
+                                    <!--<label class="col-sm-2 control-label">利息</label>-->
+                                    <div class="col-sm-8">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" ng-model="form.creditorInterest"
+                                                   required>
+                                            <span class="input-group-addon">%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"
+                                           translate="capitalproduct.creditorDepartment.label"></label>
+                                    <!--<label class="col-sm-2 control-label">资方组织</label>-->
+                                    <div class="col-sm-8">
+                                        <select ng-model="departmentVal"
+                                                class="form-control m-b"
+                                                ng-options="y.label for (x,y) in department">
+                                            <option value="">不选择</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"
+                                           translate="capitalproduct.creditorRepaymentDay.label"></label>
+                                    <!--<label class="col-sm-2 control-label">要求公司还款给资方的日序</label>-->
+                                    <div class="col-sm-8">
+                                        <div class="input-group">
+                                            <input type="text" ng-model="form.creditorRepaymentDay"
+                                                   class="form-control">
+                                            <span class="input-group-addon">号</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"
+                                           translate="capitalproduct.creditorRepaymentBankcard.label"></label>
+                                    <div class="col-sm-8">
+                                        <select ng-model="bankcardVal"
+                                                class="form-control m-b"
+                                                ng-options="y.accountIdentity for (x,y) in bankcard">
+                                            <option value="">不选择</option>
+                                        </select>
+
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"
+                                           translate="capitalproduct.overdueGraceDays.label"></label>
+                                    <div class="col-sm-8">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" ng-model="form.overdueGraceDays">
+                                            <span class="input-group-addon">天</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"
+                                           translate="capitalproduct.overduePenaltyInterestRate.label"></label>
+                                    <div class="col-sm-8">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control"
+                                                   ng-model="form.overduePenaltyInterestRate" required>
+                                            <span class="input-group-addon">%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"
+                                           translate="capitalproduct.description.label"></label>
+                                    <div class="col-sm-8">
+                                        <textarea class="form-control" cols="30" rows="7"
+                                                  ng-model="form.description"></textarea>
+                                    </div>
+                                </div>
+
+                                <!--<div class="form-group">-->
+                                <!--<label class="col-sm-2 control-label"-->
+                                <!--translate="capitalproduct.creditorRepaymentAccount.label"></label>-->
+                                <!--&lt;!&ndash;<label class="col-sm-2 control-label">还款账户（银行）</label>&ndash;&gt;-->
+                                <!--<div class="col-sm-8">-->
+                                <!--<input type="text" ng-model="form.creditorRepaymentAccount"-->
+                                <!--class="form-control">-->
+                                <!--</div>-->
+                                <!--</div>-->
+                                <!--<div class="form-group">-->
+                                <!--<label class="col-sm-2 control-label"-->
+                                <!--translate="capitalproduct.creditorRepaymentAlipayAccount.label"></label>-->
+                                <!--&lt;!&ndash;<label class="col-sm-2 control-label">还款账户（支付宝）</label>&ndash;&gt;-->
+                                <!--<div class="col-sm-8">-->
+                                <!--<input type="text" ng-model="form.creditorRepaymentAlipayAccount"-->
+                                <!--class="form-control">-->
+                                <!--</div>-->
+                                <!--</div>-->
+                                <!--<div class="form-group">-->
+                                <!--<label class="col-sm-2 control-label"-->
+                                <!--translate="capitalproduct.creditorRepaymentTenpayAccount.label"></label>-->
+                                <!--&lt;!&ndash;<label class="col-sm-2 control-label">还款账户（财付通）</label>&ndash;&gt;-->
+                                <!--<div class="col-sm-8">-->
+                                <!--<input type="text" ng-model="form.creditorRepaymentTenpayAccount"-->
+                                <!--class="form-control">-->
+                                <!--</div>-->
+                                <!--</div>-->
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"
+                                           translate="capitalproduct.sort.label"></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" ng-model="form.sort" class="form-control"
+                                               required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"
+                                           translate="capitalproduct.state.label"></label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" ng-model="state"
+                                                ng-change="changeState(state)"
+                                                ng-options="state.label for state in allStates"></select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-4 col-sm-offset-2">
+                                        <button ng-if="form._links"
+                                                ui-sref="workflowEntity.home.profile.info({id:form_id,entity_key:'capitalproduct'})"
+                                                class="btn btn-default">
+                                            返回
+                                        </button>
+                                        <button ng-if="!form._links"
+                                                ui-sref="workflowEntity.list({entity_key:'capitalproduct',workflow_id:workflow_id})"
+                                                class="btn btn-default">
+                                            返回
+                                        </button>
+                                        <button type="button" ng-click="capitalproductSave()" class="btn btn-primary">保存
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /column -->
+</div>
+<!-- /hbox layout -->

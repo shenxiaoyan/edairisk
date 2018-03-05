@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../../../css/weui.css">
+    <link rel="stylesheet" href="../../../css/weui2.css">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <title>还款计划</title>
+    <link rel="stylesheet" href="../../../css/icon.css">
+    <style>
+        a{
+            color: #000;
+        }
+        a:active{
+            color: #000;
+        }
+        .item{
+            border-top: 1px solid #e8e8e8;
+            background: #fff;
+            padding: 10px 15px;
+            display: block;
+        }
+        .item:active{
+            background: #e8e8e8;
+        }
+    </style>
+
+</head>
+<body style="padding-top: 20px;" id="list">
+    <!--<div class="clearfix item">-->
+        <!--<div class="left" style="text-align: left">-->
+            <!--<p>2015-12-12</p>-->
+            <!--<p>未结清</p>-->
+        <!--</div>-->
+        <!--<div class="right" style="text-align: right">-->
+            <!--<p>应还总额1202121</p>-->
+            <!--<p  style="color: #ccc;">-->
+                <!--<span>利息120</span>-->
+                <!--<span style="margin-left: 10px;">本金20000</span>-->
+            <!--</p>-->
+        <!--</div>-->
+    <!--</div>-->
+
+
+</body>
+<script src="../../../js/jquery-3.2.1.js"></script>
+<script src="../../../js/config.js"></script>
+<script src="../../../js/zepto.min.js"></script>
+<script>
+    if(window.location.search){
+        var href = window.location.href;
+        window.loanId = href.split('?')[1];
+        window.loanId = window.loanId.split('&')[0];
+        window.loanId = window.loanId.split('=')[1];
+        window.creditcardId = href.split('&')[1];
+        window.creditcardId = window.creditcardId.split('=')[1];
+        window.userId = href.split('&')[2];
+        window.userId =  window.userId.split('=')[1];
+    }
+
+    $.ajax({
+        type: 'GET',
+        url:'/rest/creditrepayplans/search/getCreditRepayplanByLoan?loanId='+window.loanId,
+        data: {} ,
+        headers: {
+            app_code:"WULIUQIANZHUANG",
+            client:"wechat"
+        },
+        success: function (res) {
+            var dataArr = res._embedded.creditrepayplans;
+
+            var newArr =dataArr.sort(sortId)
+            function sortId(a,b){
+                return a.id-b.id
+            }
+
+            var times =0;
+            $.each(newArr,function (key,val) {
+                times += 1;
+                $.ajax({
+                    type: 'GET',
+                    async: false,
+                    url:'/rest/creditrepayplans/'+val.id+'/state',
+                    data: {} ,
+                    headers: {
+                        app_code:"WULIUQIANZHUANG",
+                        client:"wechat"
+                    },
+                    success: function (res) {
+                        val.stateCode = res.stateCode;
+                        val.state = res.label;
+                    } ,error:function (res) {
+                        console.log(res)
+                    },
+                    dataType: 'json'
+                });
+
+                if(times == newArr.length){
+                    var arr = newArr
+                    $.each(arr,function (key,val) {
+
+                        var str ='<a planid="'+val.id+'" state="'+val.stateCode+'" href="repayment.html?planid='+val.id+'&loanid='+window.loanId+'&creditcardId='+window.creditcardId+'&userid='+window.userId+'" class="clearfix item"><div class="left" style="text-align: left"><p>'+(val.debtorRepaymentDate).split(' ')[0]+'</p><p>'+val.state+'</p></div><div class="right" style="text-align: right"><p>应还总额'+val.fees+'</p><p  style="color: #ccc;"><span>利息'+val.interest+'</span><span style="margin-left: 10px;">本金'+val.principal+'</span></p></div></a>'
+                       // var str = '<a  class="clearfix item"><div class="left" style="text-align: left"><p>第'+(key+1)+'期'+(val.debtorRepaymentDate).split(' ')[0]+'</p><p>'+val.state+'</p></div><div class="right" style="text-align: right"><p>'+val.fees+'</p><p  style="color: #ccc;"><span>利息</span><span>'+val.interest+'</span></p></div></a>\n'
+                        $('#list').append(str)
+                    })
+                }
+
+            })
+
+
+        } ,error:function (res) {
+          console.log(res)
+        },
+        dataType: 'json'
+    });
+
+
+    $(document).on('click','.item',function(e){
+        var state = $(this).attr('state');
+        var href = $(this).attr('href');
+        e.preventDefault();
+        //已出账才能跳转
+        if(state == 'ACCOUNTED'){
+            var planid = $(this).attr('planid');
+
+            $.ajax({
+                type: 'GET',
+                url:'/rest/creditrepayplans/'+planid+'/creditrepayment',
+                data: {} ,
+                headers: {
+                    app_code:"WULIUQIANZHUANG",
+                    client:"wechat"
+                },
+                success: function (res) {
+                    var resArr = res._embedded.creditrepayments;
+                    if(resArr.length !== 0){
+                        var times =0;
+                        $.each(resArr,function (key,val) {
+                            $.ajax({
+                                type: 'GET',
+                                url:'/rest/creditrepayments/'+val.id+'/state',
+                                data: {} ,
+                                headers: {
+                                    app_code:"WULIUQIANZHUANG",
+                                    client:"wechat"
+                                },
+                                success: function (res) {
+
+                                    val.stateCode=res.stateCode;
+                                    console.log(times)
+                                    times += 1;
+
+                                    if( resArr.length == times){
+                                        console.log(resArr);
+                                        var isHaveOverdue = 0;
+                                        $.each(resArr,function (k,v) {
+                                            if( v.stateCode == 'CREATED'){
+                                                isHaveOverdue =1;
+                                            }
+                                        })
+
+                                        if(isHaveOverdue == 0){
+                                            console.log(isHaveOverdue)
+                                            window.location.href=href;
+                                        }else {
+                                            $.alert('该还款正在审核,请通过审核后再还款!')
+                                        }
+                                    }
+
+
+                                } ,error:function (res) {
+                                    console.log(res)
+                                },
+                                dataType: 'json'
+                            });
+                        })
+                    }else {
+                        window.location.href=href;
+                    }
+
+
+                } ,error:function (res) {
+                    console.log(res)
+                },
+                dataType: 'json'
+            });
+        }else {
+            $.alert('账单待出账或已结清状态不能还款!')
+            $(this).attr('href','#')
+            e.preventDefault();
+        }
+
+//        if($(e.target)[0].tagName == 'A'){
+//            console.log($(e.target)[0].attributes)
+//            if($(e.target)[0].attributes){
+//                e.preventDefault();
+//            }
+//            e.preventDefault();
+//        }else {
+//            e.preventDefault();
+//        }
+
+    });
+
+</script>
+</html>

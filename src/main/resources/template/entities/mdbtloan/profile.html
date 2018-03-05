@@ -1,0 +1,96 @@
+<div class="vbox bg-white">
+    <div class="wrapper bg-white b-b clearfix">
+        <button class="pull-left btn btn-sm btn-primary btn-addon"
+                onclick="window.history.go(-1)"
+                ng-if="profile.workflow.id">
+            <i class="fa fa-arrow-left"></i>
+            返回
+        </button>
+        <!--<ul class="nav nav-pills nav-sm pull-right">-->
+            <!--<li ui-sref-active="active">-->
+                <!--<a ui-sref="workflowEntity.home.profile.info({entity_key: 'mdbtloan'})">主页</a>-->
+            <!--</li>-->
+            <!--<li ui-sref-active="active">-->
+                <!--<a ui-sref="workflowEntity.home.profile.page({entity_key:'loan',view_type:'log'})">被操作记录</a>-->
+            <!--</li>-->
+        <!--</ul>-->
+    </div>
+    <!--<div class="wrapper b-b b-light clearfix">-->
+        <!--<button ng-class="act.btnClass"-->
+                <!--ng-click="loanExcute[act.actCode]()"-->
+                <!--tooltip="{{act.help}}"-->
+                <!--tooltip-placement="bottom"-->
+                <!--ng-repeat="act in canActs">-->
+            <!--<i ng-class="act.iconClass"></i> {{act.label}}-->
+        <!--</button>-->
+    <!--</div>-->
+
+    <div class="wrapper">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        面单白条借款信息
+                    </div>
+                    <table class="table table-striped m-b-none">
+                        <tbody>
+                        <tr>
+                            <td class="v-middle text-right w-sm">借款单号：</td>
+                            <td class="v-middle w-xl">{{ profile.orderNo }}</td>
+                            <td class="v-middle text-right w-sm">操作人姓名：</td>
+                            <td class="v-middle w-xl">{{ profile.debtorName }}</td>
+                        </tr>
+                        <tr>
+                            <td class="v-middle text-right w-sm">法人姓名：</td>
+                            <td class="v-middle w-xl">{{ profile.debtorPerson.name }}</td>
+                            <td class="v-middle text-right w-sm">采购单位：</td>
+                            <td class="v-middle w-xl">{{ profile.purchasingUnit }}</td>
+                        </tr>
+                        <tr>
+                            <td class="v-middle text-right w-sm">借款本金：</td>
+                            <td class="v-middle w-xl">{{ profile.principal}}</td>
+                            <td class="v-middle text-right w-sm">借款利息：</td>
+                            <td class="v-middle w-xl">{{ profile.totalInterest }}</td>
+                        </tr>
+                        <tr>
+                            <td class="v-middle text-right w-sm">借款本息：</td>
+                            <td class="v-middle w-xl">{{ profile.principal + profile.totalInterest}}</td>
+                            <td class="v-middle text-right w-sm">剩余应还本息：</td>
+                            <td class="v-middle w-xl">{{ profile.remainAmount }}</td>
+                        </tr>
+
+                        <tr>
+                            <td class="v-middle text-right w-sm">借款申请日期：</td>
+                            <td class="v-middle w-xl">{{ profile.applyDate | datetime}}</td>
+                            <td class="v-middle text-right w-sm">借款使用日期：</td>
+                            <td class="v-middle w-xl">{{ profile.useDate | datetime }}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="wrapper bg-white b-b clearfix">
+        <ul class="nav nav-pills nav-sm">
+            <li ui-sref-active="active">
+                <a ui-sref="workflowEntity.home.profile.page({entity_key:'mdbtloan',view_type:'firstphase'})">第一期还款信息</a>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="workflowEntity.home.profile.page({entity_key:'mdbtloan',view_type:'secondphase'})">第二期还款信息</a>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="workflowEntity.home.profile.page({entity_key:'mdbtloan',view_type:'thirdphase'})">第三期还款信息</a>
+            </li>
+            <!--<li ui-sref-active="active">-->
+            <!--<a ui-sref="workflowEntity.home.profile.page({entity_key:'capitalproduct',view_type:'log'})">操作记录</a>-->
+            <!--</li>-->
+        </ul>
+    </div>
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner" ui-view=""></div>
+        </div>
+    </div>
+</div>

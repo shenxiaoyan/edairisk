@@ -1,0 +1,145 @@
+<script>
+    /*
+     * 创建人：刘雅倩
+     * 创建时间：2017/08/16
+     * 集团看到的注册用户数量
+     *
+     * */
+    "use strict";
+    app.controller("groupLoginCtrl", [
+        "$scope",
+        function($scope) {
+            //测试用的
+
+            $scope.branchList = [
+                {
+                    name: "公司",
+                    login: "560000",
+                    fee: "5120000"
+                }
+            ];
+
+            $scope.brandChart = echarts.init(document.getElementById('branch_dashboard_chart'));
+
+            $scope.option = {
+                tooltip: {
+                    trigger: 'item',
+                    formatter: "{a} <br/>{b}: {c} ({d}%)"
+                },
+                legend: {
+                    orient: 'vertical',
+                    x: 'left',
+                    data:['公司1','公司2','公司3','公司4','公司5','公司6']
+                },
+                series: [
+                    {
+                        name:'访问来源',
+                        type:'pie',
+                        selectedMode: 'single',
+                        radius: [0, '30%'],
+
+                        label: {
+                            normal: {
+                                position: 'inner'
+                            }
+                        },
+                        labelLine: {
+                            normal: {
+                                show: false
+                            }
+                        },
+                        data:[
+                            {value:335, name:'总注册', selected:true},
+                            {value:679, name:'审核中'},
+                            {value:1548, name:'未成功注册'}
+                        ]
+                    },
+                    {
+                        name:'访问来源',
+                        type:'pie',
+                        radius: ['40%', '55%'],
+
+                        data:[
+                            {value:335, name:'公司1'},
+                            {value:310, name:'公司2'},
+                            {value:234, name:'公司3'},
+                            {value:135, name:'公司4'},
+                            {value:1048, name:'公司5'},
+                            {value:251, name:'公司6'}
+                        ]
+                    }
+                ]
+            };
+
+            $scope.brandChart.setOption($scope.option);
+
+            //窗口大小改变时重新绘制图表
+            $(window).resize(function() {
+                $scope.brandChart.resize();
+            });
+        }
+    ]);
+</script>
+
+<div class="hbox hbox-auto-xs lter" ng-controller="groupLoginCtrl">
+    <!-- column -->
+    <div class="col">
+        <div class="vbox">
+            <div class="bg-light lter b-b clearfix" style="padding: 14.5px 20px;">
+                <select class="pull-left m-r-sm input-sm form-control w-sm inline v-middle" ng-options="branch.name for branch in branchList" ng-model="branch">
+                    <option value=""> --请选择公司-- </option>
+                </select>
+
+                <div class="pull-right">
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-default" ng-click="changeView()">今天</button>
+                        <button class="btn btn-sm btn-default" ng-click="changeView()">昨天</button>
+                        <button class="btn btn-sm btn-default" ng-click="changeView()">前天</button>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-default" ng-click="changeView('agendaDay')">本周</button>
+                        <button class="btn btn-sm btn-default" ng-click="changeView('agendaWeek')">上周</button>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-default" ng-click="changeView('month')">本月</button>
+                        <button class="btn btn-sm btn-default" ng-click="changeView('month')">上月</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner wrapper-md">
+                        <div style="padding-top: 0;">
+                            <div class="panel wrapper">
+                                <div id="branch_dashboard_chart" style="height:400px;"></div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="table-responsive">
+                                <table class="table table-striped b-t b-light">
+                                    <thead>
+	                                    <tr>
+	                                        <th>公司</th>
+	                                        <th>总注册量</th>
+	                                        <th>注册审核中</th>
+	                                        <th>未注册成功</th>
+	                                    </tr>
+                                    </thead>
+                                    <tbody>
+	                                    <tr ng-repeat="list in branchList">
+	                                        <td><span class="pull-left waybill_item_number"><a>{{ list.name}}</a></span></td>
+	                                        <td class="report_amount"><span class="text-ellipsis">{{ list.login }}</span></td>
+	                                        <td class="report_amount"><span class="text-ellipsis">{{ list.login }}</span></td>
+	                                        <td class="report_amount"><span class="text-ellipsis">{{ list.fee }}</span></td>>
+	                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

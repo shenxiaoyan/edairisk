@@ -1,0 +1,94 @@
+
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light">
+
+
+	<div class="col w-md ">
+
+		<div class="vbox">
+			<div class="wrapper-md b-b">
+				<div class="font-thin h4">标的</div>
+			</div>
+			<div class="wrapper b-b">
+
+				<div class="btn-group  w-full">
+					<button type="button" ui-sref="orders.create({product_id:'1'})"
+						class="btn btn-sm btn-danger">新建</button>
+					<button type="button"
+						class="btn btn-sm btn-danger dropdown-toggle   btn-addon"
+						data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						<span class="caret"></span> <span class="sr-only">Toggle
+							Dropdown</span>
+					</button>
+					<ul class="dropdown-menu">
+						<li><a ui-sref="orders.create({product_id:'1'})">网店贷</a></li>
+						<li role="separator" class="divider"></li>
+						<li><a ui-sref="orders.create({product_id:'2'})">汽车按揭</a></li>
+						<li><a ui-sref="orders.create({product_id:'3'})">车抵贷</a></li>
+						<li><a ui-sref="orders.create({product_id:'4'})">车质贷</a></li>
+					</ul>
+				</div>
+			</div>
+			<div class="row-row">
+				<div class="cell scrollable">
+					<div class="cell-inner">
+						<ul class="nav nav-pills nav-stacked nav-sm">
+							<li ui-sref-active="active"><a
+								ui-sref="orders.list({status:'all'})"> &nbsp; <b
+									class="badge bg-info pull-right">312</b> <b>全部</b></a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="orders.list({status:'unsubmit'})"> &nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;待提交
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="orders.list({status:'comfirmed'})"> &nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;待审核/待处理
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="orders.list({status:'auto_risk'})"> &nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;自动风控
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="orders.list({status:'manual_risk'})"> &nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;风控阶段
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="orders.list({status:'loaning'})"> &nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;放款阶段
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="orders.list({status:'loaned'})"> &nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;已放款/还款中
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="orders.list({status:'outday'})"> &nbsp;&nbsp;<b
+									class="badge bg-warning pull-right">3</b> <i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;逾期
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="orders.list({status:'bad_debt'})"> &nbsp;&nbsp;<b
+									class="badge bg-danger pull-right">31</b> <i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;坏账
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="orders.list({status:'handling'})"> &nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;外部催收/处置
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="orders.list({status:'judicial'})"> &nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;司法处理
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="orders.list({status:'finished'})"> &nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;完结
+							</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+	<div class="col lter" ui-view></div>
+</div>
+<!-- /hbox layout -->

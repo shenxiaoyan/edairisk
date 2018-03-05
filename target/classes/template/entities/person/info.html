@@ -1,0 +1,149 @@
+<div class="wrapper">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    自然人详细信息
+                </div>
+                <table class="table table-striped m-b-none">
+                    <tbody>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="person.name.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.name | nullToString }}</td>
+                        <td class="v-middle text-right">
+                            <span translate="person.alias.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.alias | nullToString }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="person.mobile1.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.mobile1 | nullToString }}</td>
+                        <td class="v-middle text-right">
+                            <span translate="person.mobile2.label"></span>：
+                        </td>
+                        <td class="v-middle">{{ profile.mobile2 | nullToString }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="person.maritalStatus.self.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.maritalStatus | nullToString }}</td>
+                        <td class="v-middle text-right">
+                            <span translate="person.state.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.state.label | nullToString }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="person.identity.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.identity | nullToString }}</td>
+                        <td class="v-middle text-right">
+                            <span translate="person.birthday.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.birthday | toLocalDate }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="person.education.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.education | nullToString }}</td>
+                        <td class="v-middle text-right">
+                            <span translate="person.telephone.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.telephone | nullToString }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="person.qq.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.qq | nullToString }}</td>
+                        <td class="v-middle text-right">
+                            <span translate="person.email.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.email | nullToString }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="person.homeAddress.label"></span>：
+                        </td>
+                        <td class="v-middle b-r" colspan="3">{{ (profile.homeProvince + profile.homeCity +
+                            profile.homeDistrict + profile.homeTown + profile.homeAddress) | nullToString }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="person.letterTo.label"></span>：
+                        </td>
+                        <td class="v-middle b-r" colspan="3">{{ profile.letterTo | nullToString }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="person.creditGrant.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.creditGrant | nullToString }}</td>
+                        <td class="v-middle text-right">
+                            <span translate="person.jobGrade.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.jobGrade | nullToString }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="person.companyName.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.companyName | nullToString }}</td>
+                        <td class="v-middle text-right">
+                            <span translate="person.companyTelephone.label"></span>：
+                        </td>
+                        <td class="v-middle">{{ profile.companyTelephone | nullToString }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="person.companyAddress.label"></span>：
+                        </td>
+                        <td class="v-middle b-r" colspan="3">{{ (profile.companyProvince + profile.companyCity +
+                            profile.companyDistrict + profile.companyTown + profile.companyAddress ) | nullToString}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="person.description.label"></span>：
+                        </td>
+                        <td class="v-middle b-r" colspan="3">{{ profile.description | nullToString }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="person.createdBy.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.createdBy.nickname | nullToString }}</td>
+                        <td class="v-middle text-right">
+                            <span translate="person.createdAt.label"></span>：
+                        </td>
+                        <td class="v-middle">{{ profile.createdAt | datetime }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="person.createdByDepartment.label"></span>：
+                        </td>
+                        <td class="v-middle" colspan="3">{{ profile.createdByDepartment.label | nullToString }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="person.lastModifiedBy.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.lastModifiedBy.nickname | nullToString }}</td>
+                        <td class="v-middle text-right">
+                            <span translate="person.lastModifiedAt.label"></span>：
+                        </td>
+                        <td class="v-middle">{{ profile.lastModifiedAt | datetime }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

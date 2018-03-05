@@ -1,0 +1,335 @@
+<script>
+    app.controller("orderrzzlHomeController",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "$state",
+            "entity",
+            function ($rootScope, $scope, $http, $stateParams, $state, entity) {
+
+                $scope.id = $stateParams.id;
+
+                $scope.profile     = {};
+                $scope.canActs     = [];
+                $scope.canFileActs = [];
+
+                /*
+                * 上传文件表头
+                * */
+                $scope.headerInformation = "";
+                $scope.promptInformation = "";
+
+                /*
+                *上传打包好的zipURL
+                * */
+                $scope.zipURL = "";
+
+
+                $scope.getProfile = function () {
+
+                    entity.getDetail("/rest/orderrzzls/" + $scope.id, ["createdBy", "state", "person", "workflow"]).then(function (resResult) {
+
+                        $scope.profile = resResult;
+
+                        angular.forEach($scope.profile.currentUserCanActList, function (val, key) {
+                            if (val.actGroup === "UPDATE" || val.actGroup === "OPERATE" || val.actGroup === "FILE_PACKAGE") {
+                                $scope.canActs.push(val);
+                            } else if (val.actGroup === "FILE_OPERATE") {
+                                $scope.canFileActs.push(val)
+                            }
+                        });
+
+                        $scope.state_code   = $scope.profile.state.stateCode;
+                        $scope.stateActList = $scope.profile.stateActList[$scope.state_code];
+
+
+                    });
+                };
+
+                $scope.getProfile();
+
+
+                /*patch方法*/
+                $scope.patchAct = function (type, title, url, data) {
+                    swal({
+                        title: title,
+                        type: type,
+                        showCancelButton: true,
+                        cancelButtonText: "退出",
+                        confirmButtonText: "同意",
+                        closeOnConfirm: true
+                    }, function () {
+                        $http({
+                            method: "PATCH",
+                            url: url,
+                            data: data
+                        }).success(function (resResult) {
+
+                            $state.go("workflowEntity.list", {entity_key: "orderrzzl"}, {reload: true});
+
+                        });
+                    });
+                };
+
+
+                /*大方法的对象*/
+                $scope.orderrzzlExcute = {
+
+                    /*关闭*/
+                    "disable": function () {
+                        $scope.patchAct("error", "这条客户信息是否关闭", "/rest/orderrzzls/" + $scope.id, {act: "disable"});
+                    },
+
+                    "downloadFile": function () {
+                        swal({
+                            title: "是否下载所有图片",
+                            type: "warning",
+                            showCancelButton: true,
+                            cancelButtonText: "退出",
+                            confirmButtonText: "同意",
+                            closeOnConfirm: true
+                        }, function () {
+                            html = '<div style="position: fixed;top: 50%;right: 50%" class="sk-spinner sk-spinner-cube-grid" id="loadAction">' +
+                                '<div class="sk-cube"></div>' +
+                                '<div class="sk-cube"></div>' +
+                                '<div class="sk-cube"></div>' +
+                                '<div class="sk-cube"></div>' +
+                                '<div class="sk-cube"></div>' +
+                                '<div class="sk-cube"></div>' +
+                                '<div class="sk-cube"></div>' +
+                                '<div class="sk-cube"></div>' +
+                                '<div class="sk-cube"></div>' +
+                                '</div>';
+                            $("body").append(html);
+
+                            $http({
+                                method: "PATCH",
+                                url: "/rest/orderrzzls/" + $scope.id,
+                                data: {act: "downloadFile"}
+                            }).success(function (resResult) {
+                                $("#loadAction").remove();
+                                if (resResult.filePackage) {
+                                    $("#loadAction").remove();
+                                    var form = $("<form>");//定义一个form表单
+                                    form.attr("style", "display:none");
+                                    form.attr("target", "");
+                                    form.attr("method", "get");
+                                    form.attr("action", "http://files.xiaojinpingtai.com/" + resResult.filePackage.newFileName);
+
+                                    $("body").append(form);//将表单放置在web中
+                                    form.submit();
+                                } else {
+                                    $("#loadAction").remove();
+                                    $rootScope.toasterWarning("注意", "该用户没有上传任何的图片！");
+                                }
+                            });
+                        });
+
+
+                    },
+
+                    /*分配客服*/
+                    "distribution": function () {
+                        $("#" + $scope.profile.id + "_distribution").modal("show");
+                    },
+                    "distributionSave": function (val) {
+                        if (val) {
+                            $http({
+                                method: "PATCH",
+                                url: "/rest/orderrzzls/" + $scope.id,
+                                data: {
+                                    act: "distribution",
+//                                    notice: val.openid,
+                                    serviceId: val.id
+                                }
+                            }).success(function (resResult) {
+                                $("#" + $scope.profile.id + "_distribution").modal("hide");
+                                $state.go("workflowEntity.list", {entity_key: "orderrzzl"}, {reload: true});
+                            });
+                        } else {
+                            $rootScope.toasterWarning("注意", "请选择一个客服经理！");
+                        }
+                    },
+
+
+                    /*提交资料*/
+                    "application": function () {
+                        $scope.patchAct("success", "这条客户信息是否提交", "/rest/orderrzzls/" + $scope.id, {act: "application"});
+                    },
+
+                    /*匹配销售产品*/
+                    "matching": function () {
+                        $("#" + $scope.profile.id + "_matching").modal("show");
+                    },
+
+                    /*匹配销售产品保存*/
+                    "matchingSave": function (val) {
+                        if (val) {
+                            $http({
+                                method: "PATCH",
+                                url: "/rest/orderrzzls/" + $scope.id,
+                                data: {
+                                    act: "matching",
+                                    product: val._links.product.href
+                                }
+                            }).success(function (resResult) {
+                                $("#" + $scope.profile.id + "_matching").modal("hide");
+                                $state.go("workflowEntity.list", {entity_key: "orderrzzl"}, {reload: true});
+                            });
+                        } else {
+                            $rootScope.toasterWarning("注意", "请选择一个销售产品！");
+                        }
+
+                    },
+
+
+                    /*修改额度*/
+                    "modifyApplyAmount": function () {
+                        $("#" + $scope.profile.id + "_modifyApplyAmount").modal("show");
+                    },
+
+                    "modifyApplyAmountSave": function (val) {
+                        console.log(val)
+                        if (val) {
+                            if ((10000 <= val) && (val <= 2000000)) {
+                                $http({
+                                    method: "PATCH",
+                                    url: "/rest/orderrzzls/" + $scope.id,
+                                    data: {
+                                        act: "modifyApplyAmount",
+                                        applyAmount: val
+                                    }
+                                }).success(function (resResult) {
+                                    if (resResult) {
+                                        $("#" + $scope.profile.id + "_modifyApplyAmount").modal("hide");
+                                        $state.reload();
+                                        $rootScope.toasterSuccess("成功", "额度修改成功！");
+                                    }
+                                });
+                            } else {
+                                $rootScope.toasterWarning("注意", "额度不能低于10000且不能超过2000000！");
+                            }
+                        } else {
+                            $rootScope.toasterWarning("注意", "请输入修改额度！");
+                        }
+
+                    },
+                    /*修改身份证*/
+                    "changeID": function () {
+                        $("#" + $scope.profile.id + "_changeID").modal("show");
+                    },
+                    "changeIDSave": function (val) {
+                        if (val) {
+                            if (val.length == 18 || val.length == 15) {
+                                $http({
+                                    method: "PATCH",
+                                    url: "/rest/orderrzzls/" + $scope.id,
+                                    data: {
+                                        act: "changeID",
+                                        applyIdentityNo: val
+                                    }
+                                }).success(function (resResult) {
+                                    console.log(resResult)
+                                    if (resResult.ErrorCode == 4561) {
+                                        $rootScope.toasterWarning("注意", resResult.ErrorInfo);
+                                    } else {
+                                        $("#" + $scope.profile.id + "_changeID").modal("hide");
+                                        $state.reload();
+                                        $rootScope.toasterSuccess("成功", "身份证修改成功！");
+                                    }
+                                }).error(function (resResult) {
+                                    $rootScope.toasterWarning("注意", "身份证有误请检查！");
+                                })
+                            } else {
+                                $rootScope.toasterWarning("注意", "身份证有误请检查！");
+                            }
+                        } else {
+                            $rootScope.toasterWarning("注意", "请输入身份证再提交！");
+                        }
+
+                    },
+
+                    /*驳回打开modal*/
+                    "failed": function () {
+                        $("#" + $scope.profile.id + "_failed").modal("show");
+                    },
+                    /*驳回理由加改变状态*/
+                    "failedSave": function (failedVal) {
+                        if (failedVal) {
+                            $http({
+                                method: "PATCH",
+                                url: "/rest/orderrzzls/" + $scope.id,
+                                data: {
+                                    act: "failed",
+                                    comment: failedVal
+                                }
+                            }).success(function (resResult) {
+                                $("#" + $scope.profile.id + "_failed").modal("hide");
+//                                $state.go("workflowEntity.list", {entity_key: "orderwdsjsh"}, {reload: true});
+                            });
+
+                        } else {
+                            $rootScope.toasterWarning("注意", "请填写详细的未通过理由，以方便客户提交数据！");
+                        }
+                    },
+
+
+                    /*同意 同时并向客户发合同*/
+                    "adopt": function () {
+//                        $("#" + $scope.profile.id + "_upload").modal("show");
+                        $scope.patchAct("success", "这条客户信息是否能通过", "/rest/orderrzzls/" + $scope.id, {act: "adopt"});
+                    },
+
+                    /*签约*/
+                    "sign": function () {
+                        $scope.patchAct("success", "这条客户信息是否能签约", "/rest/orderrzzls/" + $scope.id, {act: "sign"});
+                    },
+
+                    "updateSave": function () {
+                        $scope.profile.act = "update";
+                        delete $scope.profile.createdBy;
+                        $http({
+                            method: "PATCH",
+                            url: "/rest/orderrzzls/" + $scope.id,
+                            data: $scope.profile
+                        }).success(function (resResult) {
+                            if (resResult) {
+                                $rootScope.toasterSuccess("成功", "修改成功");
+                                $state.reload();
+                            }
+
+                        });
+                    },
+
+
+                    "update": function () {
+                        $state.go("workflowEntity.home.profile.form", {
+                            id: $scope.id,
+                            entity_key: "orderrzzl"
+                        }, {reload: false});
+                    }
+                };
+
+
+                /*模态框显示图片*/
+                $scope.imgSrc = null;
+                $scope.showImgModel=function ($event) {
+                    console.log($event.target.src)
+                    $scope.imgSrc = $event.target.src;
+                    $('#imgModel').modal('show')
+                }
+            }
+        ]
+    );
+</script>
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light" ng-controller="orderrzzlHomeController">
+    <!-- column -->
+    <div class="col w-md lter b-l">
+        <div class="h-full" ui-view></div>
+    </div>
+    <!-- /column -->
+</div>
+<!-- /hbox layout -->

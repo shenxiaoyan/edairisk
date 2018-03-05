@@ -1,0 +1,311 @@
+<script>
+    "use strict";
+    app.controller("bankcardFormController",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "$state",
+            "entity",
+            function ($rootScope, $scope, $http, $stateParams, $state, entity) {
+
+                /*
+                 * bank
+                 * */
+                $scope.allBanks = [];
+                $scope.Bank     = [];
+
+                /*
+                 * state
+                 * */
+                $scope.allStates = [];
+                $scope.state     = [];
+
+
+                /*
+                * 获取users 资源
+                * */
+                $scope.userLink = null;
+                entity.getDetail("rest/users/" + $rootScope.myinfo.id).then(function (resResult) {
+                    $scope.userLink = resResult._links.self.href;
+                });
+
+
+                //时间控件开始
+                //控制点击日历图表弹出选择框
+                $scope.open = function ($event) {
+                    $event.preventDefault();
+                    $event.stopPropagation();
+                    $scope.opened = true;
+                };
+
+                //时间控件属性设置 参考http://www.cnblogs.com/pilixiami/p/5611346.html
+                $scope.dateOptions = {
+                    formatYear: "yy",
+                    startingDay: 1,
+                    class: "datepicker"
+                };
+                //时间控件结束
+
+
+                if ($stateParams.id) {
+
+                    $scope.id = $stateParams.id;
+
+
+                    entity.getDetail("rest/bankcards/" + $stateParams.id).then(function (resResult) {
+
+                        $scope.form = resResult;
+
+                        //状态列表
+                        entity.getList("rest/bankcardStates").then(function (resResult) {
+                            $scope.allStates = resResult._embeddedItems;
+                            entity.getDetail($scope.form._links.state.href).then(function (resResult) {
+                                $scope.state = entity.getSelectedMyOwn($scope.allStates, resResult);
+                            });
+                        });
+
+                        //列表
+                        entity.getList("rest/banks").then(function (resResult) {
+                            $scope.allBanks = resResult._embeddedItems;
+                            entity.getDetail($scope.form._links.bank.href).then(function (resResult) {
+                                $scope.bank = entity.getSelectedMyOwn($scope.allBanks, resResult);
+                            });
+
+                        });
+
+                    });
+
+                } else {
+
+                    $scope.form = {};
+
+                    /*bank列表*/
+                    entity.getList("rest/banks").then(function (resResult) {
+                        $scope.allBanks = resResult._embeddedItems;
+                        $scope.bank     = $scope.allBanks[0];
+                    });
+
+                    //状态列表
+                    entity.getList("rest/bankcardStates").then(function (resResult) {
+                        $scope.allStates = resResult._embeddedItems;
+                        $scope.state     = $scope.allStates[0];
+                    });
+
+                    $scope.form.isOnline = true;
+                }
+
+
+                $scope.saveBankcard = function () {
+
+                    $scope.form.bank  = $scope.bank ? $scope.bank._links.self.href : null;
+                    $scope.form.user  = $scope.userLink ? $scope.userLink : null;
+                    $scope.form.state = $scope.state ? $scope.state._links.self.href : null;
+
+                    if ($scope.form._links) {
+
+                        $scope.form.act = "update";
+
+                        $http({
+                            method: "PATCH",
+                            url: $scope.form._links.self.href,
+                            data: $scope.form
+                        }).success(function (resResult) {
+                            $state.go("auditEntity.home.profile.info", {
+                                id: resResult.id,
+                                entity_key: "bankcard"
+                            }, {reload: true});
+                            $rootScope.toasterSuccess("修改成功！", "银行卡修改成功！");
+                        });
+
+                    } else {
+
+                        $scope.form.act = "create";
+
+                        $http({
+                            method: "POST",
+                            url: "rest/bankcards",
+                            data: $scope.form
+                        }).success(function (resResult) {
+                            $state.go("auditEntity.list", {entity_key: "bankcard"}, {reload: true});
+                            $rootScope.toasterSuccess("保存成功！", "银行卡保存成功！");
+                        });
+
+                    }
+
+                };
+
+            }
+        ]
+    )
+</script>
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs" ng-controller="bankcardFormController">
+    <!-- column -->
+    <div class="col w-md lter b-l">
+        <div class="vbox">
+            <div class="wrapper b-b" ng-if="!form._links">
+                <div class="font-thin h4">
+                    <span translate="bankcard.self.label"></span>新建
+                </div>
+            </div>
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner">
+                        <div class="wrapper">
+                            <form name="bankcard_form" class="form-horizontal">
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">
+                                        <span class="text-danger">*</span>
+                                        <span translate="bankcard.accountIdentity.label"></span>
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="accountIdentity"
+                                               ng-model="form.accountIdentity"
+                                               required
+                                               pattern="^[0-9]{1,}$">
+                                        <span class="help-block text-danger"
+                                              ng-show="bankcard_form.accountIdentity.$dirty && bankcard_form.accountIdentity.$invalid">
+                                            <i class="fa fa-exclamation-circle text-danger"></i>&ensp;账户号码为数字，且必填
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">
+                                        <span class="text-danger">*</span>
+                                        <span translate="bankcard.bank.label"></span>
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control"
+                                                name="bank"
+                                                ng-model="bank"
+                                                ng-options="y.label for y in allBanks"
+                                                required></select>
+                                        <span class="help-block text-danger"
+                                              ng-show="bankcard_form.bank.$dirty && bankcard_form.bank.$invalid">
+                                            <i class="fa fa-exclamation-circle text-danger"></i>&ensp;所属银行为必填
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"
+                                           translate="bankcard.description.label"></label>
+                                    <div class="col-sm-8">
+                                        <textarea class="form-control" cols="20" rows="7"
+                                                  ng-model="form.description"></textarea>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label" translate="bankcard.branchName.label"></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" ng-model="form.branchName">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">
+                                        <span class="text-danger">*</span>
+                                        <span translate="bankcard.realName.label"></span>
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="realName"
+                                               ng-model="form.realName"
+                                               required>
+                                        <span class="help-block text-danger"
+                                              ng-show="bankcard_form.realName.$dirty && bankcard_form.realName.$invalid">
+                                            <i class="fa fa-exclamation-circle text-danger"></i>&ensp;持有人姓名为必填
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"
+                                           translate="bankcard.isOnline.self.label"></label>
+                                    <div class="col-sm-8">
+                                        <div style="margin-top: 6px">
+                                            <label class="i-checks">
+                                                <input type="radio" ng-value="true" ng-model="form.isOnline"
+                                                       name="isOnline">
+                                                <i></i>
+                                                是
+                                            </label>
+                                            <label class="i-checks">
+                                                <input type="radio" ng-value="false" ng-model="form.isOnline"
+                                                       name="isOnline">
+                                                <i></i>
+                                                否
+                                            </label>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <!--<div class="form-group">-->
+                                <!--<label class="col-sm-2 control-label"-->
+                                <!--translate="bankcard.registerDate.label"></label>-->
+                                <!--<div class="col-sm-8">-->
+                                <!--<div class="input-group">-->
+                                <!--<input type="text"-->
+                                <!--disabled-->
+                                <!--class="form-control"-->
+                                <!--datepicker-popup="yyyy-MM-dd"-->
+                                <!--ng-model="form.registerDate"-->
+                                <!--is-open="opened"-->
+                                <!--datepicker-options="dateOptions"-->
+                                <!--close-text="关闭"-->
+                                <!--clear-text="清空"-->
+                                <!--current-text="今天"/>-->
+                                <!--<span class="input-group-btn">-->
+                                <!--<button type="button" class="btn btn-default" ng-click="open($event)">-->
+                                <!--<i class="fa fa-calendar"></i>-->
+                                <!--</button>-->
+                                <!--</span>-->
+                                <!--</div>-->
+                                <!--</div>-->
+                                <!--</div>-->
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">
+                                        <span class="text-danger">*</span>
+                                        <span translate="bankcard.state.label"></span>
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control"
+                                                name="state"
+                                                ng-model="state"
+                                                ng-options="state.label for state in allStates"
+                                                required></select>
+                                        <span class="help-block text-danger"
+                                              ng-show="bankcard_form.state.$dirty && bankcard_form.state.$invalid">
+                                            <i class="fa fa-exclamation-circle text-danger"></i>&ensp;状态为必填
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-4 col-sm-offset-2">
+                                        <button ng-if="form._links"
+                                                ui-sref="auditEntity.home.profile.info({id:id,entity_key:'bankcard'})"
+                                                class="btn btn-default">返回
+                                        </button>
+                                        <button ng-if="!form._links"
+                                                ui-sref="auditEntity.list({entity_key:'bankcard'})"
+                                                class="btn btn-default">返回
+                                        </button>
+                                        <button type="button"
+                                                class="btn btn-primary"
+                                                ng-disabled="bankcard_form.$invalid"
+                                                ng-click="saveBankcard()">保存
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /column -->
+</div>
+<!-- /hbox layout -->

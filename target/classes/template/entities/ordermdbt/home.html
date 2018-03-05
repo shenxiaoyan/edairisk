@@ -1,0 +1,622 @@
+<script>
+    app.controller("ordermdbtHomeController",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "$state",
+            "FileUploader",
+            "entity",
+            function ($rootScope, $scope, $http, $stateParams, $state, FileUploader, entity) {
+
+                $scope.id = $stateParams.id;
+
+                $scope.profile     = {};
+                $scope.canActs     = [];
+                $scope.canFileActs = [];
+
+                /*
+                * 上传文件表头
+                * */
+                $scope.headerInformation = "";
+                $scope.promptInformation = "";
+
+                /*
+                *上传打包好的zipURL
+                * */
+                $scope.zipName = "";
+
+                entity.getDetail("/rest/ordermdbts/" + $scope.id, ["createdBy", "state", "person", "workflow","company"]).then(function (resResult) {
+
+                    $scope.profile = resResult;
+                    console.log($scope.profile);
+                    angular.forEach($scope.profile.currentUserCanActList, function (val, key) {
+                        if (val.actGroup === "UPDATE" || val.actGroup === "OPERATE" || val.actGroup === "FILE_PACKAGE") {
+                            $scope.canActs.push(val);
+                        } else if (val.actGroup === "FILE_OPERATE") {
+                            $scope.canFileActs.push(val)
+                        }
+                    });
+
+                    console.log($scope.canActs)
+
+                    $scope.state_code   = $scope.profile.state.stateCode;
+                    $scope.stateActList = $scope.profile.stateActList[$scope.state_code];
+
+//                    if ($scope.state_code === "ENABLED") {
+//
+//                        /*开卡成功*/
+//                        $scope.accountShow = false;
+//                        $scope.accountList = {};
+//
+//                        $http.get("/rest/accounts/search/findByPerson_id?personId=" + $scope.profile.person.id).success(function (resResult) {
+//
+//                            if (resResult) {
+//                                $scope.accountShow = true;
+//                                $scope.accountList = resResult;
+//
+//                                $http.get($scope.accountList._links.state.href).success(function (res2) {
+//                                    $scope.accountList.state = res2.stateCode;
+//                                })
+//                            }
+//
+//                        })
+//                    }
+                });
+
+
+                /*patch方法*/
+                $scope.patchAct = function (type, title, url, data) {
+                    swal({
+                        title: title,
+                        type: type,
+                        showCancelButton: true,
+                        cancelButtonText: "退出",
+                        confirmButtonText: "同意",
+                        closeOnConfirm: true
+                    }, function () {
+                        $http({
+                            method: "PATCH",
+                            url: url,
+                            data: data
+                        }).success(function (resResult) {
+
+                            $state.go("workflowEntity.list", {entity_key: "ordermdbt"}, {reload: true});
+
+                        });
+                    });
+                };
+
+
+                /*大方法的对象*/
+                $scope.ordermdbtExcute = {
+
+
+                    /*打开通过行为上传文件*/
+                    "adopt": function () {
+                        $scope.actCode= "adopt";
+                        $scope.headerInformation = "上传pdf文件";
+                        $scope.promptInformation = "只能上传一个pdf文件";
+                        $scope.headerInformation = "上传审核通过的文件";
+                        $scope.promptInformation = "只能上传一个文件";
+                        $scope.uploader.clearQueue();
+                        $("#" + $scope.profile.id + "_upload").modal("show");
+
+
+
+//                        $scope.patchAct("success","这条客户信息是否能通过","/rest/ordermdbts/" + $scope.id,{act:"adopt"});
+                    },
+
+                    "uploadMaterials": function () {
+//                        $scope.actCode           = "uploadMaterials";
+//                        $scope.headerInformation = "上传审核通过的文件";
+//                        $scope.promptInformation = "只能上传一个压缩包";
+//                        $scope.uploader.clearQueue();
+//                        $("#" + $scope.profile.id + "_upload").modal("show");
+//                        $scope.patchAct("success","这条客户信息是否能通过","/rest/" + $scope.entity_key + "s/" + $scope.id,{act:"adopt"});
+                    },
+
+
+                    /*未通过打开modal*/
+                    "failed": function () {
+                        $("#" + $scope.profile.id + "_failed").modal("show");
+                    },
+                    /*未通过理由加改变状态*/
+                    "failedSave": function (failedVal) {
+                        if (failedVal) {
+//                            alert("asdfkljhakdlgfyktu");
+                            $http({
+                                method: "PATCH",
+                                url: "/rest/ordermdbts/" + $scope.id,
+                                data: {
+                                    act: "failed",
+                                    comment: failedVal
+                                }
+                            }).success(function (resResult) {
+                                $("#" + $scope.profile.id + "_failed").modal("hide");
+                                $state.go("workflowEntity.list", {entity_key: "ordermdbt"}, {reload: true});
+
+                            });
+
+                        } else {
+                            $rootScope.toasterWarning("注意", "请填写详细的未通过理由，以方便客户提交数据！");
+                        }
+                    },
+
+                    /*关闭*/
+                    "disable": function () {
+                        $scope.patchAct("error", "这条客户信息是否关闭", "/rest/ordermdbts/" + $scope.id, {act: "disable"});
+                    },
+
+                    /*开卡*/
+                    "handl": function () {
+                        alert("开卡成功!!!")
+                    },
+
+                    "downloadFile": function () {
+                        swal({
+                            title: "是否下载所有图片",
+                            type: "warning",
+                            showCancelButton: true,
+                            cancelButtonText: "退出",
+                            confirmButtonText: "同意",
+                            closeOnConfirm: true
+                        }, function () {
+                            html = '<div style="position: fixed;top: 50%;right: 50%" class="sk-spinner sk-spinner-cube-grid" id="loadAction">' +
+                                '<div class="sk-cube"></div>' +
+                                '<div class="sk-cube"></div>' +
+                                '<div class="sk-cube"></div>' +
+                                '<div class="sk-cube"></div>' +
+                                '<div class="sk-cube"></div>' +
+                                '<div class="sk-cube"></div>' +
+                                '<div class="sk-cube"></div>' +
+                                '<div class="sk-cube"></div>' +
+                                '<div class="sk-cube"></div>' +
+                                '</div>';
+                            $("body").append(html);
+
+                            $http({
+                                method: "PATCH",
+                                url: "/rest/ordermdbts/" + $scope.id,
+                                data: {act: "downloadFile"}
+                            }).success(function (resResult) {
+                                $("#loadAction").remove();
+                                if (resResult.filePackage) {
+                                    $("#loadAction").remove();
+                                    var form = $("<form>");//定义一个form表单
+                                    form.attr("style", "display:none");
+                                    form.attr("target", "");
+                                    form.attr("method", "get");
+                                    form.attr("action", "http://files.xiaojinpingtai.com/" + resResult.filePackage.newFileName);
+
+                                    $("body").append(form);//将表单放置在web中
+                                    form.submit();
+                                } else {
+                                    $("#loadAction").remove();
+                                    $rootScope.toasterWarning("注意", "该用户没有上传任何的图片！");
+                                }
+                            });
+                        });
+
+
+                    },
+                    /*修改企业名称*/
+                    "modifyCompanyName": function () {
+                        $("#" + $scope.profile.id + "_modifyCompanyName").modal("show");
+                    },
+                    "modifyCompanyNameSave": function (val) {
+                        console.log(val)
+
+                        if (val) {
+                            $http({
+                                method: "PATCH",
+                                url: "/rest/companies/" + $scope.profile.company.id,
+                                data: {
+                                    act: "update",
+                                    companyName: val
+                                }
+                            }).success(function (resResult) {
+                                $("#" + $scope.profile.id + "_modifyCompanyName").modal("hide");
+                                $state.go("workflowEntity.list", {entity_key: "ordermdbt"}, {reload: true});
+                            });
+                        } else {
+                            $rootScope.toasterWarning("注意", "输入修改企业名称");
+                        }
+
+                    },
+                    /*分配业务员*/
+                    "distribution": function () {
+                        $("#" + $scope.profile.id + "_distribution").modal("show");
+                    },
+                    "distributionSave": function (val) {
+                        console.log(val)
+
+                        if (val) {
+                            $http({
+                                method: "PATCH",
+                                url: "/rest/ordermdbts/" + $scope.id,
+                                data: {
+                                    act: "distribution",
+                                    notice: val.id,
+                                    serviceId: val.id
+                                }
+                            }).success(function (resResult) {
+                                $("#" + $scope.profile.id + "_distribution").modal("hide");
+                                $state.go("workflowEntity.list", {entity_key: "ordermdbt"}, {reload: true});
+                            });
+                        } else {
+                            $rootScope.toasterWarning("注意", "请选择一个业务员！");
+                        }
+
+                    },
+
+                    /*修改额度*/
+                    "modifyApplyAmount": function () {
+                        $("#" + $scope.profile.id + "_modifyApplyAmount").modal("show");
+                    },
+                    /*修改代理品牌*/
+                    "modifyingAgentBrand": function () {
+                        $("#" + $scope.profile.id + "_modifyingAgentBrand").modal("show");
+                    },
+                    "modifyingAgentBrandSave": function (val) {
+                        console.log(val)
+                        if (val) {
+                            $http({
+                                method: "PATCH",
+                                url: "/rest/ordermdbts/" + $scope.id,
+                                data: {
+                                    act: "modifyingAgentBrand",
+                                    agentBrand: val
+                                }
+                            }).success(function (resResult) {
+                                if (resResult) {
+                                    $("#" + $scope.profile.id + "_modifyingAgentBrand").modal("hide");
+                                    $state.reload();
+                                    $rootScope.toasterSuccess("成功", "代理品牌成功！");
+                                }
+                            });
+                        } else {
+                            $rootScope.toasterWarning("注意", "请输入修改代理品牌！");
+                        }
+
+                    },
+                    "modifyApplyAmountSave": function (val) {
+                        console.log(val)
+                        if (val) {
+                            if ((10000 <= val) && (val <= 2000000)) {
+                                $http({
+                                    method: "PATCH",
+                                    url: "/rest/ordermdbts/" + $scope.id,
+                                    data: {
+                                        act: "modifyApplyAmount",
+                                        applyAmount: val
+                                    }
+                                }).success(function (resResult) {
+                                    if (resResult) {
+                                        $("#" + $scope.profile.id + "_modifyApplyAmount").modal("hide");
+                                        $state.reload();
+                                        $rootScope.toasterSuccess("成功", "额度修改成功！");
+                                    }
+                                });
+                            } else {
+                                $rootScope.toasterWarning("注意", "额度不能低于10000且不能超过2000000！");
+                            }
+                        } else {
+                            $rootScope.toasterWarning("注意", "请输入修改额度！");
+                        }
+
+                    },
+                    /*修改身份证*/
+                    "changeID": function () {
+                        $("#" + $scope.profile.id + "_changeID").modal("show");
+                    },
+                    "changeIDSave": function (val) {
+                        if (val) {
+                            if (val.length == 18 || val.length == 15) {
+                                $http({
+                                    method: "PATCH",
+                                    url: "/rest/ordermdbts/" + $scope.id,
+                                    data: {
+                                        act: "changeID",
+                                        applyIdentityNo: val
+                                    }
+                                }).success(function (resResult) {
+                                    console.log(resResult)
+                                    if (resResult.ErrorCode == 4561) {
+                                        $rootScope.toasterWarning("注意", resResult.ErrorInfo);
+                                    } else {
+                                        $("#" + $scope.profile.id + "_changeID").modal("hide");
+                                        $state.reload();
+                                        $rootScope.toasterSuccess("成功", "身份证修改成功！");
+                                    }
+                                }).error(function (resResult) {
+                                    $rootScope.toasterWarning("注意", "身份证有误请检查！");
+                                })
+                            } else {
+                                $rootScope.toasterWarning("注意", "身份证有误请检查！");
+                            }
+                        } else {
+                            $rootScope.toasterWarning("注意", "请输入身份证再提交！");
+                        }
+
+                    },
+                    "update": function () {
+                        $state.go("workflowEntity.home.profile.form", {}, {reload: true});
+                    },
+                    "updateSave": function () {
+                        $scope.profile.act = "update";
+                        delete $scope.profile.createdBy;
+                        delete $scope.profile.workflow;
+                        delete $scope.profile.state;
+                        delete $scope.profile.person;
+                        delete $scope.profile.company;
+                        $http({
+                            method: "PATCH",
+                            url: "/rest/ordermdbts/" + $scope.id,
+                            data: $scope.profile
+                        }).success(function (resResult) {
+                            if (resResult) {
+                                $rootScope.toasterSuccess("成功", "修改成功");
+                                $state.reload();
+                            }
+
+                        });
+                    },
+
+
+                    /*上传照片*/
+                    "uploadBusinessLicense": function () {
+
+                        $scope.actCode     = "uploadBusinessLicense";
+                        $scope.topcategory = "身份证明类";
+                        $scope.subcategory = "营业执照";
+
+                        $("#upload_file_modal").modal("show");
+                    },
+                    "uploadExpressBusinessCertificate": function () {
+
+                        $scope.actCode     = "uploadExpressBusinessCertificate";
+                        $scope.topcategory = "身份证明类";
+                        $scope.subcategory = "快递业务经营许可证";
+
+                        $("#upload_file_modal").modal("show");
+                    },
+                    "uploadCreditReport": function () {
+
+                        $scope.actCode     = "uploadCreditReport";
+                        $scope.topcategory = "征信材料类";
+                        $scope.subcategory = "法人和企业征信报告";
+
+                        $("#upload_file_modal").modal("show");
+                    },
+                    "uploadBranchScreenshot": function () {
+
+                        $scope.actCode     = "uploadBranchScreenshot";
+                        $scope.topcategory = "资产证明类";
+                        $scope.subcategory = "网点系统截图";
+
+                        $("#upload_file_modal").modal("show");
+                    },
+                    "uploadSpouseIDCard": function () {
+
+                        $scope.actCode     = "uploadMarriageCertificate";
+                        $scope.topcategory = "身份证明类";
+                        $scope.subcategory = "申请人夫妻双方身份证";
+
+                        $("#upload_file_modal").modal("show");
+                    },
+                    "uploadMarriageCertificate": function () {
+
+                        $scope.actCode     = "uploadMarriageCertificate";
+                        $scope.topcategory = "身份证明类";
+                        $scope.subcategory = "结婚证";
+
+                        $("#upload_file_modal").modal("show");
+                    },
+                    "uploadPlaceOfBranchPhoto": function () {
+
+                        $scope.actCode     = "uploadPlaceOfBranchPhoto";
+                        $scope.topcategory = "资产证明类";
+                        $scope.subcategory = "网点经营场地照片";
+
+                        $("#upload_file_modal").modal("show");
+                    },
+                    "uploadContractOfRentingOrLandCertificate": function () {
+
+                        $scope.actCode     = "uploadContractOfRentingOrLandCertificate";
+                        $scope.topcategory = "资产证明类";
+                        $scope.subcategory = "租房合同或土地证";
+
+                        $("#upload_file_modal").modal("show");
+                    },
+                    "uploadPropertyCertificate": function () {
+
+                        $scope.actCode     = "uploadPropertyCertificate";
+                        $scope.topcategory = "资产证明类";
+                        $scope.subcategory = "个人名下房产证";
+
+                        $("#upload_file_modal").modal("show");
+                    },
+                    "uploadVehicleList": function () {
+
+                        $scope.actCode     = "uploadVehicleList";
+                        $scope.topcategory = "资产证明类";
+                        $scope.subcategory = "个人名下车辆清单";
+
+                        $("#upload_file_modal").modal("show");
+                    },
+                    "uploadCompanyAssetsList": function () {
+
+                        $scope.actCode     = "uploadCompanyAssetsList";
+                        $scope.topcategory = "资产证明类";
+                        $scope.subcategory = "公司名下资产明细清单";
+
+                        $("#upload_file_modal").modal("show");
+                    },
+                    "uploadLatestSixMonthsOfBankFlow": function () {
+
+                        $scope.actCode     = "uploadLatestSixMonthsOfBankFlow";
+                        $scope.topcategory = "资产证明类";
+                        $scope.subcategory = "近6个月主要走账的银行流水";
+
+                        $("#upload_file_modal").modal("show");
+                    },
+                    "uploadExternalBorrowingMonthlyRepaymentList": function () {
+
+                        $scope.actCode     = "uploadExternalBorrowingMonthlyRepaymentList";
+                        $scope.topcategory = "资产证明类";
+                        $scope.subcategory = "对外借款及月还款清单";
+
+                        $("#upload_file_modal").modal("show");
+                    },
+                    "uploadNearlyThreeMonthsListOfUtilities": function () {
+
+                        $scope.actCode     = "uploadNearlyThreeMonthsListOfUtilities";
+                        $scope.topcategory = "资产证明类";
+                        $scope.subcategory = "近3个月水电费清单";
+
+                        $("#upload_file_modal").modal("show");
+                    },
+                    "uploadContractorBusinessVolumeList": function () {
+
+                        $scope.actCode     = "uploadContractorBusinessVolumeList";
+                        $scope.topcategory = "资产证明类";
+                        $scope.subcategory = "下设承包商的业务量清单";
+
+                        $("#upload_file_modal").modal("show");
+                    },
+                    "uploadBranchFranchiseAgreement": function () {
+
+                        $scope.actCode     = "uploadBranchFranchiseAgreement";
+                        $scope.topcategory = "合同协议类";
+                        $scope.subcategory = "与总公司签订的《网点加盟协议》";
+
+                        $("#upload_file_modal").modal("show");
+                    },
+                    "uploadOther": function () {
+
+                        $scope.actCode     = "uploadOther";
+                        $scope.topcategory = "身份证明类";
+                        $scope.subcategory = "其他";
+
+                        $("#upload_file_modal").modal("show");
+                    },
+                    "test": function () {
+                        alert("aaa");
+                    }
+
+                };
+
+                /*上传文件*/
+                //以下是上传文件的动作详情参考前端框架示例 js/controllers/file-upload.js
+                $scope.uploadDone = false;
+
+                $scope.setUploadDone = function () {
+                    $scope.uploadDone = false;
+                };
+
+                $scope.uploader = new FileUploader({
+                    url: '/fileUpload'
+                });
+
+                $scope.uploader.filters.push({
+                    name: 'customFilter',
+                    fn: function (item, options) {
+                        return this.queue.length < 1;
+                    }
+                });
+
+                $scope.uploader.onAfterAddingFile = function (fileItem) {
+
+                    console.log(fileItem)
+                    fileItem.actCode = $scope.actCode;
+//                    if (fileItem.file.type !== "application/x-zip-compressed") {
+//
+//                        $rootScope.toasterError("警告！", "审核文件的格式需要为ZIP的压缩文件格式！");
+//
+//                        fileItem.remove();
+//
+//                    } else {
+                    fileItem.formData = [{fileType: "file"}]
+//                    }
+
+                    $("#audit_zip_file_input").val("");
+
+                };
+
+                $scope.uploader.onErrorItem = function (fileItem, response, status, headers) {
+                    $rootScope.toasterError("上传失败！", fileItem.file.name + " 上传失败！");
+                };
+
+                $scope.uploader.onSuccessItem = function (fileItem, response, status, headers) {
+                    $scope.uploadDone = true;
+                    if (fileItem.actCode === "uploadMaterials") {
+                        $scope.zipName = response.result.newFileName;
+                        $http({
+                            method: "PATCH",
+                            url: "/rest/ordermdbts/" + $scope.id,//这里是关联的实体
+                            data: {
+                                fileObject: response.result,//fileObject是上传完文件后的文件对象
+                                act: fileItem.actCode//上传文件的行为
+                            }
+                        }).success(function (data) {
+                            $("#" + $scope.profile.id + "_upload").modal("hide");
+                            $rootScope.toasterSuccess("成功", "打包好的文件上传成功");
+                        });
+
+
+                    } else if (fileItem.actCode === "adopt") {
+//                        console.log($scope.zipName)
+//                        if ($scope.zipName) {
+                        swal({
+                            title: "文件上传成功！是否审核通过",
+                            type: "warning",
+                            showCancelButton: true,
+                            cancelButtonText: "退出",
+                            confirmButtonText: "同意",
+                            closeOnConfirm: true
+                        }, function () {
+                            $http({
+                                method: "PATCH",
+                                url: "/rest/ordermdbts/" + $scope.id,
+                                data: {
+                                    act: "adopt",
+                                    zipName: response.result.newFileName,
+                                    fileObject: response.result//fileObject是上传完文件后的文件对象
+//                                        pdfName: response.result.newFileName,//fileObject是上传完文件后的文件对象
+//                                        zipName: $scope.zipName,
+//                                        fileObject: response.result//fileObject是上传完文件后的文件对象
+                                }
+                            }).success(function (resResult) {
+                                $("#" + $scope.profile.id + "_upload").modal("hide");
+                                $state.go("workflowEntity.list", {entity_key: "ordermdbt"}, {reload: true});
+                            });
+                        });
+//                        } else {
+//                            $rootScope.toasterError("失败", "请先上传打包好的资料！");
+//                        }
+                    }
+
+                };
+
+                /*模态框显示图片*/
+                $scope.imgSrc = null;
+                $scope.showImgModel=function ($event) {
+                    console.log($event.target.src)
+                    $scope.imgSrc = $event.target.src;
+                    $('#imgModel').modal('show')
+                }
+            }
+        ]
+    );
+</script>
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light" ng-controller="ordermdbtHomeController">
+    <!-- column -->
+    <div class="col">
+        <div class="h-full" ui-view></div>
+    </div>
+    <!-- /column -->
+</div>
+<!-- /hbox layout -->

@@ -1,0 +1,93 @@
+<script>
+    app.controller("productHomeController",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "$state",
+            "entity",
+            function ($rootScope, $scope, $http, $stateParams, $state, entity) {
+
+                $scope.id = $stateParams.id;
+
+                $scope.profile     = {};
+                $scope.canActs     = [];
+                $scope.canFileActs = [];
+
+                //收费项目
+                $scope.forms = {};
+
+                entity.getDetail("/rest/products/" + $scope.id, ["createdBy", "state", "capitalproduct", "workflow", "capitalproduct"]).then(function (resResult) {
+
+                    $scope.profile = resResult;
+
+                    angular.forEach($scope.profile.currentUserCanActList, function (val, key) {
+                        if (val.actGroup === "UPDATE" || val.actGroup === "OPERATE" || val.actGroup === "FILE_PACKAGE") {
+                            $scope.canActs.push(val);
+                        } else if (val.actGroup === "FILE_OPERATE") {
+                            $scope.canFileActs.push(val)
+                        }
+                    });
+
+                    $scope.state_code = $scope.profile.state.stateCode;
+
+                    //获取所有费用项目
+                    entity.getList("rest/feetypes").then(function (resResult1) {
+                        $scope.feetypes = resResult1._embeddedItems;
+                        //获取自己已经添加的收费项目
+                        entity.getList("rest/productcompanyfees", ["product"]).then(function (resResult2) {
+                            angular.forEach(resResult2._embeddedItems, function (val, key) {
+                                if (val.product.id === $scope.profile.id) {
+                                    $scope.forms[val.feetypeCode] = val;
+                                }
+                            });
+                        });
+                    });
+
+                });
+
+
+                /*patch方法*/
+                $scope.patchAct = function (type, title, url, data) {
+                    swal({
+                        title: title,
+                        type: type,
+                        showCancelButton: true,
+                        cancelButtonText: "退出",
+                        confirmButtonText: "同意",
+                        closeOnConfirm: true
+                    }, function () {
+                        $http({
+                            method: "PATCH",
+                            url: url,
+                            data: data
+                        }).success(function (resResult) {
+
+                            $state.go("workflowEntity.list", {entity_key: "product"}, {reload: true});
+
+                        });
+                    });
+                };
+
+                /*大方法的对象*/
+                $scope.productExcute = {
+                    "update": function () {
+                        console.log("sydrrrrrrr " + $scope.id);
+                        $state.go("workflowEntity.home.profile.form", {id: $scope.id, entity_key: "product"}, {});
+                    }
+                };
+
+            }
+        ]
+    );
+</script>
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light" ng-controller="productHomeController">
+    <!-- column -->
+    <div class="col w-md lter b-l">
+        <div class="h-full" ui-view></div>
+    </div>
+    <!-- /column -->
+</div>
+<!-- /hbox layout -->

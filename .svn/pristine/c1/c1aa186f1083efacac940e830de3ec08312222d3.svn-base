@@ -1,0 +1,132 @@
+<div class="wrapper">
+    <div class="row">
+        <div class="col-xs-12 col-sm-10">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    销售产品基础信息
+                </div>
+                <table class="table table-striped m-b-none">
+                    <tbody>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="product.state.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.state.label }}</td>
+                        <td class="v-middle text-right">
+                            <span translate="product.label.label"></span>：
+                        </td>
+                        <td class="v-middle">{{ profile.label }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="product.storeInterest.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.storeInterest }}</td>
+                        <td class="v-middle text-right">
+                            <span translate="product.debtorInterest.label"></span>：
+                        </td>
+                        <td class="v-middle">{{ profile.debtorInterest }}</td>
+                    </tr>
+
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="product.storeAmountMin.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.capitalproduct.creditorAmountMin }}</td>
+                        <td class="v-middle text-right">
+                            <span translate="product.storeAmountMax.label"></span>：
+                        </td>
+                        <td class="v-middle">{{ profile.capitalproduct.creditorAmountMax }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="product.capitalproduct.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.capitalproduct.label }}</td>
+                        <td class="v-middle text-right">
+                            <span translate="product.repaymentAccount.label"></span>：
+                        </td>
+                        <td class="v-middle">{{ profile.repaymentAccount }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="product.description.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.description }}</td>
+                        <td class="v-middle text-right">
+                            <span>分期数</span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.capitalproduct.periodNumber }}</td>
+
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="panel panel-success">
+                <div class="panel-heading">
+                    门店收费项目
+                </div>
+                <table class="table table-striped m-b-none">
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th>收费项目名称</th>
+                        <th>分期数</th>
+                        <th>按比例收费(优先)</th>
+                        <th>固定收费</th>
+                        <th>描述</th>
+                        <th>说明</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="fee in feetypes">
+                        <td class="v-middle">
+
+                        </td>
+                        <td class="v-middle">
+                            {{ fee.label }}
+                        </td>
+                        <td class="v-middle">
+                            <!--<input type="text"-->
+                            <!--ng-model="forms[fee.feetypeCode].periodNumber"-->
+                            <!--class="form-control"-->
+                            <!--required>-->
+                            {{ forms[fee.feetypeCode].periodNumber }}
+                        </td>
+                        <td class="v-middle">
+                            <!--<input type="text" ng-model="forms[fee.feetypeCode].feeRate"-->
+                            <!--class="form-control"-->
+                            <!--required>-->
+                            {{ forms[fee.feetypeCode].feeRate }}
+                        </td>
+                        <td class="v-middle">
+                            <!--<input type="text" ng-model="forms[fee.feetypeCode].feeAmount"-->
+                            <!--class="form-control"-->
+                            <!--required>-->
+                            {{ forms[fee.feetypeCode].feeAmount }}
+                        </td>
+                        <td class="v-middle">
+                            <!--<input type="text" ng-model="forms[fee.feetypeCode].description"-->
+                            <!--class="form-control"-->
+                            <!--required>-->
+                            {{ forms[fee.feetypeCode].description }}
+                        </td>
+                        <td class="v-middle">
+                            <!--<input type="text" ng-model="forms[fee.feetypeCode].comment"-->
+                            <!--class="form-control"-->
+                            <!--required>-->
+                            {{ forms[fee.feetypeCode].comment }}
+                        </td>
+
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
+        </div>
+        <div class="col-xs-12 col-sm-2">
+            <div class="m-t">记录...</div>
+        </div>
+    </div>
+</div>

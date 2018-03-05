@@ -1,0 +1,67 @@
+<div class="wrapper-md">
+    <p class="m-b">这是配置人员要用的，页面不重要</p>
+    <form class="form-validation form-horizontal">
+        <table class="table table-striped bg-white b-a">
+            <thead>
+                <tr>
+                    <th style="width:40px">启用</th>
+                    <th style="width:300px">费用名称</th>
+                    <th>数额或百分比</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <label class="i-checks  i-checks-lg">
+                            <input checked="" value="" type="checkbox">
+                            <i></i>
+                        </label>
+                    </td>
+                    <td>  
+                        平台服务费
+                    </td>
+                    <td><input type="text" class="form-control text-center w-md" value='20%' /></td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="i-checks  i-checks-lg">
+                            <input checked="" value="" type="checkbox">
+                            <i></i>
+                        </label>
+                    </td>
+                    <td>  
+                        信息服务费
+                    </td>
+                    <td><input type="text" class="form-control text-center w-md" value='50' /></td>
+                </tr>
+                  <tr>
+                    <td>
+                        <label class="i-checks  i-checks-lg">
+                            <input checked="" value="" type="checkbox">
+                            <i></i>
+                        </label>
+                    </td>
+                    <td>  
+                        GPS押金
+                    </td>
+                    <td><input type="text" class="form-control text-center w-md" value='50' /></td>
+                </tr>
+                 <tr>
+                    <td>
+                        <label class="i-checks  i-checks-lg">
+                            <input checked="" value="" type="checkbox">
+                            <i></i>
+                        </label>
+                    </td>
+                    <td>  
+                        其它费用林林总总
+                    </td>
+                    <td><input type="text" class="form-control text-center w-md" value='50' /></td>
+                </tr>
+            </tbody>
+        </table>  
+        <div class="form-group wrapper-sm">
+            <button type="button" class="btn btn-success">保存</button>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,106 @@
+
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light">
+
+
+	<div class="col w-md ">
+
+		<div class="vbox">
+			<div class="wrapper b-b">
+				<div class="font-thin h4">风控查询</div>
+			</div>
+			<div class="row-row">
+				<div class="cell scrollable">
+					<div class="cell-inner">
+						<ul class="nav nav-pills nav-stacked nav-sm">
+							<li><a>&nbsp; <b>个人查询</b>
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="risks.page({view_type:'intellegence'})"> &nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;<b>个人智能查询</b></a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="risks.page({view_type:'pers1onal_info'})"> &nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;系统内消息
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="risks.page({view_type:'personal_info'})"> &nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;身份证核验
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="risks.page({view_type:'persona2l_info'})"> &nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;手机号综合分析
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="risks.page({view_type:'persona4l_info'})"> &nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;执法失信人
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="risks.page({view_type:'persona5l_info'})"> &nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;互金黑名单
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="risks.page({view_type:'persona8l_info'})"> &nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;多头借款信息
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="risks.page({view_type:'persona6l_info'})"> &nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;芝麻信用
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="risks.page({view_type:'persona7l_info'})"> &nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;银行卡
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="risks.page({view_type:'persona8l_info'})"> &nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;行程轨迹分析
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="risks.page({view_type:'persona7l_info'})"> &nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;股权投资
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="risks.page({view_type:'persona7l_info'})"> &nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;电商数据查询
+							</a></li>
+							<li><a>&nbsp; <b>企业单项查询</b>
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="risks.page({view_type:'ent_info'})"> &nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;工商信息
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="risks.page({view_type:'ent_info'})"> &nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;投资信息
+							</a></li>
+							<li><a>&nbsp; <b>资产类</b>
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="risks.page({view_type:'persona7l_info'})"> &nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;房产信息查询
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="risks.page({view_type:'vehicle'})"> &nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;车辆信息查询
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="risks.page({view_type:'vehicle'})"> &nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;车辆维修查询
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="risks.page({view_type:'vehicle'})"> &nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;车辆估价查询
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="risks.page({view_type:'vehicle'})"> &nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;车辆违章查询
+							</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+	<div class="col lter" ui-view></div>
+</div>
+<!-- /hbox layout -->

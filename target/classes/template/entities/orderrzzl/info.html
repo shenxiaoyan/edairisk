@@ -1,0 +1,235 @@
+<div class="wrapper">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="panel panel-warning" ng-show="state_code=='DENIED'">
+                <div class="panel-heading">
+                    未通过理由
+                </div>
+                <div class="m-l m-r m-b-sm m-t-sm">
+                    {{ profile.comment?profile.comment:'未填写'}}
+                </div>
+            </div>
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    申请信息
+                </div>
+                <table class="table table-striped m-b-none">
+                    <tbody>
+                    <tr>
+                        <td class="v-middle text-right w-sm">业务类型:</td>
+                        <td class="v-middle w-xl">融资租赁</td>
+                        <td class="v-middle text-right w-sm">身份证号：</td>
+                        <td class="v-middle w-xl">{{ profile.applyIdentityNo }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right w-sm">姓名：</td>
+                        <td class="v-middle w-xl">{{ profile.realName }}</td>
+                        <td class="v-middle text-right w-sm">手机号码：</td>
+                        <td class="v-middle w-xl">{{ profile.applyMobile }}</td>
+                    </tr>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right w-sm">申请额度：</td>
+                        <td class="v-middle w-xl">{{ profile.applyAmount }}</td>
+                        <td class="v-middle text-right w-sm">借款期限：</td>
+                        <td class="v-middle w-xl">{{ profile.applyPeriodNumber }}期</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">日平均收件量：</td>
+                        <td class="v-middle">{{ profile.applyDayPatchExpress }}</td>
+                        <td class="v-middle text-right">日平均派件量：</td>
+                        <td class="v-middle">{{ profile.applyDayPickExpress }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">快递网点名称：</td>
+                        <td class="v-middle">{{ profile.applyEnterpriseName }}</td>
+                        <td class="v-middle text-right">经营区域：</td>
+                        <td class="v-middle">
+                            {{ profile.applyEnterpriseProvince }}
+                            {{ profile.applyEnterpriseCity }}
+                            {{ profile.applyEnterpriseDistrict }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">代理品牌：</td>
+                        <td class="v-middle">{{ profile.agentBrand }}</td>
+                        <td class="v-middle text-right">创建时间：</td>
+                        <td class="v-middle">{{ profile.createdAt | datetime }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">推荐人：</td>
+                        <td class="v-middle">{{ profile.applyReferrerRealName?profile.applyReferrerRealName:"无" }}</td>
+                        <td class="v-middle text-right"></td>
+                        <td class="v-middle"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!--<div class="clearfix m-b-md" ng-if="accountShow">-->
+            <!--<div class="pull-left m-r" style="width: 410px;">-->
+            <!--<div class="wrapper-md bg-white" style="border: 1px solid #E7EBED;">-->
+            <!--<div class="bg-info text-center"-->
+            <!--style="width: 80px;height: 50px; line-height: 50px;border-radius: 5px;">-->
+            <!--<span class="text-white font-bold">小金银行</span>-->
+            <!--</div>-->
+            <!--<div class="m-t-md m-b-md text-muted font-thin h4">-->
+            <!--1234 4321 3214 3241-->
+            <!--</div>-->
+            <!--<div class="clearfix">-->
+            <!--<div class="pull-left clearfix">-->
+            <!--<span class="pull-left font-bold">过期时间：</span>-->
+            <!--<span class="pull-left">20/09</span>-->
+            <!--</div>-->
+            <!--<div class="pull-right clearfix">-->
+            <!--<span class="pull-left font-bold">持卡人：</span>-->
+            <!--<span class="pull-left">力饼</span>-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--<div class="pull-left w-xl">-->
+            <!--<button class="btn btn-sm btn-success btn-addon"-->
+            <!--ui-sref="workflowEntity.home.profile.info({entity_key:'account',state_code:accountList.state_code,id:accountList.id})">-->
+            <!--<i class="fa fa-credit-card"></i> 账户详情-->
+            <!--</button>-->
+            <!--<div class="line line-dashed b-b"></div>-->
+            <!--<div>创建时间：{{ accountList.createdAt | datetime }}</div>-->
+            <!--<div class="line line-dashed b-b"></div>-->
+            <!--<div>提示：{{ accountList.notice }}</div>-->
+            <!--<div class="line line-dashed b-b"></div>-->
+            <!--<div>账号：{{ accountList.account }}</div>-->
+            <!--<div class="line line-dashed b-b m-b-n"></div>-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--<div class="panel panel-success" ng-if="accountShow">-->
+            <!--<div class="panel-heading">-->
+            <!--信用卡信息-->
+            <!--</div>-->
+            <!--<div class="clearfix" style="background: #FAFBFC;">-->
+            <!--<div class="wrapper-sm pull-left" style="width: 410px;">-->
+            <!--<div class="wrapper-md bg-white" style="border: 1px solid #E7EBED;">-->
+            <!--<div class="bg-info text-center" style="width: 80px;height: 50px; line-height: 50px;border-radius: 5px;">-->
+            <!--<span class="text-white font-bold">小金银行</span>-->
+            <!--</div>-->
+            <!--<div class="m-t-md m-b-md text-muted font-thin h4">-->
+            <!--1234 4321 3214 3241-->
+            <!--</div>-->
+            <!--<div class="clearfix">-->
+            <!--<div class="pull-left clearfix">-->
+            <!--<span class="pull-left font-bold">过期时间：</span>-->
+            <!--<span class="pull-left">20/09</span>-->
+            <!--</div>-->
+            <!--<div class="pull-right clearfix">-->
+            <!--<span class="pull-left font-bold">持卡人：</span>-->
+            <!--<span class="pull-left">力饼</span>-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--<div class="wrapper-sm pull-left">-->
+            <!--<div class="m-b-sm">创建时间：{{ accountList.createdAt | datetime }}</div>-->
+            <!--<div class="m-b-sm">提示：{{ accountList.notice }}</div>-->
+            <!--<div class="m-b-sm">账号：{{ accountList.account }}</div>-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--</div>-->
+        </div>
+    </div>
+    <!--文件夹-->
+    <div ng-controller="workflowEntityFileController">
+        <!--<div class="m-b-md clearfix" ng-if="canFileActs.length > 0">-->
+        <!--<button-->
+        <!--ng-class="act.btnClass"-->
+        <!--ng-click="orderwdsjshExcute[act.actCode]()"-->
+        <!--tooltip="{{act.help}}"-->
+        <!--tooltip-placement="bottom"-->
+        <!--ng-repeat="act in canFileActs">-->
+        <!--<i ng-class="act.iconClass"></i> {{act.label}}-->
+        <!--</button>-->
+        <!--</div>-->
+        <div class="m-b-md clearfix" ng-if="!firstFolder.opened">
+        <span class="pull-left" ng-click="backFolder()">
+            <span class="text-info file_back_btn">上一级</span>&ensp;|&ensp;
+        </span>
+            <span class="pull-left">{{ firstFolder.folderName }}&ensp;</span>
+            <span class="pull-left" ng-if="secondFolder.folderName">>&ensp;{{ secondFolder.folderName }}</span>
+        </div>
+
+        <div class="m-b-md" ng-if="firstFolder.opened">
+            全部文件夹
+        </div>
+        <div class="m-b-md" ng-if="!fileTree">
+            暂无文件
+        </div>
+
+        <div class="clearfix" ng-if="firstFolder.opened">
+            <div ng-repeat="(key,level1) in fileTree"
+                 ng-click="jumpToLevel2(key,level1)"
+                 class="pull-left panel b-a inline m-r-sm m-b-sm bg-light">
+                <div class="wrapper-xs b-b text-center">
+                    <i class="fa fa-paperclip"></i> {{ key }}
+                </div>
+                <div class="wrapper-xs w-sm lt">
+                    <img class="img-full" src="img/open-folder-full.png">
+                </div>
+            </div>
+        </div>
+
+        <div class="clearfix" ng-if="secondFolder.opened">
+            <div ng-repeat="(key,level2) in level2Tree"
+                 ng-click="jumpToLevel3(key)"
+                 class="pull-left panel b-a inline m-r-sm m-b-sm bg-light">
+                <div class="wrapper-xs b-b text-center">
+                    <i class="fa fa-paperclip"></i> {{ key }}
+                </div>
+                <div class="wrapper-xs w-sm lt">
+                    <img class="img-full" src="img/open-folder-full.png">
+                </div>
+            </div>
+        </div>
+
+        <div ng-if="thirdFolder.opened">
+
+            <div class="panel panel-default">
+                <span class="inline upload-photo-img m-r-xs m-t-xs" ng-repeat="(index,level3) in level3Tree">
+                    <img ng-click="showImgModel($event)" class="upload-img" src="http://files.xiaojinpingtai.com/{{ level3.newFileName }}">
+                </span>
+
+                <!--<table class="table table-striped m-b-none">-->
+                <!--<thead>-->
+                <!--<tr>-->
+                <!--<th>文件名</th>-->
+                <!--<th>大小</th>-->
+                <!--<th>创建日期</th>-->
+                <!--</tr>-->
+                <!--</thead>-->
+                <!--<tbody>-->
+                <!--<tr ng-repeat="(index,level3) in level3Tree">-->
+                <!--<td>-->
+                <!--<a class="file_icon_container text-ellipsis" ng-class="'file_' + level3.fileType"-->
+                <!--href="http://files.xiaojinpingtai.com/{{ level3.newFileName }}" target="_blank">{{-->
+                <!--level3.newFileName }}</a>-->
+                <!--</td>-->
+                <!--<td>-->
+                <!--{{ level3.fileSize/1024/1024 | number:2 }} MB-->
+                <!--</td>-->
+                <!--<td>-->
+                <!--{{ level3.createdAt | datetime }}-->
+                <!--</td>-->
+                <!--</tr>-->
+                <!--</tbody>-->
+                <!--</table>-->
+            </div>
+        </div>
+
+        <!--//图片模态框-->
+        <div class="modal fade" tabindex="-1" role="dialog" id="imgModel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content" style="max-width: 1000px;">
+                    <img class="img-responsive" src="{{imgSrc}}">
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+
+    </div>
+</div>

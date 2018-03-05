@@ -1,0 +1,759 @@
+<script>
+    "use strict";
+    app.controller("loanListController",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "entity",
+            "$stateParams",
+            "$state",
+            'FileUploader',
+            function ($rootScope, $scope, $http, entity, $stateParams,$state,FileUploader) {
+
+                $scope.states = [];
+                $scope.products =[];
+                $scope.searchForm={
+                    realname:'',
+                    telephone:'',
+                    productid:'1'
+                };
+
+                /*上传文件大数组*/
+                $scope.uploadVal = [];
+
+                /*上传文件时传入*/
+                $scope.actCode = null;
+
+                /*上传文件夹*/
+                $scope.subcategory = null;
+                $scope.topcategory = null;
+
+
+                $scope.modalMaxPhoto = null;
+
+                /*所有的上传的行为*/
+                $scope.canActs = [];
+
+                //面单白条表格是否显示   2个表格不一样
+                $scope.mdbtTabel=false;
+                $scope.mdbtBtn=true;
+
+                entity.getList("/rest/loanWorkflows/ " + $stateParams.workflow_id + "/states").then(function (resResult) {
+                    $scope.states = resResult._embeddedItems;
+                    if ($scope.states.length > 0) {
+
+                        $scope.states     = $scope.states.sort(function (a, b) {
+                            return a.sort - b.sort;
+                        });
+                        $scope.state_code = $scope.states[0].stateCode;
+                        $scope.getList(0);
+                    }
+                });
+
+                //全部读出来
+                entity.getList("/rest/products?page=0&size=1000").then(function (resResult) {
+                    $scope.products = resResult._embeddedItems;
+                    console.log($scope.products)
+                });
+
+
+                $scope.searchList = function(page) {
+
+                    console.log($scope.searchForm)
+                    //# % & 号键会注释掉后面的内容
+                    $scope.searchForm.realname= $scope.searchForm.realname.replace(/#/g,'').replace(/%/g,'').replace(/&/g,'')
+                    $scope.searchForm.telephone=$scope.searchForm.telephone.replace(/#/g,'').replace(/%/g,'').replace(/&/g,'')
+
+                    $http({
+                        method: "GET",
+                        url: "/loan/searchloanrecord?stateCode="+$scope.state_code+"&realname="+$scope.searchForm.realname+"&telephone="+$scope.searchForm.telephone+"&productid="+$scope.searchForm.productid+"&page="+page+"&size=20&sort=id,desc"
+                    }).success(function (resResult) {
+                        console.log(resResult)
+                        $scope.list = resResult.data.content;
+                        if($scope.searchForm.productid == 4){
+                            $scope.mdbtTabel=true;
+                        }else {
+                            $scope.mdbtTabel=false;
+                        }
+                        if($scope.state_code == 'CREATED'){
+                            $scope.mdbtBtn=true;
+                        }else {
+                            $scope.mdbtBtn=false;
+                        }
+                        //随借随还的TABEL
+                        angular.forEach($scope.list,function (val,key) {
+                            if(val.information){
+                                val.sn =JSON.parse(val.information).id
+                                val.mobile = JSON.parse(val.information).mobile
+                                val.accountName =JSON.parse(val.information).accountName
+                                val.loanAmount =JSON.parse(val.information).loanAmount
+                                val.accountBank =JSON.parse(val.information).accountBank
+                                val.loanStartDate =$scope.formatDate(JSON.parse(val.information).loanStartDate);
+                                val.loanEndDate =$scope.formatDate(JSON.parse(val.information).loanEndDate);
+                                val.product=val.label
+                            }
+                        })
+
+
+                        //搜索的返回格式和 rest/search不一样
+                        $scope.pageList = {
+                            size: resResult.data.size,
+                            total_elements: resResult.data.totalElements,
+                            current_page: resResult.data.number,
+                            num_page: resResult.data.totalPages,
+                            total_page: resResult.data.totalPages
+                        };
+
+                        console.log($scope.list)
+                        if ($scope.list.length > 0) {
+                            $("#loan_list_paginator").show();
+                            $rootScope.setPaginator("#loan_list_paginator", $scope.pageList, $scope.getList);
+                        }else{
+                            $("#loan_list_paginator").hide();
+                        }
+
+                    });
+                }
+
+                //搜索按钮
+                $scope.searchFormBtn=function () {
+                    console.log( $scope.state_code)
+                    $scope.searchList(0)
+                }
+
+                //重置按钮
+                $scope.resetSearchFormBtn=function () {
+                    $scope.selectModel=null;
+                    $scope.searchForm= {
+                        realname:'',
+                        telephone:'',
+                        productid:'1'
+                    }
+                    console.log($scope.searchForm)
+                    $scope.searchList(0)
+                }
+
+
+
+//                entity.getList("/rest/loanStates?sort=sort").then(function (resResult) {
+//                    angular.forEach(resResult._embeddedItems, function (val, key) {
+//                        if (val.stateCode !== "DELETED") {
+//                            $scope.states.push(val)
+//                        }
+//                    });
+//                });
+
+                $scope.pageList = {
+                    size: 0,
+                    total_elements: 0,
+                    current_page: 0,
+                    num_page: 1,
+                    total_page: 1
+                };
+
+                $scope.list = [];
+
+
+                $scope.getList = function (page) {
+                    $scope.loading = true;
+
+                    $scope.list = [];
+
+                    //var link = "/rest/loans/search/listOwnDepartmentAndChildren?size=20&page=" + page;
+
+                    //if($scope.state_code){
+                    //var link = "/rest/loans?sort=id,desc&stateCode=" + $scope.state_code + "&size=20&page=" + page;
+                    var link = "/loan/searchloanrecord?stateCode="+$scope.state_code+"&realname=&telephone=&productid=1&page="+page+"&size=20&sort=id,desc";
+                   // var link = "/rest/loans/search/listStateOwnDepartmentAndChildren?sort=id,desc&stateCode=" + $scope.state_code + "&size=20&page=" + page;
+                    //}
+
+                    if($scope.searchForm.productid == 4){
+                        $scope.mdbtTabel=true;
+                    }else {
+                        $scope.mdbtTabel=false;
+                    }
+
+                    if($scope.state_code == 'CREATED'){
+                        $scope.mdbtBtn=true;
+                    }else {
+                        $scope.mdbtBtn=false;
+                    }
+
+                    entity.getList(link).then(function (resResult) {
+                        $scope.loading = false;
+                       $scope.list = resResult.data.content;
+                        angular.forEach($scope.list,function (val,key) {
+                            val.sn =JSON.parse(val.information).id
+                            val.mobile = JSON.parse(val.information).mobile
+                            val.accountName =JSON.parse(val.information).accountName
+                            val.loanAmount =JSON.parse(val.information).loanAmount
+                            val.accountBank =JSON.parse(val.information).accountBank
+                            val.loanStartDate =$scope.formatDate(JSON.parse(val.information).loanStartDate);
+                            val.loanEndDate =$scope.formatDate(JSON.parse(val.information).loanEndDate);
+                            val.product=val.label
+                        })
+
+                        //搜索的返回格式和 rest/search不一样
+                        $scope.pageList = {
+                            size: resResult.data.size,
+                            total_elements: resResult.data.totalElements,
+                            current_page: resResult.data.number,
+                            num_page: resResult.data.totalPages,
+                            total_page: resResult.data.totalPages
+                        };
+
+                        console.log($scope.list)
+                        if ($scope.list.length > 0) {
+                            $("#loan_list_paginator").show();
+                            $rootScope.setPaginator("#loan_list_paginator", $scope.pageList, $scope.getList);
+                        }else{
+                            $("#loan_list_paginator").hide();
+                        }
+
+                    });
+                };
+
+//                if ($scope.state_code) {
+//                    $scope.getList(0);
+//                }
+
+                $scope.stateSelect = function ($event, stateCode) {
+                    if ($event.target.nodeName === "INPUT") {
+                        $scope.state_code = stateCode;
+                        $scope.searchForm= {
+                            realname:'',
+                            telephone:'',
+                            productid:'1'
+                        }
+                        $scope.getList(0);
+                    }
+                };
+                $scope.formatDate = function (date) {
+                    return date.substring(0,4)+'-'+date.substring(4,6)+'-'+date.substring(6,8);
+                };
+
+
+                $scope.fn={
+                    'adopt':function (id) {
+                        swal({
+                            title: "是否确定放款",
+                            type: "warning",
+                            showCancelButton: true,
+                            cancelButtonText: "退出",
+                            confirmButtonText: "同意",
+                            closeOnConfirm: true
+                        }, function () {
+                            $http({
+                                method: "patch",
+                                url: "/rest/loans/"+id,
+                                data: {
+                                    act:'adopt'
+                                }
+                            }).success(function (resResult) {
+                                console.log(resResult);
+                                $rootScope.toasterSuccess("注意",'放贷成功！');
+                                $state.go("workflowEntity.list", {entity_key: "loan"}, {reload: true});
+                            });
+                        });
+                    },
+                    'upload':function (id) {
+                        $scope.headerInformation = "上传审核通过的文件";
+                        $scope.promptInformation = "只能上传一个压缩包";
+                        $scope.subcategory="";
+                        $scope.topcategory="";
+                        $scope.id=id;
+                        $scope.uploader.clearQueue();
+                        $("#loan_upload").modal("show");
+                    },
+                    'openFile':function(id){
+                        $scope.id=id;
+                        entity.getList("/rest/loans/" +id+"/files").then(function (resResult) {
+                            //console.log(resResult)
+
+                            $scope.loanFiles = resResult._embeddedItems;
+                            if($scope.loanFiles.length){
+                                angular.forEach($scope.loanFiles,function(data){
+                                $scope.imgSrc="http://files.xiaojinpingtai.com/"+data.newFileName;
+                                $("#file_open").modal("show");
+                            })
+
+                            }else{
+                                $rootScope.toasterWarning("还没有上传凭证！");
+                                }
+                            }
+                        );
+
+
+                    }
+                }
+                /*显示凭证*/
+
+
+
+                /*上传文件*/
+                //以下是上传文件的动作详情参考前端框架示例 js/controllers/file-upload.js
+                $scope.uploadDone = false;
+
+                $scope.setUploadDone = function () {
+                    $scope.uploadDone = false;
+                };
+
+                $scope.uploader = new FileUploader({
+                    url: '/fileUpload'
+                });
+
+                $scope.uploader.filters.push({
+                    name: 'customFilter',
+                    fn: function (item, options) {
+                        return this.queue.length < 30;
+                    }
+                });
+
+                $scope.uploader.onAfterAddingFile = function (fileItem) {
+
+                    if (fileItem.file.type.indexOf("image") !== -1) {
+                        fileItem.formData    = [{fileType: "image"}]
+                        //fileItem.actCode     = $scope.actCode;
+                        fileItem.subcategory = $scope.subcategory;
+                        fileItem.topcategory = $scope.topcategory;
+
+//                        fileItem.formData = [{fileType: "file"}];
+
+                    } else {
+                        $rootScope.toasterError("警告！", "只能上传图片格式请重新选择！");
+                        fileItem.remove();
+
+//                        fileItem.formData = [{fileType: "file"}]
+                    }
+
+
+//                    $("#audit_zip_file_input").val("");
+
+                    console.log(fileItem);
+                };
+
+                $scope.uploader.onErrorItem = function (fileItem, response, status, headers) {
+                    $rootScope.toasterError("上传失败！", fileItem.file.name + " 上传失败！");
+                };
+
+                $scope.uploader.onSuccessItem = function (fileItem, response, status, headers) {
+                    $scope.uploadDone = true;
+
+                    console.log(response);
+
+
+                    //response.result.actCode     = fileItem.actCode;
+                    response.result.subcategory = fileItem.subcategory;
+                    response.result.topcategory = fileItem.topcategory;
+
+//                    angular.forEach($scope.canActs, function (val, key) {
+//                        if (val.actCode == fileItem.actCode) {
+//                            val.actPhoto.push(response.result);
+//                        }
+//                    });
+                    $http({
+                        method: "PATCH",
+                        url: "rest/loans/" + $scope.id,//这里是关联的实体
+                        data: {
+                            fileObject: response.result,//fileObject是上传完文件后的文件对象
+                            act: $scope.fn.upload($scope.id)//上传文件的行为
+                        }
+                    }).success(function (data) {
+                        $('#loan_upload').modal('hide')
+                        $rootScope.toasterSuccess("上传成功！", $scope.subcategory + "：" + fileItem.file.name + " 上传成功！");
+                    });
+
+
+                };
+
+            }
+        ]
+    );
+</script>
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light" ng-controller="loanListController">
+    <!-- column -->
+    <div class="col w-md lter b-l">
+        <div class="vbox">
+            <!--<div class="wrapper b-b b-light clearfix">-->
+            <!--<div class="pull-left m-r w inline">-->
+            <!--<label class="sr-only" for=""></label>-->
+            <!--<input type="text" class="form-control" id="">-->
+            <!--</div>-->
+            <!--<div class="pull-left m-r w inline">-->
+            <!--<label class="sr-only" for=""></label>-->
+            <!--<input type="text" class="form-control" id="">-->
+            <!--</div>-->
+            <!--<div class="pull-left m-r w inline">-->
+            <!--<label class="sr-only" for=""></label>-->
+            <!--<input type="text" class="form-control" id="">-->
+            <!--</div>-->
+            <!--<div class="pull-left m-r inline">-->
+            <!--<button class="btn btn-primary btn-addon">-->
+            <!--<i class="fa fa-search"></i>-->
+            <!--查询-->
+            <!--</button>-->
+            <!--</div>-->
+            <!--</div>-->
+            <div class="wrapper b-b b-light clearfix">
+                <div class="inline pull-left">
+                    借款记录状态：
+                    <!--<span translate="loan.self.label"></span>状态：-->
+                </div>
+                <!--<div class="inline pull-left m-r">-->
+                <!--<label class="i-checks pull-left m-n" ng-click="stateSelect($event,'')">-->
+                <!--<input type="radio" name="state" checked><i></i>  全部-->
+                <!--</label>-->
+                <!--</div>-->
+                <div class="inline pull-left m-r" ng-repeat="state in states">
+                    <label class="i-checks pull-left m-n" ng-click="stateSelect($event,state.stateCode)">
+                        <input type="radio" value="{{state.stateCode}}" ng-model="state_code" name="state"><i></i> {{
+                        state.label }}
+                    </label>
+                </div>
+            </div>
+            <div class="wrapper b-b clearfix ">
+                <form class="form-inline">
+                    <div class="form-group m-r">
+                        <label for="">客户姓名: </label>
+                        <input ng-model="searchForm.realname" class="form-control" type="text">
+                    </div>
+                    <div class="form-group m-r">
+                        <label for="">手机号: </label>
+                        <input ng-model="searchForm.telephone" class="form-control" type="tel">
+                    </div>
+                    <div class="form-group m-r">
+                        <label for="">产品线: </label>
+                        <select id="loanProductId" class="form-control" ng-model="searchForm.productid">
+                            <option ng-repeat="product in products" value="{{product.id}}">{{product.label}}</option>
+                        </select>
+                    </div>
+
+                    <button class="btn btn-primary m-r" ng-click="searchFormBtn()">
+                        <i class="fa fa-search"></i>查询
+                    </button>
+                    <button class="btn btn-default m-r" ng-click="resetSearchFormBtn()">
+                        <i class="fa fa-refresh"></i>重置
+                    </button>
+                </form>
+            </div>
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner" style="overflow: scroll;">
+                        <div class="wrapper">
+                            <div class="panel panel-default" style="width: 2000px;">
+                                <div class="panel-heading" ng-if="!loading && list.length > 0">
+                                    查询结果
+                                </div>
+                                <div ng-if="loading"
+                                     style="position: fixed;top: 50%;right: 50%;margin-left: -15px;margin-top: -15px;">
+                                    <div class="sk-spinner sk-spinner-cube-grid">
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                    </div>
+                                    <div class="text-center m-t">加载中请稍后</div>
+                                </div>
+                                <div class="panel-heading" ng-if="!loading && list.length < 1">
+                                    暂无数据！
+                                </div>
+                                <div class="table-responsive" ng-if="!loading && list.length > 0">
+                                    <table ng-if="!mdbtTabel" class="table table-hover b-light">
+                                        <thead>
+                                        <tr>
+                                            <th>订单号</th>
+                                            <th>客户姓名</th>
+                                            <th>手机号</th>
+                                            <!--<th>申请日期</th>-->
+                                            <th>借款金额(元)</th>
+                                            <!--<th>销售产品</th>-->
+                                            <th>开户行</th>
+                                            <th>产品线</th>
+                                            <th>产品线总额度(元)</th>
+                                            <!--<th>产品线剩余额度</th>-->
+                                            <th>借款开始日期</th>
+                                            <th>借款还款日期</th>
+                                            <th>操作</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr ng-repeat="item in list">
+                                            <td class="v-middle">
+                                                {{ item.sn }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.accountName }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.mobile }}
+                                            </td>
+                                            <!--<td class="v-middle">-->
+
+                                            <!--</td>-->
+                                            <td class="v-middle">
+                                                {{ item.loanAmount }}
+                                            </td>
+                                            <!--<td class="v-middle">-->
+                                            <!--{{ item.principal }}-->
+                                            <!--</td>-->
+                                            <td class="v-middle">
+                                                {{ item.accountBank }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.product }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.creditGrant }}
+                                            </td>
+                                            <!--<td class="v-middle">-->
+                                                <!--{{ item.creditBalance }}-->
+                                            <!--</td>-->
+                                            <td class="v-middle">
+                                                {{ item.loanStartDate}}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.loanEndDate }}
+                                            </td>
+                                            <td class="v-middle clearfix">
+                                                <button ui-sref="workflowEntity.home.profile.info({id:item.id})"
+                                                        class="pull-left btn btn-sm btn-info m-r">详情
+                                                </button>
+                                                <!--<button ui-sref="workflowEntity.home.profile.form({id:item.id})"-->
+                                                <!--class="pull-left btn btn-sm btn-info m-r">编辑-->
+                                                <!--</button>-->
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table ng-if="mdbtTabel" class="table table-hover b-light">
+                                        <thead>
+                                        <tr>
+                                            <th>借款单号</th>
+                                            <th>法人姓名</th>
+                                            <th>手机号</th>
+                                            <!--<th>申请日期</th>-->
+                                            <th>产品线总额度</th>
+                                            <th>借款本金(元)</th>
+                                            <th>借款利息(元)</th>
+                                            <th>本息(元)</th>
+                                            <th>当前剩余应还(元)</th>
+                                            <!--<th>销售产品</th>-->
+                                            <th>产品线</th>
+
+                                            <!--<th>产品线剩余额度</th>-->
+                                            <th>操作人</th>
+                                            <th>借款申请日期</th>
+                                            <th>借款使用日期</th>
+                                            <th>操作</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr ng-repeat="item in list">
+                                            <td class="v-middle">
+                                                {{ item.loanSn }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.personName }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.phone }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.creditGrant }}
+                                            </td>
+                                            <!--<td class="v-middle">-->
+
+                                            <!--</td>-->
+                                            <td class="v-middle">
+                                                {{ item.loanAmount }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.totalInterest }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.loanAmount + item.totalInterest }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.remainAmount }}
+                                            </td>
+                                            <!--<td class="v-middle">-->
+                                            <!--{{ item.principal }}-->
+                                            <!--</td>-->
+                                            <td class="v-middle">
+                                                {{ item.label }}
+                                            </td>
+
+                                            <!--<td class="v-middle">-->
+                                                <!--{{ item.creditBalance }}-->
+                                            <!--</td>-->
+                                            <td class="v-middle">
+                                                {{ item.userName}}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.applyDate | datetime}}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.useDate | datetime }}
+                                            </td>
+                                            <td class="v-middle clearfix">
+                                                <!--<button ui-sref="workflowEntity.home.profile.info({id:item.id})"-->
+                                                        <!--class="pull-left btn btn-sm btn-info m-r">详情-->
+                                                <!--</button>-->
+                                                <button ng-if="mdbtBtn"  ng-click="fn.adopt(item.id)" class="pull-left btn btn-sm btn-success m-r">放款</button>
+                                                <button ng-if="mdbtBtn" ng-click="fn.upload(item.id)"  class="pull-left btn btn-sm btn-primary m-r">上传凭证</button>
+                                                <button ng-if="mdbtBtn" ng-click="fn.openFile(item.id)" class="pull-left btn btn-sm btn-info m-r">查看凭证</button>
+                                                <!--<button ui-sref="workflowEntity.home.profile.form({id:item.id})"-->
+                                                <!--class="pull-left btn btn-sm btn-info m-r">编辑-->
+                                                <!--</button>-->
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="wrapper b-t b-light clearfix">
+                <ul id="loan_list_paginator" style="margin:2px 0;float: right;"></ul>
+                <small class="m-l-md pull-right text-muted inline m-t-sm m-b-sm m-r">共 {{pageList.total_elements}} 条，本页共 {{ list.length }}
+                    条
+                </small>
+            </div>
+            <div class="modal fade" id="loan_upload">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close"
+                                    ng-click="uploader.clearQueue();setUploadDone();"
+                                    data-dismiss="modal">
+                                <span>&times;</span>
+                            </button>
+                            <!--上传审核通过的文件-->
+                            上传凭证
+                        </div>
+                        <div class="modal-body">
+                            <div class="hbox hbox-auto-xs hbox-auto-sm" nv-file-drop="" uploader="uploader"
+                                 filters="queueLimit, customFilter">
+                                <div class="col w-lg bg-light b-r bg-auto">
+                                    <div class="wrapper-md dker b-b">
+                                        <h4 class="m-n font-thin">选择文件</h4>
+                                    </div>
+                                    <div class="wrapper-md">
+                                        <div ng-show="uploader.isHTML5" class="m-b-md">
+                                            <!-- 3. nv-file-over uploader="link" over-class="className" -->
+                                            <div class="b-a b-2x b-dashed wrapper-lg bg-white text-center m-b"
+                                                 nv-file-over="" over-class="b-info" uploader="uploader">
+                                                拖动文件放到此处
+                                            </div>
+                                        </div>
+                                        <input id="audit_zip_file_input" class="w" type="file"
+                                               nv-file-select=""
+                                               multiple
+                                               uploader="uploader"/>
+                                    </div>
+                                </div>
+                                <div class="col bg-light bg-auto">
+                                    <div class="wrapper-md bg-light dk b-b">
+                                                    <span class="pull-right">文件数：
+                                                        <b class="badge bg-info">{{ uploader.queue.length }}</b>
+                                                    </span>
+                                        <h4 class="m-n font-thin text-danger ">文件上传</h4>
+                                    </div>
+                                    <div class="wrapper-md">
+                                        <table class="table bg-white-only b-a">
+                                            <thead>
+                                            <tr>
+                                                <th>文件名</th>
+                                                <th ng-show="uploader.isHTML5">大小</th>
+                                                <th>状态</th>
+                                                <th>操作</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr ng-repeat="item in uploader.queue">
+                                                <td>
+                                                    <div class="text-ellipsis w-sm">{{ item.file.name }}
+                                                    </div>
+                                                </td>
+                                                <td ng-show="uploader.isHTML5" nowrap>{{
+                                                    item.file.size/1024/1024|number:2
+                                                    }} MB
+                                                </td>
+                                                <td class="text-center">
+                                                                <span ng-show="item.isSuccess" class="text-success">
+                                                                    <i class="fa fa-check"></i>
+                                                                </span>
+                                                    <span ng-show="item.isCancel" class="text-warning">
+                                                                    <i class="fa fa-ban"></i>
+                                                                </span>
+                                                    <span ng-show="item.isError" class="text-danger">
+                                                                    <i class="fa fa-cancel"></i>
+                                                                </span>
+                                                </td>
+                                                <td nowrap>
+                                                    <button type="button" class="btn btn-default btn-xs"
+                                                            ng-click="item.upload()"
+                                                            ng-disabled="item.isReady || item.isUploading || item.isSuccess">
+                                                        上传
+                                                    </button>
+                                                    <button type="button" class="btn btn-default btn-xs"
+                                                            ng-click="item.remove();setUploadDone();">
+                                                        清除
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                        <div>
+                                            <div>
+                                                <p>进度</p>
+                                                <div class="progress bg-light dker" style="">
+                                                    <div class="progress-bar progress-bar-striped bg-info"
+                                                         role="progressbar"
+                                                         ng-style="{ 'width': uploader.progress + '%' }"></div>
+                                                </div>
+                                                <div class="m-t m-b font-bold h4 text-danger"
+                                                     ng-if="uploader.progress === 100 && !uploadDone">
+                                                    服务器正在处理中，请稍等。。。
+                                                </div>
+                                            </div>
+                                            <button type="button" class="btn btn-addon btn-success"
+                                                    ng-click="uploader.uploadAll()"
+                                                    ng-disabled="!uploader.getNotUploadedItems().length">
+                                                <i class="fa fa-arrow-circle-o-up"></i> 上传
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="file_open">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content" style="float:left">
+                        <img class="img-responsive" src="{{imgSrc}}">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+
+    <!-- /column -->
+</div>
+<!-- /hbox layout -->

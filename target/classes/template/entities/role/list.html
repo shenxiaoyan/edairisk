@@ -1,0 +1,138 @@
+<script>
+    app.controller("roleListController",
+        [
+            "$scope",
+            "$http",
+            "entity",
+            function ($scope, $http, entity) {
+
+                $scope.list = [];
+
+                $scope.loading = true;
+
+                entity.getList("rest/roles?sort=id,desc&size=10000", ["state", "departmenttype"]).then(function (resResult) {
+
+                    $scope.loading = false;
+
+                    $scope.list = resResult._embeddedItems;
+                });
+
+            }
+        ]
+    );
+</script>
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light" ng-controller="roleListController">
+    <!-- column -->
+    <div class="col w-md lter b-l">
+        <div class="vbox">
+            <div class="wrapper b-b b-light clearfix">
+                <!--<div class="pull-left m-r w inline">-->
+                <!--<label class="sr-only" for=""></label>-->
+                <!--<input type="text" class="form-control" id="">-->
+                <!--</div>-->
+                <!--<div class="pull-left m-r w inline">-->
+                <!--<label class="sr-only" for=""></label>-->
+                <!--<input type="text" class="form-control" id="">-->
+                <!--</div>-->
+                <!--<div class="pull-left m-r w inline">-->
+                <!--<label class="sr-only" for=""></label>-->
+                <!--<input type="text" class="form-control" id="">-->
+                <!--</div>-->
+                <!--<div class="pull-left m-r inline">-->
+                <!--<button class="btn btn-primary btn-addon">-->
+                <!--<i class="fa fa-search"></i>-->
+                <!--查询-->
+                <!--</button>-->
+                <!--</div>-->
+                <div class="pull-left inline">
+                    <button class="btn btn-danger btn-addon" ui-sref="auditEntity.form">
+                        <i class="fa fa-star"></i>
+                        新建
+                    </button>
+                </div>
+            </div>
+            <div class="wrapper b-b b-light clearfix">
+                <div class="inline pull-left">
+                    所有<span translate="role.self.label"></span>
+                </div>
+            </div>
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner">
+                        <div class="wrapper">
+                            <div class="panel panel-default">
+                                <div class="panel-heading" ng-if="!loading && list.length > 0">
+                                    查询结果
+                                </div>
+                                <div ng-if="loading"
+                                     style="position: fixed;top: 50%;right: 50%;margin-left: -15px;margin-top: -15px;">
+                                    <div class="sk-spinner sk-spinner-cube-grid">
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                    </div>
+                                    <div class="text-center m-t">加载中请稍后</div>
+                                </div>
+                                <div class="panel-heading" ng-if="!loading && list.length < 1">
+                                    暂无数据！
+                                </div>
+                                <div class="table-responsive" ng-if="!loading && list.length > 0">
+                                    <table class="table table-hover b-light">
+                                        <thead>
+                                        <tr>
+                                            <th>角色名称</th>
+                                            <th>创建时间</th>
+                                            <th>所属部门类型</th>
+                                            <th>状态</th>
+                                            <th>最后修改时间</th>
+                                            <th>操作</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr ng-repeat="item in list">
+                                            <td class="v-middle">
+                                                {{item.label}}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{item.createdAt | datetime}}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{
+                                                item.departmenttype.id?item.departmenttype.label?item.departmenttype.label:"类型名称未知":"未分配"
+                                                }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.state.id?item.state.label?item.state.label:"状态名称未知":"无" }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{item.lastModifiedAt | datetime}}
+                                            </td>
+                                            <td class="v-middle clearfix">
+                                                <button ui-sref="auditEntity.home.profile.info({id:item.id})"
+                                                        class="pull-left btn btn-sm btn-info m-r">详情
+                                                </button>
+                                                <button ui-sref="auditEntity.form({id:item.id})"
+                                                        class="pull-left btn btn-sm btn-danger m-r">编辑
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /column -->
+</div>
+<!-- /hbox layout -->

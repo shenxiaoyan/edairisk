@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>提现申请</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <link rel="stylesheet" href="../../../css/weui.css">
+    <link rel="stylesheet" href="../../../css/weui2.css">
+    <link rel="stylesheet" href="../../../css/icon.css">
+    <style>
+        .btn{
+            width: 100%;
+            height: 40px;
+            background: #169BD5;
+            border-radius: 20px;
+            display: inline-block;
+            text-align: center;
+            line-height: 40px;
+            color: white;
+            font-size: 16px;
+        }
+        .btn:active{
+            background: #CCCCCC;
+            color: white;
+        }
+        .weui_cells_form .weui_cell_ft{
+            font-size: 16px;
+        }
+    </style>
+
+</head>
+<body>
+<div>
+    <p style="color: #FF403E; height: 25px;line-height:25px;font-weight: bolder;font-size:15px;background: #FFFBDE;padding-left: 15px;">使用日期必须是申请日期的七天之后</p>
+</div>
+<form id="form">
+    <div class="weui_cells weui_cells_form" style="margin-top: 0">
+        <!--<div class="weui_cell">-->
+        <!--<div class="weui_cell_hd"><label class="weui_label">采购单位</label></div>-->
+        <!--<div class="weui_cell_bd weui_cell_primary">-->
+        <!--<input id="purchasingUnit" style="text-align: right" class="weui_input" type="text" placeholder="请输入采购单位" emptyTips="请输入采购单位"  />-->
+        <!--</div>-->
+        <!--</div>-->
+        <div class="weui_cell">
+            <div class="weui_cell_hd">
+                <label for="" class="weui_label">申请日期:</label>
+            </div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <input style="text-align: right;" class="weui_input" readonly type="text" id='nowDate'/>
+            </div>
+            <!--<div class="weui_cell_ft" style="color: #000;" id="nowDate">-->
+            <!--</div>-->
+        </div>
+
+        <div class="weui_cell" style="position: relative">
+            <div class="weui_cell_hd">
+                <label for="" class="weui_label">使用日期:</label>
+            </div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <input style="text-align: right;" class="weui_input" readonly type="text" id='preDate'/>
+            </div>
+            <div class="weui_cell_ft" style="position: absolute;top: -1px;right: -1px">
+                <a href="javascript:;" style="padding:0;color:#0a1015;height: 24px;border-left: none " class="weui-vcode-btn ">
+                    <i class="icon icon-108"></i>
+                </a>
+                <i class="weui_icon_warn"></i>
+            </div>
+        </div>
+
+        <div class="weui_cell">
+            <div class="weui_cell_hd"><label class="weui_label" id="nameLabel">借款金额</label></div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <input id="amount" required oninput="changeAmout()"  class="weui_input" style="text-align: right" type="number" placeholder="请输入借款金额" emptyTips="请输入借款金额"  />
+            </div>
+            <div class="weui_cell_ft">
+                <i class="weui_icon_warn"></i>
+            </div>
+        </div>
+
+        <div class="weui_cell" id="planBtn">
+            <div class="weui_cell_bd weui_cell_primary">
+                <p>还款计划</p>
+            </div>
+            <div id="palnIcon"  class="weui_cell_ft icon icon-74"></div>
+        </div>
+        <div id="planList" style="display: none;">
+            <!--<div class="weui_cell">-->
+            <!--<div class="weui_cell_bd weui_cell_primary">-->
+            <!--<p>第一期</p>-->
+            <!--</div>-->
+            <!--<div  class="weui_cell_ft">还款金额1212</div>-->
+            <!--</div>-->
+            <!--<div class="weui_cell">-->
+            <!--<div class="weui_cell_bd weui_cell_primary">-->
+            <!--<p>第二期</p>-->
+            <!--</div>-->
+            <!--<div  class="weui_cell_ft">还款金额1212</div>-->
+            <!--</div>-->
+            <!--<div class="weui_cell"><div class="weui_cell_bd weui_cell_primary"><p>第三期</p></div><div  class="weui_cell_ft">还款金额1212</div></div>-->
+        </div>
+    </div>
+</form>
+
+<div style="margin-top: 90px;" class="page-bd-15">
+    <a id="applyBtn" class="btn">立即申请</a>
+</div>
+</body>
+<script src="../../../js/jquery-3.2.1.js"></script>
+<script src="../../../js/zepto.min.js"></script>
+<script src="../../../js/picker.js"></script>
+<script src="../../../js/config.js"></script>
+<script>
+
+    if(window.location.search){
+        var href = window.location.href;
+        window.userId = href.split('&')[1];
+        window.userId = window.userId.split('=')[1];
+        window.creditcard = href.split('?')[1];
+        window.creditcard = window.creditcard.split('&')[0];
+        window.creditcard = window.creditcard.split('=')[1];
+        window.amoumt = href.split('&')[2];
+        window.amoumt = window.amoumt.split('=')[1];
+        $('#amount').attr('placeholder','本次最高申请金额'+window.amoumt)
+    }
+
+//    $.ajax({
+//        type: 'GET',
+//        url:'/rest/users/'+ window.userId,
+//        //data: {'code':code} ,
+//        headers: {
+//            app_code:"WULIUQIANZHUANG",
+//            client:"wechat"
+//        },
+//        success: function (res) {
+//            window.debtorName = res.realname;
+//        } ,error:function (res) {
+//            alert(res.responseJSON.message)
+//        },
+//        dataType: 'json'
+//    });
+    var $form = $("#form");
+    $form.form();
+
+    $.ajax({
+        type: 'GET',
+        url:'/rest/products/4',
+        //data: {'code':code} ,
+        headers: {
+            app_code:"WULIUQIANZHUANG",
+            client:"wechat"
+        },
+        success: function (res) {
+            window.interest = (res.loanRate)/100;
+        } ,error:function (res) {
+            alert(res.responseJSON.message)
+        },
+        dataType: 'json'
+    });
+
+//    $.ajax({
+//        type: 'GET',
+//        url:'/rest/ordermdbts/search/listOwn',
+//        //data: {'code':code} ,
+//        headers: {
+//            app_code:"WULIUQIANZHUANG",
+//            client:"wechat"
+//        },
+//        success: function (res) {
+//            var agentBrand =res._embedded.ordermdbts[0].agentBrand;
+//           $('#purchasingUnit').val(agentBrand)
+//        } ,error:function (res) {
+//            alert(res.responseJSON.message)
+//        },
+//        dataType: 'json'
+//    });
+
+
+    var d = new Date();
+    var vYear = d.getFullYear();
+    var vMon = d.getMonth() + 1;
+    var vDay = d.getDate();
+    var preMon=d.getMonth() + 4;
+    if(preMon > 12){
+        preMon = preMon -12
+    }
+    var s=vYear+"-"+(vMon<10 ? "0" + vMon : vMon)+"-"+(vDay<10 ? "0"+ vDay : vDay);
+
+    //增加几天
+    function AddDays(dayIn) {
+        var date=new Date();
+        var myDate=new Date(date.getTime()+dayIn*24*60*60*1000);
+        var year=myDate.getFullYear();
+        var month=myDate.getMonth()+1;
+        var day=myDate.getDate();
+        CurrentDate=year+"-";
+        if(month>=10)
+        {
+            CurrentDate=CurrentDate+month+"-";
+        }
+        else
+        {
+            CurrentDate=CurrentDate+"0"+month+"-";
+        }
+        if(day>=10)
+        {
+            CurrentDate=CurrentDate+day;
+        }
+        else
+        {
+            CurrentDate=CurrentDate+"0"+day;
+        }
+        return CurrentDate;
+    }
+
+    //获取当前时间 yyyy-MM-dd HH:MM:SS
+    function getNowFormatDate() {
+        var date = new Date();
+        var seperator1 = "-";
+        var seperator2 = ":";
+        var month = date.getMonth() + 1;
+        var strDate = date.getDate();
+        if (month >= 1 && month <= 9) {
+            month = "0" + month;
+        }
+        if (strDate >= 0 && strDate <= 9) {
+            strDate = "0" + strDate;
+        }
+        var currentdate = date.getFullYear() + seperator1 + month + seperator1 + strDate
+            + " " + date.getHours() + seperator2 + date.getMinutes()
+            + seperator2 + date.getSeconds();
+        return currentdate;
+    }
+
+    var nowDate =getNowFormatDate();
+    console.log(s)
+    var preDate = AddDays(7);
+    $('#nowDate').val(s);
+    $('#preDate').val(preDate)
+
+    $("#preDate").datetimePicker({title:"选择日期时间",min:preDate,m:1});
+
+    //利息
+    function changeAmout() {
+        $('#planList').empty();
+        var amoumt = $('#amount').val();
+        var planInterest = ($('#amount').val() * window.interest)/12;
+        var con =parseFloat(amoumt)+parseFloat(planInterest);
+        for(var i=1 ;i<=3 ;i++){
+            if(i==3){
+                var str ='<div class="weui_cell"><div class="weui_cell_bd weui_cell_primary"><p>第'+i+'期</p></div><div  class="weui_cell_ft">还款本金'+amoumt+'元,还款利息'+planInterest.toFixed(2)+'元</div></div>'
+            }else {
+                var str ='<div class="weui_cell"><div class="weui_cell_bd weui_cell_primary"><p>第'+i+'期</p></div><div  class="weui_cell_ft">还款本金0元,还款利息'+planInterest.toFixed(2)+'元</div></div>'
+            }
+            $('#planList').append(str)
+        }
+        $('#Dailyinterest').text(con);
+    }
+    //申请
+    $('#applyBtn').click(function () {
+
+        $form.validate(function(error) {
+            if (error) {
+
+            } else {
+                var principal =$('#amount').val();
+                if(parseFloat(principal) > parseFloat(window.amoumt) ){
+                    $.alert('您的申请额度超过本月最高申请额度'+window.amoumt+'元!')
+                }else {
+                    $.showLoading();
+
+                    var totalInterest = ( principal * window.interest)/12 *3;
+                    var applyDate = getNowFormatDate();
+                    var useDate = $('#preDate').val() +' '+ applyDate.split(' ')[1];
+//            var purchasingUnit =$('#purchasingUnit').val();
+
+                    var data={
+                        act:'create',
+                        principal:principal,
+                        totalInterest:totalInterest,
+                        applyDate:applyDate,
+                        useDate:useDate,
+                        creditcard:'/rest/creditcards/'+window.creditcard,
+                        debtorUser:'/rest/users/'+window.userId,
+                        loanType:'ORDERMDBT',
+//                debtorName:debtorName,
+//                purchasingUnit:purchasingUnit
+                    }
+                    var upDate=JSON.stringify(data);
+                    $.ajax({
+                        type: 'post',
+                        url: '/rest/loans',
+                        headers: {
+                            "Content-Type":"application/json",
+                            app_code:"WULIUQIANZHUANG",
+                            client:"wechat",
+                        },
+                        data:upDate,
+                        success: function (res) {
+
+                            if(res.ActionStatus == 'FAIL'){
+                                alert(res.ErrorInfo)
+                                $.hideLoading();
+                            }else{
+                                $.toast('借款申请成功');
+                                window.location.href=document.referrer;
+//                                window.history.back();
+                                $.hideLoading();
+                            }
+
+                        },error:function(res){
+                            console.log(res)
+                            $.hideLoading();
+                            alert(res.responseJSON.message)
+                            //alert(JSON.stringify(res))
+                        },
+                        dataType: 'json'
+                    });
+                }
+
+            }
+        })
+
+    })
+    
+    $('#planBtn').click(function () {
+        if($('#planList').css('display') == 'none'){
+            $('#planList').slideDown()
+            $('#palnIcon').removeClass('icon-74').addClass('icon-35')
+        }else {
+            $('#planList').slideUp()
+            $('#palnIcon').removeClass('icon-35').addClass('icon-74')
+        }
+    })
+
+</script>
+</html>

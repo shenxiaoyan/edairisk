@@ -1,0 +1,321 @@
+<div class="bg-light lter b-b wrapper-md" style="background: #f6f8f8">
+    <form class="form-inline">
+        <div class="form-group m-r">
+            <label for="">产品名称: </label>
+            <select class="form-control"
+                    ng-model="selectActive"
+                    ng-options="selectList.name for selectList in selectLists"
+                    ng-change="changeSelect(selectActive)">
+            </select>
+        </div>
+    </form>
+</div>
+<div class="wrapper">
+    <div ng-if="listInfo.sjshShow">
+        <div ng-if="profile.sjshList.length == 0 ? true : false ">暂无申请记录!</div>
+        <div>
+            <div class="panel panel-info" ng-repeat="profile in profile.sjshList">
+                <div class="panel-heading">
+                    随借随还申请信息
+                </div>
+                <table class="table table-striped m-b-none">
+                    <tbody>
+                    <tr>
+                        <td class="v-middle text-right w-sm">业务类型：</td>
+                        <td class="v-middle w-xl">随借随还</td>
+                        <td class="v-middle text-right w-sm">代理品牌：</td>
+                        <td class="v-middle w-xl">{{profile.agentBrand}}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right w-sm">姓名：</td>
+                        <td class="v-middle w-xl">{{ profile.realName }}</td>
+                        <td class="v-middle text-right w-sm">手机号码：</td>
+                        <td class="v-middle w-xl">{{ profile.applyMobile }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right w-sm">身份证号：</td>
+                        <td class="v-middle w-xl">{{ profile.applyIdentityNo }}</td>
+                        <td class="v-middle text-right w-sm">办公地址：</td>
+                        <td class="v-middle w-xl">{{ profile.applyEnterpriseAddress }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right w-sm">申请额度：</td>
+                        <td class="v-middle w-xl">{{ profile.applyAmount }}</td>
+                        <td class="v-middle text-right w-sm">借款期限：</td>
+                        <td class="v-middle w-xl">{{ profile.applyPeriodNumber == 3 ? '授信期限1年，3个月随借随还' : '3' }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">日平均收件量：</td>
+                        <td class="v-middle">{{ profile.applyDayPatchExpress }}</td>
+                        <td class="v-middle text-right">日平均派件量：</td>
+                        <td class="v-middle">{{ profile.applyDayPickExpress }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">快递网点名称：</td>
+                        <td class="v-middle">{{ profile.applyEnterpriseName }}</td>
+                        <td class="v-middle text-right">经营区域：</td>
+                        <td class="v-middle">
+                            {{ profile.applyEnterpriseProvince }}
+                            {{ profile.applyEnterpriseCity }}
+                            {{ profile.applyEnterpriseDistrict }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">推荐人：</td>
+                        <td class="v-middle">{{ profile.applyReferrerRealName?profile.applyReferrerRealName:"无" }}</td>
+                        <td class="v-middle text-right">创建时间：</td>
+                        <td class="v-middle">{{ profile.createdAt | datetime }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div ng-if="listInfo.xydShow">
+        <div ng-if="profile.xydList.length == 0 ? true : false ">暂无申请记录!</div>
+            <div class="panel panel-info" ng-repeat="profile in profile.xydList">
+                <div class="panel-heading">
+                    网点信用贷申请信息
+                </div>
+                <table class="table table-striped m-b-none">
+                    <tbody>
+                    <tr>
+                        <td class="v-middle text-right w-sm">业务类型：</td>
+                        <td class="v-middle w-xl">网点信用贷</td>
+                        <td class="v-middle text-right w-sm"></td>
+                        <td class="v-middle w-xl"></td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right w-sm">姓名：</td>
+                        <td class="v-middle w-xl">{{ profile.realName }}</td>
+                        <td class="v-middle text-right w-sm">手机号码：</td>
+                        <td class="v-middle w-xl">{{ profile.applyMobile }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right w-sm">身份证号：</td>
+                        <td class="v-middle w-xl">{{ profile.applyIdentityNo }}</td>
+                        <td class="v-middle text-right w-sm">办公地址：</td>
+                        <td class="v-middle w-xl">{{ profile.applyEnterpriseAddress }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right w-sm">综合负债：</td>
+                        <td class="v-middle w-xl">{{ profile.comfirmComprehensiveLiabilities }}</td>
+                        <td class="v-middle text-right w-sm">抵押类负债：</td>
+                        <td class="v-middle w-xl">{{ profile.comfirmMortgageLiabilities }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right w-sm">申请额度：</td>
+                        <td class="v-middle w-xl">{{ profile.applyAmount }}</td>
+                        <td class="v-middle text-right w-sm">借款期限：</td>
+                        <td class="v-middle w-xl">{{ profile.applyPeriodNumber }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">日平均收件量：</td>
+                        <td class="v-middle">{{ profile.applyDayPatchExpress }}</td>
+                        <td class="v-middle text-right">日平均派件量：</td>
+                        <td class="v-middle">{{ profile.applyDayPickExpress }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">快递网点名称：</td>
+                        <td class="v-middle">{{ profile.applyEnterpriseName }}</td>
+                        <td class="v-middle text-right w-sm">代理品牌：</td>
+                        <td class="v-middle w-xl">{{profile.agentBrand}}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">推荐人：</td>
+                        <td class="v-middle">{{ profile.applyReferrerRealName?profile.applyReferrerRealName:"无" }}</td>
+                        <td class="v-middle text-right">创建时间：</td>
+                        <td class="v-middle">{{ profile.createdAt | datetime }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+    </div>
+
+    <div ng-if="listInfo.rzzlShow">
+        <div ng-if="profile.rzzlList.length == 0 ? true : false ">暂无申请记录!</div>
+            <div class="panel panel-info" ng-repeat="profile in profile.rzzlList">
+                <div class="panel-heading">
+                    融资租赁申请信息
+                </div>
+                <table class="table table-striped m-b-none">
+                    <tbody>
+                    <tr>
+                        <td class="v-middle text-right w-sm">业务类型:</td>
+                        <td class="v-middle w-xl">融资租赁</td>
+                        <td class="v-middle text-right w-sm">身份证号：</td>
+                        <td class="v-middle w-xl">{{ profile.applyIdentityNo }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right w-sm">姓名：</td>
+                        <td class="v-middle w-xl">{{ profile.realName }}</td>
+                        <td class="v-middle text-right w-sm">手机号码：</td>
+                        <td class="v-middle w-xl">{{ profile.applyMobile }}</td>
+                    </tr>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right w-sm">申请额度：</td>
+                        <td class="v-middle w-xl">{{ profile.applyAmount }}</td>
+                        <td class="v-middle text-right w-sm">借款期限：</td>
+                        <td class="v-middle w-xl">{{ profile.applyPeriodNumber }}期</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">日平均收件量：</td>
+                        <td class="v-middle">{{ profile.applyDayPatchExpress }}</td>
+                        <td class="v-middle text-right">日平均派件量：</td>
+                        <td class="v-middle">{{ profile.applyDayPickExpress }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">快递网点名称：</td>
+                        <td class="v-middle">{{ profile.applyEnterpriseName }}</td>
+                        <td class="v-middle text-right w-sm">代理品牌：</td>
+                        <td class="v-middle w-xl">{{profile.agentBrand}}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">推荐人：</td>
+                        <td class="v-middle">{{ profile.applyReferrerRealName?profile.applyReferrerRealName:"无" }}</td>
+                        <td class="v-middle text-right">创建时间：</td>
+                        <td class="v-middle">{{ profile.createdAt | datetime }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+    </div>
+
+    <div ng-if="listInfo.sjshShow  && (profile.sjshList.length > 0)" class="wrapper bg-white b-b" style="margin-bottom: 30px;">
+        <ul class="nav nav-pills nav-sm">
+            <li ng-click="sjshLoanTab()" ng-class="{true: 'active', false: ''}[listInfo.sjshTabShow]">
+                <a>借款记录</a>
+            </li>
+            <li ng-click="sjshRepayTab()" ng-class="{true: '', false: 'active'}[listInfo.sjshTabShow]">
+                <a>还款记录</a>
+            </li>
+        </ul>
+    </div>
+
+    <div ng-if="listInfo.sjshShow && (profile.sjshList.length > 0)">
+        <div ng-if="listInfo.sjshTabShow" class="panel panel-default">
+            <div class="panel-heading" ng-if="listInfo.isHaveLoan">
+                借款记录
+            </div>
+            <div class="panel-heading" ng-if="!listInfo.isHaveLoan">
+                暂无借款记录！
+            </div>
+            <div class="table-responsive" ng-if="listInfo.isHaveLoan">
+                <table class="table table-hover b-light">
+                    <thead>
+                    <tr>
+                        <th>订单号</th>
+                        <th>客户姓名</th>
+                        <th>联系方式</th>
+                        <!--<th>申请日期</th>-->
+                        <th>借款金额(元)</th>
+                        <th>总额度(元)</th>
+                        <th>剩余额度(元)</th>
+                        <!--<th>销售产品</th>-->
+                        <th>开户行</th>
+                        <th>借款开始时间</th>
+                        <th>借款还款时间</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="item in infoList.loans._embeddedItems">
+                        <td class="v-middle">
+                            {{ item.informationJson.id }}
+                        </td>
+                        <td class="v-middle">
+                            {{ item.informationJson.accountName }}
+                        </td>
+                        <td class="v-middle">
+                            {{ item.informationJson.mobile }}
+                        </td>
+                        <!--<td class="v-middle">-->
+
+                        <!--</td>-->
+                        <td class="v-middle">
+                            {{ item.informationJson.loanAmount }}
+                        </td>
+                        <td class="v-middle">
+                            {{ infoList.creditGrant }}
+                        </td>
+                        <td class="v-middle">
+                            {{ infoList.creditBalance }}
+                        </td>
+                        <!--<td class="v-middle">-->
+                        <!--{{ item.principal }}-->
+                        <!--</td>-->
+                        <td class="v-middle">
+                            {{ item.informationJson.accountBank }}
+                        </td>
+                        <td class="v-middle">
+                            {{ item.informationJson.loanStartDate }}
+                        </td>
+                        <td class="v-middle">
+                            {{ item.informationJson.loanEndDate }}
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div ng-if="!listInfo.sjshTabShow && (profile.sjshList.length > 0)" class="panel panel-default">
+            <div class="panel-heading" ng-if="listInfo.isHaveCreditRepayments">
+                还款记录
+            </div>
+            <div class="panel-heading" ng-if="!listInfo.isHaveCreditRepayments">
+                暂无还款记录！
+            </div>
+            <div class="table-responsive" ng-if="listInfo.isHaveCreditRepayments">
+                <table class="table table-hover b-light">
+                    <thead>
+                    <tr>
+                        <th>订单号</th>
+                        <th>客户名</th>
+                        <th>联系方式</th>
+                        <th>还款金额(元)</th>
+                        <th>是否逾期</th>
+                        <th>本金(元)</th>
+                        <th>罚息(元)</th>
+                        <th>利息+手续费(元)</th>
+                        <th>还款时间</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="item in infoList.creditrepayments._embeddedItems">
+                        <td class="v-middle">
+                            {{item.informationJson.id}}
+                        </td>
+                        <td class="v-middle">
+                            {{ personName }}
+                        </td>
+                        <td class="v-middle">
+                            {{ item.informationJson.mobile }}
+                        </td>
+                        <td class="v-middle">
+                            {{ item.informationJson.payAmount }}
+                        </td>
+                        <td class="v-middle">
+                            {{ item.payPlans.isOverdue == 0 ? '否' : '逾期'  }}
+                        </td>
+                        <td class="v-middle">
+                            {{ item.payPlans.planCorpus }}
+                        </td>
+                        <td class="v-middle">
+                            {{ item.payPlans.penatly }}
+                        </td>
+                        <td class="v-middle">
+                            {{ item.payPlans.planInterest }}
+                        </td>
+                        <td class="v-middle">
+                            {{ item.informationJson.payDate}}
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>

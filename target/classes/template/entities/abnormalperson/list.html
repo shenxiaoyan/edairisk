@@ -1,0 +1,396 @@
+<script>
+    "use strict";
+    app.controller("userListController",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "entity",
+            "$state",
+            function ($rootScope, $scope, $http, $stateParams, entity,$state) {
+
+                $scope.states = [];
+
+                $scope.searchForm={
+                    name:'',
+                    telephone:'',
+                    identity:'',
+                    accountStatus:''
+                };
+                $scope.accountStatus=[
+                    {'val':'未选择','code':''},
+                    {'val':'异常客户','code':'ABNORMAL'},
+                    {'val':'正常客户','code':'NORMAL'}
+                ]
+
+                $scope.abnormalId=null;
+
+                $scope.searchList = function(page) {
+                    $http({
+                        method: "GET",
+                        url: "/person/list?stateCode="+$scope.state_code+"&accountStatus="+$scope.searchForm.accountStatus+"&telephone="+$scope.searchForm.telephone+"&name="+$scope.searchForm.name+"&identity="+$scope.searchForm.identity+"&page="+page+"&size=10&sort=id,desc"
+                    }).success(function (resResult) {
+
+                        console.log(resResult)
+                        $scope.list = resResult.data.content;
+
+                        //搜索的返回格式和 rest/search不一样
+                        $scope.pageList = {
+                            size: resResult.data.size,
+                            total_elements: resResult.data.totalElements,
+                            current_page: resResult.data.number,
+                            num_page: resResult.data.totalPages,
+                            total_page: resResult.data.totalPages
+                        };
+
+                        if ($scope.list.length > 0) {
+                            $rootScope.setPaginator("#abnormalperson_list_paginator", $scope.pageList, $scope.searchList);
+                        }
+
+                    });
+                }
+
+                //搜索按钮
+                $scope.searchFormBtn=function () {
+                    console.log( $scope.state_code)
+                    $scope.searchList(0)
+
+                }
+
+                //重置按钮
+                $scope.resetSearchFormBtn=function () {
+                    $scope.searchForm={
+                        name:'',
+                        telephone:'',
+                        identity:'',
+                        accountStatus:''
+                    };
+                    $scope.searchList(0)
+                }
+
+                entity.getList("/rest/userWorkflows/ " + $stateParams.workflow_id + "/states").then(function (resResult) {
+                    $scope.states = resResult._embeddedItems;
+                    if ($scope.states.length > 0) {
+
+                        $scope.states = $scope.states.sort(function (a, b) {
+                            return a.sort - b.sort;
+                        });
+
+                        //默认有效了，每次都点很烦
+                        $scope.state_code = $scope.states[2].stateCode;
+                        $scope.getList(0);
+                    }
+                });
+
+                //初始化分页参数
+                $scope.pageList = {
+                    size: 0,
+                    total_elements: 0,
+                    current_page: 0,
+                    num_page: 1,
+                    total_page: 1
+                };
+
+                $scope.list = [];
+
+                /*
+                 * 获取实体列表
+                 * @author  金杭
+                 * @param   {number}  页码
+                 * @return  无
+                 * */
+
+                $scope.getList = function (page) {
+
+                    $scope.loading = true;
+
+                    $scope.list = [];
+
+
+                    //var link="/user/list?state.stateCode="+$scope.state_code+"&page="+page+"&size=20&sort=id,desc"+"&nickname="+$scope.searchForm.nickname+"&username="+$scope.searchForm.username;
+
+                    var link="/person/list?stateCode="+$scope.state_code+"&accountStatus=&telephone=&name=&identity=&page="+page+"&size=10&sort=id,desc";
+
+                    entity.getList(link).then(function (resResult) {
+
+                        $scope.loading = false;
+
+                        $scope.list = resResult.data.content;
+                        //console.log(resResult._embeddedItems)
+
+                        //设置分页参数
+                        $scope.pageList = {
+                            size: resResult.data.size,
+                            total_elements: resResult.data.totalElements,
+                            current_page: resResult.data.number,
+                            num_page: resResult.data.totalPages,
+                            total_page: resResult.data.totalPages
+                        };
+
+                        //生成翻页插件
+                        if ($scope.list.length > 0) {
+                            $("#abnormalperson_list_paginator").show();
+                            $rootScope.setPaginator("#abnormalperson_list_paginator", $scope.pageList, $scope.getList);
+                        }else{
+                            $("#abnormalperson_list_paginator").hide();
+                        }
+
+                    });
+                };
+
+                //状态筛选
+                $scope.stateSelect = function ($event, stateCode) {
+                    if ($event.target.nodeName === "INPUT") {
+                        $scope.state_code = stateCode;
+                        $scope.searchForm={
+                            name:'',
+                            telephone:'',
+                            identity:'',
+                            accountStatus:''
+                        };
+                        $scope.getList(0);
+                    }
+                };
+
+                $('#failSave').click(function () {
+                    var failedVla = $('#failedVla').val();
+                    $http({
+                        method: "PATCH",
+                        url: "/rest/persons/" + $scope.abnormalId ,
+                        data: {
+                            'accountStatus':'ABNORMAL',
+                            'abnormalRemark':failedVla
+                        }
+                    }).success(function (resResult) {
+                        $("#abbormalModel").modal("hide");
+                        $rootScope.toasterSuccess("成功", "设为异常用户成功!");
+                        $state.go("workflowEntity.list", {entity_key: "abnormalperson"}, {reload: true});
+                    });
+                })
+
+                $scope.fn={
+                    //设为异常用户
+                    'setToAbbormal':function (id) {
+                        $scope.abnormalId=id
+                        $("#abbormalModel").modal("show");
+                    },
+                    //设为正常用户
+                    'setUser':function (id) {
+                        swal({
+                            title: "是否设为正常用户",
+                            type: "warning",
+                            showCancelButton: true,
+                            cancelButtonText: "退出",
+                            confirmButtonText: "同意",
+                            closeOnConfirm: true
+                        }, function () {
+                            $http({
+                                method: "PATCH",
+                                url: "/rest/persons/" + id,
+                                data: {
+                                   'accountStatus':'NORMAL',
+                                    'abnormalRemark':null
+                                }
+                            }).success(function (resResult) {
+                                $rootScope.toasterSuccess("成功", "设为正常用户成功!");
+                                $state.go("workflowEntity.list", {entity_key: "abnormalperson"}, {reload: true});
+                            });
+                        });
+                    }
+                }
+
+            }
+        ]
+    );
+</script>
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light" ng-controller="userListController">
+    <!-- column -->
+    <div class="col w-md lter b-l">
+        <div class="vbox">
+            <!--<div class="wrapper b-b clearfix">-->
+                <!--<div class="inline pull-left">-->
+                    <!--异常<span translate="user.self.label"></span>状态：-->
+                <!--</div>-->
+                <!--&lt;!&ndash;<div class="inline pull-left m-r">&ndash;&gt;-->
+                <!--&lt;!&ndash;<label class="i-checks pull-left m-n" ng-click="stateSelect($event,'')">&ndash;&gt;-->
+                <!--&lt;!&ndash;<input type="radio" name="state" checked><i></i>  全部&ndash;&gt;-->
+                <!--&lt;!&ndash;</label>&ndash;&gt;-->
+                <!--&lt;!&ndash;</div>&ndash;&gt;-->
+                <!--<div class="inline pull-left m-r" ng-repeat="state in states">-->
+                    <!--<label class="i-checks pull-left m-n" ng-click="stateSelect($event,state.stateCode)">-->
+                        <!--<input type="radio" value="{{state.stateCode}}" ng-model="state_code" name="state"><i></i>{{state.label }}-->
+                    <!--</lab- el>-->
+                <!--</div>-->
+            <!--</div>-->
+            <div class="wrapper b-b clearfix ">
+                <form class="form-inline" name="search_form">
+                    <!--<div class="form-group m-r">-->
+                        <!--<label for="">姓名: </label>-->
+                        <!--<input ng-model="searchForm.name" class="form-control" type="text">-->
+                    <!--</div>-->
+                    <!--<div class="form-group m-r">-->
+                        <!--<label for="">手机号: </label>-->
+                        <!--<input ng-model="searchForm.telephone" class="form-control" type="tel">-->
+                    <!--</div>-->
+                    <!--<div class="form-group m-r">-->
+                        <!--<label for="">身份证: </label>-->
+                        <!--<input ng-model="searchForm.identity" class="form-control" type="tel">-->
+                    <!--</div>-->
+                    <div class="form-group m-r">
+                        <label for="">客户类型: </label>
+                        <select class="form-control" ng-model="searchForm.accountStatus">
+                            <option ng-repeat=" option in accountStatus" value="{{option.code}}">{{option.val}}</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group m-r">
+                        <label for="">姓名: </label>
+                        <input ng-model="searchForm.name" class="form-control" type="text" pattern="^\s*[\u4e00-\u9fa5]+(·[\u4e00-\u9fa5]+)*\s*$" name="name">
+                        <span class="help-block text-danger"
+                              ng-show="search_form.name.$dirty && search_form.name.$invalid">
+                            <i class="fa fa-exclamation-circle text-danger"></i>不符合姓名格式
+                        </span>
+                    </div>
+                    <div class="form-group m-r">
+                        <label for="">手机号: </label>
+                        <input ng-model="searchForm.telephone" class="form-control" type="tel" pattern="^\s*\d+\s*$" name="telephone">
+                        <span class="help-block text-danger"
+                              ng-show="search_form.telephone.$dirty && search_form.telephone.$invalid">
+                            <i class="fa fa-exclamation-circle text-danger"></i>手机号必须为数字
+                        </span>
+                    </div>
+                    <div class="form-group m-r">
+                        <label for="">身份证: </label>
+                        <input ng-model="searchForm.identity" class="form-control" type="tel" pattern="^\s*\d+(x|X)?\s*$" name="identity">
+                        <span class="help-block text-danger"
+                              ng-show="search_form.identity.$dirty && search_form.identity.$invalid">
+                            <i class="fa fa-exclamation-circle text-danger"></i>格式错误
+                        </span>
+                    </div>
+                    <button class="btn btn-primary m-r" ng-click="searchFormBtn()" ng-disabled="search_form.$invalid">
+                        <i class="fa fa-search"></i>查询
+                    </button>
+                    <button class="btn btn-default m-r" ng-click="resetSearchFormBtn()">
+                        <i class="fa fa-refresh"></i>重置
+                    </button>
+                </form>
+            </div>
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner">
+                        <div class="wrapper">
+                            <div class="panel panel-default">
+                                <div class="panel-heading" ng-if="!loading && list.length > 0">
+                                    查询结果
+                                </div>
+                                <div ng-if="loading"
+                                     style="position: fixed;top: 50%;right: 50%;margin-left: -15px;margin-top: -15px;">
+                                    <div class="sk-spinner sk-spinner-cube-grid">
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                        <div class="sk-cube"></div>
+                                    </div>
+                                    <div class="text-center m-t">加载中请稍后</div>
+                                </div>
+                                <div class="panel-heading" ng-if="!loading && list.length < 1">
+                                    暂无数据！
+                                </div>
+                                <div ng-if="!loading && list.length > 0">
+                                    <table class="table table-hover b-light" ng-if="list.length > 0">
+                                        <thead>
+                                        <tr>
+                                            <th>操作</th>
+                                            <th>姓名</th>
+                                            <th>手机号</th>
+                                            <th>身份证</th>
+                                            <th>用户状态</th>
+                                            <th>异常备注</th>
+                                            <th>创建时间</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr ng-repeat="item in list">
+                                            <td class="v-middle">
+                                                <div class="btn-group dropdown">
+                                                    <button class="btn btn-success btn-xs" data-toggle="dropdown">操作 <span class="caret"></span></button>
+                                                    <ul class="dropdown-menu">
+                                                        <li ng-if="!(item.accountStatus == 'ABNORMAL')" ng-click="fn.setToAbbormal(item.id)" >
+                                                            <a>设为异常用户</a>
+                                                        </li>
+                                                        <li ng-click="fn.setUser(item.id)" ng-if="(item.accountStatus == 'ABNORMAL')">
+                                                            <a>设为正常用户</a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.name }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.telephone }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{  item.identity }}
+                                            </td>
+                                            <td class="v-middle" ng-class="{true: 'color_red', false: 'color_black'}[(item.accountStatus == 'ABNORMAL')]">
+                                                {{  item.accountStatus == 'ABNORMAL' ? '异常用户':'正常用户'}}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{  item.abnormalRemark ? item.abnormalRemark:'无'}}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{  item.createdAt | datetime }}
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="wrapper b-t b-light clearfix">
+                <ul id="abnormalperson_list_paginator" style="margin:2px 0;float: right;"></ul>
+                <small class="m-l-md pull-right text-muted inline m-t-sm m-b-sm m-r">共 {{pageList.total_elements}} 条，本页共 {{ list.length }} 条</small>
+            </div>
+        </div>
+    </div>
+    <!-- /column -->
+</div>
+<!-- /hbox layout -->
+<div class="modal fade" id="abbormalModel" tabindex="-1" role="dialog">
+    <div class="modal-xs modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"
+                        aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title">请填写设为异常用户理由</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group clearfix">
+                    <label class="col-lg-2 text-right">理由</label>
+                    <div class="col-lg-10">
+                                <textarea id="failedVla" class="form-control"  cols="9" style="height: 250px">
+                                </textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer text-center">
+                <button id="failSave" type="button" class="btn btn-success w-lg">
+                    提交
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

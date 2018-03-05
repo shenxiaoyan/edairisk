@@ -1,0 +1,45 @@
+<div class="wrapper">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    部门详细信息
+                </div>
+                <table class="table table-striped m-b-none">
+                    <tbody>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="department.label.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ department.label }}</td>
+                        <td class="v-middle text-right">
+                            <span translate="department.state.label"></span>：
+                        </td>
+                        <td class="v-middle">{{ profile.state.label }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="enterprise.createdBy.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.createdBy.nickname }}</td>
+                        <td class="v-middle text-right">
+                            <span translate="enterprise.createdAt.label"></span>：
+                        </td>
+                        <td class="v-middle">{{ profile.createdAt | datetime }}</td>
+                    </tr>
+                    <tr>
+                        <td class="v-middle text-right">
+                            <span translate="enterprise.lastModifiedBy.label"></span>：
+                        </td>
+                        <td class="v-middle b-r">{{ profile.lastModifiedBy.label }}</td>
+                        <td class="v-middle text-right">
+                            <span translate="enterprise.lastModifiedAt.label"></span>：
+                        </td>
+                        <td class="v-middle">{{ profile.lastModifiedAt | datetime }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

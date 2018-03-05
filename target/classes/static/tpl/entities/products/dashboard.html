@@ -1,0 +1,185 @@
+<div class="hbox hbox-auto-xs bg-light ">
+
+    <div class="col lter">
+        <div class="vbox">
+            <div class="row-row">
+                <div class="cell scrollable">
+                    <div class="cell-inner">
+                        <div class="wrapper-md">
+                            <form editable-form name="editableForm" onaftersave="saveUser()">
+                                <div class="form-horizontal">
+
+                                    <div class="form-group">
+                                        <label for="application_id" class="col-sm-3 control-label">展现到应用</label>
+                                        <div class="col-sm-3">
+                                            <select class="form-control" name="application_id">
+                                                <option value="ios终端">ios终端</option>
+                                                <option value="android终端">android终端</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label" for="alias">实际销售利率</label>
+                                        <div class="col-sm-3">
+                                            <input class='form-control' type='text' ng-model="debtor_interest_rate"  name="debtor_interest_rate" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label" for="alias">最小申请额度</label>
+                                        <div class="col-sm-3">
+                                            <input class='form-control' type='text' ng-model="debtor_amout_min"  name="debtor_amout_min" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label" for="alias">最大申请额度</label>
+                                        <div class="col-sm-3">
+                                            <input class='form-control' type='text' ng-model="debtor_amout_max"  name="debtor_amout_max" />
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label" for="label">产品名称</label>
+                                        <div class="col-sm-3">
+                                            <input class='form-control' type='text' ng-model="label"  name="label" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label" for="alias">产品别名</label>
+                                        <div class="col-sm-3">
+                                            <input class='form-control' type='text' ng-model="alias"  name="alias" />
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label" for="intro1">产品介绍1</label>
+                                        <div class="col-sm-3">
+                                            <textarea class='form-control' ng-model="intro1"  name="intro1" /></textarea>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label" for="intro2">产品介绍2</label>
+                                        <div class="col-sm-3">
+                                            <textarea class='form-control' ng-model="intro2"  name="intro2" /></textarea>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label" for="intro3">产品介绍3</label>
+                                        <div class="col-sm-3">
+                                            <textarea class='form-control' ng-model="intro3"  name="intro3" /></textarea>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label" for="intro4">产品介绍4</label>
+                                        <div class="col-sm-3">
+                                            <textarea class='form-control' ng-model="intro4"  name="intro4" /></textarea>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label" for="intro5">产品介绍5</label>
+                                        <div class="col-sm-3">
+                                            <textarea class='form-control' ng-model="intro5"  name="intro5" /></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label" for="intro5">图片1</label>
+                                        <div class="col-sm-3">
+                                            <input ui-jq="filestyle" data-icon="false" data-classbutton="btn btn-default" data-classinput="form-control inline v-middle input-s" id="image1" style="position: absolute; clip: rect(0px, 0px, 0px, 0px);" tabindex="-1" type="file">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label" for="intro5">图片2</label>
+                                        <div class="col-sm-3">
+                                            <input ui-jq="filestyle" data-icon="false" data-classbutton="btn btn-default" data-classinput="form-control inline v-middle input-s" id="image2" style="position: absolute; clip: rect(0px, 0px, 0px, 0px);" tabindex="-1" type="file">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label" for="intro5">图片3</label>
+                                        <div class="col-sm-3">
+                                            <input ui-jq="filestyle" data-icon="false" data-classbutton="btn btn-default" data-classinput="form-control inline v-middle input-s" id="image3" style="position: absolute; clip: rect(0px, 0px, 0px, 0px);" tabindex="-1" type="file">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label" for="intro5">图片4</label>
+                                        <div class="col-sm-3">
+                                            <input ui-jq="filestyle" data-icon="false" data-classbutton="btn btn-default" data-classinput="form-control inline v-middle input-s" id="image4" style="position: absolute; clip: rect(0px, 0px, 0px, 0px);" tabindex="-1" type="file">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label" for="intro5">图片5</label>
+                                        <div class="col-sm-3">
+                                            <input ui-jq="filestyle" data-icon="false" data-classbutton="btn btn-default" data-classinput="form-control inline v-middle input-s" id="image5" style="position: absolute; clip: rect(0px, 0px, 0px, 0px);" tabindex="-1" type="file">
+                                        </div>
+                                    </div>
+
+
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label" for="file1">文件1</label>
+                                        <div class="col-sm-1">
+                                            <input class='form-control' type='text' ng-model="file1_name"  name="file1_name" placeholder="文件显示名称" />
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <input ui-jq="filestyle" data-icon="false" data-classbutton="btn btn-default" data-classinput="form-control inline v-middle input-s" id="file1" style="position: absolute; clip: rect(0px, 0px, 0px, 0px);" tabindex="-1" type="file">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label" for="file2">文件2</label>
+                                        <div class="col-sm-1">
+                                            <input class='form-control' type='text' ng-model="file2_name"  name="file2_name" placeholder="文件显示名称" />
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <input ui-jq="filestyle" data-icon="false" data-classbutton="btn btn-default" data-classinput="form-control inline v-middle input-s" id="file2" style="position: absolute; clip: rect(0px, 0px, 0px, 0px);" tabindex="-1" type="file">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label" for="file3">文件3</label>
+                                        <div class="col-sm-1">
+                                            <input class='form-control' type='text' ng-model="file3_name"  name="file3_name" placeholder="文件显示名称" />
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <input ui-jq="filestyle" data-icon="false" data-classbutton="btn btn-default" data-classinput="form-control inline v-middle input-s" id="file3" style="position: absolute; clip: rect(0px, 0px, 0px, 0px);" tabindex="-1" type="file">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label" for="file4">文件4</label>
+                                        <div class="col-sm-1">
+                                            <input class='form-control' type='text' ng-model="file4_name"  name="file4_name" placeholder="文件显示名称" />
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <input ui-jq="filestyle" data-icon="false" data-classbutton="btn btn-default" data-classinput="form-control inline v-middle input-s" id="file5" style="position: absolute; clip: rect(0px, 0px, 0px, 0px);" tabindex="-1" type="file">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label" for="file5">文件5</label>
+                                        <div class="col-sm-1">
+                                            <input class='form-control' type='text' ng-model="file5_name"  name="file5_name" placeholder="文件显示名称" />
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <input ui-jq="filestyle" data-icon="false" data-classbutton="btn btn-default" data-classinput="form-control inline v-middle input-s" id="file5" style="position: absolute; clip: rect(0px, 0px, 0px, 0px);" tabindex="-1" type="file">
+                                        </div>
+                                    </div>
+                                    <div class="line line-dashed b-b line-lg pull-in"></div>
+
+                                    <div class="form-group">
+                                        <label for="submit" class="col-sm-3 control-label sr-only"></label>
+                                        <div class="col-sm-3">
+                                            <button type="button" class="btn btn-success">保存</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

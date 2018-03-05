@@ -1,0 +1,55 @@
+<script>
+    app.controller("creditcardHomeController",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "$state",
+            "entity",
+            function ($rootScope, $scope, $http, $stateParams, $state, entity) {
+
+                $scope.id = $stateParams.id;
+
+                $scope.profile     = {};
+                $scope.canActs     = [];
+                $scope.canFileActs = [];
+
+                $scope.getProfile = function () {
+
+                    entity.getDetail("/rest/creditcards/" + $scope.id, ["createdBy", "state", "role", "createdByDepartment", "lastModifiedBy", "workflow"]).then(function (resResult) {
+
+                        $scope.profile = resResult;
+
+                        angular.forEach($scope.profile.currentUserCanActList, function (val, key) {
+                            if (val.actGroup === "UPDATE" || val.actGroup === "OPERATE" || val.actGroup === "FILE_PACKAGE") {
+                                $scope.canActs.push(val);
+                            } else if (val.actGroup === "FILE_OPERATE") {
+                                $scope.canFileActs.push(val)
+                            }
+                        });
+
+                        $scope.state_code = $scope.profile.state.stateCode;
+
+                    });
+                };
+
+                $scope.getProfile();
+
+
+                /*大方法的对象*/
+                $scope.creditcardExcute = {};
+
+            }
+        ]
+    );
+</script>
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light" ng-controller="creditcardHomeController">
+    <!-- column -->
+    <div class="col w-md lter b-l">
+        <div class="h-full" ui-view></div>
+    </div>
+    <!-- /column -->
+</div>
+<!-- /hbox layout -->

@@ -1,0 +1,165 @@
+<script>
+    /*
+     * 创建人：刘雅倩
+     * 创建时间：2017/07/31
+     * 全国贷款报表
+     *
+     * */
+    "use strict";
+    app.controller("countryRegionCtrl",
+        [
+            "$scope",
+            function ($scope) {
+//                  测试用的
+
+                $scope.branchList = [
+                    {
+                        employee: "上海1",
+                        pickup: "560000",
+                        dispatch: "5120000"
+                    },
+                    {
+                        employee: "上海1",
+                        pickup: "560000",
+                        dispatch: "5120000"
+                    },
+                    {
+                        employee: "上海1",
+                        pickup: "560000",
+                        dispatch: "5120000"
+                    },
+                    {
+                        employee: "上海1",
+                        pickup: "560000",
+                        dispatch: "5120000"
+                    }
+                ]
+
+//                echarts，数据是假的
+                $scope.brandChart = echarts.init(document.getElementById('branch_dashboard_chart'));
+
+                $scope.option = {
+                    title : {
+                        text: '全国贷款报表'
+                    },
+                    tooltip : {
+                        trigger: 'axis'
+                    },
+                    legend: {
+                        data:['贷款金额', '还款金额']
+                    },
+                    toolbox: {
+                        show : true,
+                        feature : {
+                            mark : {show: true},
+                            dataView : {show: true, readOnly: false},
+                            magicType: {show: true, type: ['line', 'bar']},
+                            restore : {show: true},
+                            saveAsImage : {show: true}
+                        }
+                    },
+                    calculable : true,
+                    xAxis : [
+                        {
+                            type : 'value',
+                            boundaryGap : [0, 0.01]
+                        }
+                    ],
+                    yAxis : [
+                        {
+                            type : 'category',
+                            data : [' 上海',' 上海',' 上海',' 上海',' 上海',' 上海']
+                        }
+                    ],
+                    series : [
+                        {
+                            name:'贷款金额',
+                            type:'bar',
+                            data:[18203, 23489, 29034, 104970, 131744, 230230]
+                        },
+                        {
+                            name:'还款金额',
+                            type:'bar',
+                            data:[19325, 23438, 31000, 121594, 134141, 281807]
+                        }
+                    ]
+                };
+
+                $scope.brandChart.setOption($scope.option);
+
+                //窗口大小改变时重新绘制图表
+                $(window).resize(function () {
+                    $scope.brandChart.resize();
+                });
+            }
+        ]
+    );
+</script>
+
+<div class="hbox hbox-auto-xs lter" ng-controller="countryRegionCtrl">
+    <!-- column -->
+    <div class="col">
+        <div class="vbox">
+            <div class="bg-light lter b-b clearfix" style="padding: 14px 20px;">
+                <!--<select class="pull-left m-r-sm input-sm form-control w-sm inline v-middle"-->
+                        <!--ng-options="branch.name for branch in branchList"-->
+                        <!--ng-model="branch">-->
+                    <!--<option value=""> &#45;&#45;请选择&#45;&#45; </option>-->
+                <!--</select>-->
+                <div class="btn-group">
+                    <button type="button" class="m-r btn btn-sm btn-addon btn-info">
+                        <i class="fa fa-plus" ng-class="iconClass[btn]"></i><span tanslate="">打印</span>
+                    </button>
+                </div>
+                <div class="pull-right">
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-default" ng-click="changeView($event)">今天</button>
+                        <button class="btn btn-sm btn-default" ng-click="changeView($event)">昨天</button>
+                        <button class="btn btn-sm btn-default" ng-click="changeView($event)">前天</button>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-default" ng-click="changeView('agendaDay')">本周</button>
+                        <button class="btn btn-sm btn-default" ng-click="changeView('agendaWeek')">上周</button>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-default" ng-click="changeView('month')">本月</button>
+                        <button class="btn btn-sm btn-default" ng-click="changeView('month')">上月</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner wrapper-md">
+                        <div style="padding-top: 0;">
+                            <div class="panel wrapper">
+                                <div id="branch_dashboard_chart" style="height:400px;"></div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="table-responsive">
+                                <table class="table table-striped b-t b-light">
+                                    <thead>
+                                        <tr>
+                                            <th>地区</th>
+                                            <th>贷款金额</th>
+                                            <th>还款金额</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="list in branchList">
+                                            <td><span class="pull-left waybill_item_number"><a ui-sref="release.detail({id:waybill.id})">{{ list.employee}}</a></span></td>
+                                            <td class="report_amount"><span class="text-ellipsis">{{ list.pickup }}</span></td>
+                                            <td class="report_amount"><span class="text-ellipsis">{{ list.dispatch }}</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,207 @@
+<script>
+    /*
+     * 创建人：刘雅倩
+     * 创建时间：2017/07/31
+     * 公司客户质量分析图
+     *
+     * */
+    "use strict";
+    app.controller("companyQualityCtrl",
+        [
+            "$scope",
+            function ($scope) {
+//                  测试用的
+
+                $scope.branchList = [
+                    {
+                        name: "",
+                        employee: "上海1",
+                        pickup: "560000",
+                        dispatch: "5120000"
+                    },
+                    {
+                        name: "",
+                        employee: "上海1",
+                        pickup: "560000",
+                        dispatch: "5120000"
+                    },
+                    {
+                        name: "",
+                        employee: "上海1",
+                        pickup: "560000",
+                        dispatch: "5120000"
+                    },
+                    {
+                        name: "",
+                        employee: "上海1",
+                        pickup: "560000",
+                        dispatch: "5120000"
+                    }
+                ]
+
+//                echarts，数据是假的
+                $scope.brandChart = echarts.init(document.getElementById('branch_dashboard_chart'));
+
+                $scope.option = {
+                    title: {
+                        text: '公司客户质量分析图'
+                    },
+                    tooltip : {
+                        trigger: 'axis',
+                        axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+                            type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                        },
+                        formatter: function (params) {
+                            var tar;
+                            if (params[1].value != '-') {
+                                tar = params[1];
+                            }
+                            else {
+                                tar = params[0];
+                            }
+                            return tar.name + '<br/>' + tar.seriesName + ' : ' + tar.value;
+                        }
+                    },
+                    legend: {
+                        data:['信用值','风险值']
+                    },
+                    toolbox: {
+                        show : true,
+                        feature : {
+                            mark : {show: true},
+                            dataView : {show: true, readOnly: false},
+                            magicType: {show: true, type: ['line', 'bar']},
+                            restore : {show: true},
+                            saveAsImage : {show: true}
+                        }
+                    },
+                    xAxis : [
+                        {
+                            type : 'category',
+                            splitLine: {show:false},
+                            data :   function (){
+                                var list = ['上海','杭州','重庆','香港','哈密','上海','杭州','重庆','香港','哈密','杭州','重庆','香港','哈密'];
+                                return list;
+                            }()
+                        }
+                    ],
+                    yAxis : [
+                        {
+                            type : 'value'
+                        }
+                    ],
+                    series : [
+                        {
+                            name:'辅助',
+                            type:'bar',
+                            stack: '总量',
+                            itemStyle:{
+                                normal:{
+                                    barBorderColor:'rgba(0,0,0,0)',
+                                    color:'rgba(0,0,0,0)'
+                                },
+                                emphasis:{
+                                    barBorderColor:'rgba(0,0,0,0)',
+                                    color:'rgba(0,0,0,0)'
+                                }
+                            },
+                            data:[0, 900, 1245, 1530, 1376, 1376, 1511, 1689, 1856, 1495, 1292, 1511, 1689]
+                        },
+                        {
+                            name:'信用值',
+                            type:'bar',
+                            stack: '总量',
+                            itemStyle : { normal: {label : {show: true, position: 'top'}}},
+                            data:[900, 345, 393, '-', '-', 135, 178, 286, '-', '-', '-',178, 286]
+                        },
+                        {
+                            name:'风险值',
+                            type:'bar',
+                            stack: '总量',
+                            itemStyle : { normal: {label : {show: true, position: 'bottom'}}},
+                            data:['-', '-', '-', 108, 154, '-', '-', '-', 119, 361, 203, '-', '-']
+                        }
+                    ]
+                };
+
+
+                $scope.brandChart.setOption($scope.option);
+
+                //窗口大小改变时重新绘制图表
+                $(window).resize(function () {
+                    $scope.brandChart.resize();
+                });
+            }
+        ]
+    );
+</script>
+
+<div class="hbox hbox-auto-xs lter" ng-controller="companyQualityCtrl">
+    <!-- column -->
+    <div class="col">
+        <div class="vbox">
+            <div class="bg-light lter b-b clearfix" style="padding: 14px 20px;">
+                <div class="btn-group">
+                    <select class="pull-left m-r-sm input-sm form-control w-sm inline v-middle"
+                            ng-options="branch.name for branch in branchList"
+                            ng-model="branch">
+                        <option value="">--请选择区域--</option>
+                    </select>
+                </div>
+                <!--<div class="btn-group">-->
+                    <!--<button type="button" class="m-r btn btn-sm btn-addon btn-info">-->
+                        <!--<i class="fa fa-plus" ng-class="iconClass[btn]"></i><span tanslate="">打印</span>-->
+                    <!--</button>-->
+                <!--</div>-->
+                <div class="pull-right">
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-default" ng-click="changeView($event)">今天</button>
+                        <button class="btn btn-sm btn-default" ng-click="changeView($event)">昨天</button>
+                        <button class="btn btn-sm btn-default" ng-click="changeView($event)">前天</button>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-default" ng-click="changeView('agendaDay')">本周</button>
+                        <button class="btn btn-sm btn-default" ng-click="changeView('agendaWeek')">上周</button>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-default" ng-click="changeView('month')">本月</button>
+                        <button class="btn btn-sm btn-default" ng-click="changeView('month')">上月</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner wrapper-md">
+                        <div style="padding-top: 0;">
+                            <div class="panel wrapper">
+                                <div id="branch_dashboard_chart" style="height:500px;"></div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="table-responsive">
+                                <table class="table table-striped b-t b-light">
+                                    <thead>
+                                    <tr>
+                                        <th>公司</th>
+                                        <th>信用值</th>
+                                        <th>风险值</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="list in branchList">
+                                        <td><span class="pull-left waybill_item_number"><a ui-sref="release.detail({id:waybill.id})">{{ list.employee}}</a></span></td>
+                                        <td class="report_amount"><span class="text-ellipsis">{{ list.pickup }}</span></td>
+                                        <td class="report_amount"><span class="text-ellipsis">{{ list.dispatch }}</span></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

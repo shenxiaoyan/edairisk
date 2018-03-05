@@ -1,0 +1,64 @@
+<script>
+    "use strict";
+    app.controller("departmentHomeController",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "$state",
+            "entity",
+            function ($rootScope, $scope, $http, $stateParams, $state, entity) {
+
+                $scope.id = $stateParams.id;
+
+                $scope.profile     = {};
+                $scope.canActs     = [];
+                $scope.canFileActs = [];
+                $scope.userListUrl = "/rest/users/search/findAllByDepartment_Id?sort=id&size=20&departmentId=" + $scope.id;
+
+                /*
+                 * 获取实体详情
+                 * @author  金杭
+                 * */
+                entity.getDetail("/rest/departments/" + $scope.id, ["createdBy", "state", "createdByDepartment", "lastModifiedBy"]).then(function (resResult) {
+
+                    $scope.profile = resResult;
+
+                    //对实体的行为进行分类显示
+                    angular.forEach($scope.profile.currentUserCanActList, function (val, key) {
+                        if (val.actGroup == "UPDATE") {
+                            $scope.canActs.push(val);
+                        } else if (val.actGroup == "FILE_OPERATE") {
+                            $scope.canFileActs.push(val)
+                        }
+                    });
+
+                    //获取当前状态
+                    $scope.state_code = $scope.profile.state.stateCode;
+
+                });
+
+                /*大方法的对象*/
+                $scope.departmentExcute = {
+                    "update": function () {
+                        $state.go("auditEntity.home.profile.form", {
+                            id: $scope.id,
+                            entity_key: "department"
+                        }, {reload: false});
+                    }
+                };
+
+            }
+        ]
+    );
+</script>
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light" ng-controller="departmentHomeController">
+    <!-- column -->
+    <div class="col w-md lter b-l">
+        <div class="h-full" ui-view></div>
+    </div>
+    <!-- /column -->
+</div>
+<!-- /hbox layout -->

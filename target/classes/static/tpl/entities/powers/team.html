@@ -1,0 +1,267 @@
+<script>
+    /*
+     * 创建人：刘雅倩
+     * 创建时间：2017/07/31
+     * 团队人员权限分布
+     *
+     * */
+    "use strict";
+    app.controller("teamCtrl",
+        [
+            "$scope",
+            function ($scope) {
+//                  测试用的
+
+//                $scope.branchList = [
+//                    {
+//                        name: "康桥网点",
+//                        employee: "上海1",
+//                        pickup: "560000",
+//                        dispatch: "5120000"
+//                    },
+//                    {
+//                        name: "城西网点",
+//                        employee: "上海1",
+//                        pickup: "560000",
+//                        dispatch: "5120000"
+//                    },
+//                    {
+//                        name: "滨江网点",
+//                        employee: "上海1",
+//                        pickup: "560000",
+//                        dispatch: "5120000"
+//                    },
+//                    {
+//                        name: "萧山网点",
+//                        employee: "上海1",
+//                        pickup: "560000",
+//                        dispatch: "5120000"
+//                    }
+//                ];
+//                echarts，数据是假的
+                $scope.brandChart = echarts.init(document.getElementById('branch_dashboard_chart'));
+
+                var labelTop = {
+                    normal : {
+                        label : {
+                            show : true,
+                            position : 'center',
+                            formatter : '{b}',
+                            textStyle: {
+                                baseline : 'bottom'
+                            }
+                        },
+                        labelLine : {
+                            show : false
+                        }
+                    }
+                };
+                var labelFromatter = {
+                    normal : {
+                        label : {
+                            formatter : function (params){
+                                return 100 - params.value + '%'
+                            },
+                            textStyle: {
+                                baseline : 'top'
+                            }
+                        }
+                    }
+                };
+                var labelBottom = {
+                    normal : {
+                        color: '#ccc',
+                        label : {
+                            show : true,
+                            position : 'center'
+                        },
+                        labelLine : {
+                            show : false
+                        }
+                    },
+                    emphasis: {
+                        color: 'rgba(0,0,0,0)'
+                    }
+                };
+                var radius = [40, 55];
+               $scope.option = {
+                    legend: {
+                        x : 'center',
+                        y : '80%',
+                        data:[
+                            '增加','删除','查询','更改','取消'
+                        ]
+                    },
+                    title : {
+                        text: '团队人员权限分布',
+                        subtext: '上海公司团队',
+                        x: 'center'
+                    },
+                    toolbox: {
+                        show : true,
+                        feature : {
+                            dataView : {show: true, readOnly: false},
+                            magicType : {
+                                show: true,
+                                type: ['pie', 'funnel'],
+                                option: {
+                                    funnel: {
+                                        width: '20%',
+                                        height: '30%',
+                                        itemStyle : {
+                                            normal : {
+                                                label : {
+                                                    formatter : function (params){
+                                                        return 'other\n' + params.value + '%\n'
+                                                    },
+                                                    textStyle: {
+                                                        baseline : 'middle'
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            restore : {show: true},
+                            saveAsImage : {show: true}
+                        }
+                    },
+                    series : [
+                        {
+                            type : 'pie',
+                            center : ['10%', '50%'],
+                            radius : radius,
+                            x: '0%', // for funnel
+                            itemStyle : labelFromatter,
+                            data : [
+                                {name:'other', value:46, itemStyle : labelBottom},
+                                {name:'增加', value:54,itemStyle : labelTop}
+                            ]
+                        },
+                        {
+                            type : 'pie',
+                            center : ['30%', '50%'],
+                            radius : radius,
+                            x:'20%', // for funnel
+                            itemStyle : labelFromatter,
+                            data : [
+                                {name:'other', value:56, itemStyle : labelBottom},
+                                {name:'删除', value:44,itemStyle : labelTop}
+                            ]
+                        },
+                        {
+                            type : 'pie',
+                            center : ['50%', '50%'],
+                            radius : radius,
+                            x:'40%', // for funnel
+                            itemStyle : labelFromatter,
+                            data : [
+                                {name:'other', value:65, itemStyle : labelBottom},
+                                {name:'查询', value:35,itemStyle : labelTop}
+                            ]
+                        },
+                        {
+                            type : 'pie',
+                            center : ['70%', '50%'],
+                            radius : radius,
+                            x:'60%', // for funnel
+                            itemStyle : labelFromatter,
+                            data : [
+                                {name:'other', value:70, itemStyle : labelBottom},
+                                {name:'更改', value:30,itemStyle : labelTop}
+                            ]
+                        },
+                        {
+                            type : 'pie',
+                            center : ['90%', '50%'],
+                            radius : radius,
+                            x:'80%', // for funnel
+                            itemStyle : labelFromatter,
+                            data : [
+                                {name:'other', value:73, itemStyle : labelBottom},
+                                {name:'取消', value:27,itemStyle : labelTop}
+                            ]
+                        }
+                    ]
+                };
+
+
+                $scope.brandChart.setOption($scope.option);
+
+                //窗口大小改变时重新绘制图表
+                $(window).resize(function () {
+                    $scope.brandChart.resize();
+                });
+            }
+        ]
+    );
+</script>
+
+<div class="hbox hbox-auto-xs lter" ng-controller="teamCtrl">
+    <!-- column -->
+    <div class="col">
+        <div class="vbox">
+            <div class="bg-light lter b-b clearfix" style="padding: 14px 20px;">
+                <select class="pull-left m-r-sm input-sm form-control w-sm inline v-middle"
+                        ng-options="branch.name for branch in branchList"
+                        ng-model="branch">
+                    <option value=""> --请选择-- </option>
+                </select>
+                <!--<div class="btn-group">-->
+                    <!--<button type="button" class="m-r btn btn-sm btn-addon btn-info">-->
+                        <!--<i class="fa fa-plus" ng-class="iconClass[btn]"></i><span tanslate="">打印</span>-->
+                    <!--</button>-->
+                <!--</div>-->
+                <div class="pull-right">
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-default" ng-click="changeView($event)">今天</button>
+                        <button class="btn btn-sm btn-default" ng-click="changeView($event)">昨天</button>
+                        <button class="btn btn-sm btn-default" ng-click="changeView($event)">前天</button>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-default" ng-click="changeView('agendaDay')">本周</button>
+                        <button class="btn btn-sm btn-default" ng-click="changeView('agendaWeek')">上周</button>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-default" ng-click="changeView('month')">本月</button>
+                        <button class="btn btn-sm btn-default" ng-click="changeView('month')">上月</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner wrapper-md">
+                        <div style="padding-top: 0;">
+                            <div class="panel wrapper">
+                                <div id="branch_dashboard_chart" style="height:400px;"></div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="table-responsive">
+                                <table class="table table-striped b-t b-light">
+                                    <thead>
+                                        <tr>
+                                            <th>团队</th>
+                                            <th>人员</th>
+                                            <th>权限</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="list in branchList">
+                                            <td><span class="pull-left waybill_item_number"><a>{{ list.employee}}</a></span></td>
+                                            <td class="report_amount"><span class="text-ellipsis">{{ list.pickup }}</span></td>
+                                            <td class="report_amount"><span class="text-ellipsis">{{ list.dispatch }}</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,47 @@
+<script>
+
+    "use strict";
+    app.controller("storeReportCtrl", [
+        "$scope",
+        function ($scope) {
+            $scope.groupList = [
+                {
+                    id: "",
+                    name: "产品贷款报表",
+                    sref: "storeProductReport.page({view_type:'loan'})"
+                },
+                {
+                    id: "",
+                    name: "产品还款报表",
+                    sref: "storeProductReport.page({view_type:'repayment'})"
+                },
+                {
+                    id: "",
+                    name: "信用卡数量统计",
+                    sref: "storeProductReport.page({view_type:'credit'})"
+                }
+            ]
+        }
+    ]);
+</script>
+
+<div class="hbox hbox-auto-xs hbox-auto-sm" ng-controller="storeReportCtrl">
+    <div class="col w-md bg-light dk b-r bg-auto hidden-sm hidden-xs">
+        <div class="wrapper-md b-b bg-light">
+            <div class="font-thin h4">
+                门店报表
+            </div>
+        </div>
+        <div class="wrapper-md">
+            <ul class="nav nav-pills nav-stacked nav-sm">
+                <li ui-sref-active="active"
+                    ng-repeat="list in groupList">
+                    <a ui-sref="{{ list.sref }}">{{list.name}}</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="col">
+        <div class="hbox hbox-auto-xs bg-light" ui-view></div>
+    </div>
+</div>
